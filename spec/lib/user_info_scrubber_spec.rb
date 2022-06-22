@@ -5,29 +5,69 @@ def scrub_user_details(user)(user)
 end
 
 describe UserInfoScrubber do
-  describe '::scrub_personal_info!' do
+  describe '::scrub_personal_info!', :focus do
     context "when using an active user" do
       let(:user) { create(:user, current_sign_in_ip: '1.2.3.4', last_sign_in_ip: '1.2.3.5', tsv: 'foo', private_profile: false, nasa_email_communication: true) }
 
-      subject(:changes) do
-        -> { described_class.scrub_personal_info!(user) }
+      it 'scrubs the email' do
+        expect { described_class.scrub_personal_info!(user) }.to change(user, :email)
       end
 
-      it { is_expected.to change(user, :email) }
-      it { is_expected.to change(user, :current_sign_in_ip).to(nil) }
-      it { is_expected.to change(user, :last_sign_in_ip).to(nil) }
-      it { is_expected.to change(user, :display_name).to("Deleted user #{user.id}") }
-      it { is_expected.to change(user, :login).to("deleted-#{user.id}") }
-      it { is_expected.to change(user, :credited_name).to(nil) }
-      it { is_expected.to change(user, :encrypted_password) }
-      it { is_expected.to change(user, :global_email_communication).to(false) }
-      it { is_expected.to change(user, :project_email_communication).to(false) }
-      it { is_expected.to change(user, :beta_email_communication).to(false) }
-      it { is_expected.to change(user, :nasa_email_communication).to(false) }
-      it { is_expected.to change(user, :valid_email).to(false) }
-      it { is_expected.to change(user, :private_profile).to(true) }
-      it { is_expected.to change(user, :api_key).to(nil) }
-      it { is_expected.to change(user, :tsv).to(nil) }
+      it 'scrubs the current_sign_in_ip' do
+        expect { described_class.scrub_personal_info!(user) }.to change(user, :current_sign_in_ip).to(nil)
+      end
+
+      it 'scrubs the last_sign_in_ip' do
+        expect { described_class.scrub_personal_info!(user) }.to change(user, :last_sign_in_ip).to(nil)
+      end
+
+      it 'scrubs the display_name' do
+        expect { described_class.scrub_personal_info!(user) }.to change(user, :display_name).to("Deleted user #{user.id}")
+      end
+
+      it 'scrubs the login' do
+        expect { described_class.scrub_personal_info!(user) }.to change(user, :login).to("deleted-#{user.id}")
+      end
+
+      it 'scrubs the credited_name' do
+        expect { described_class.scrub_personal_info!(user) }.to change(user, :credited_name).to(nil)
+      end
+
+      it 'scrubs the encrypted_password' do
+        expect { described_class.scrub_personal_info!(user) }.to change(user, :encrypted_password)
+      end
+
+      it 'scrubs the global_email_communication' do
+        expect { described_class.scrub_personal_info!(user) }.to change(user, :global_email_communication).to(false)
+      end
+
+      it 'scrubs the project_email_communication' do
+        expect { described_class.scrub_personal_info!(user) }.to change(user, :project_email_communication).to(false)
+      end
+
+      it 'scrubs the beta_email_communication' do
+        expect { described_class.scrub_personal_info!(user) }.to change(user, :beta_email_communication).to(false)
+      end
+
+      it 'scrubs the nasa_email_communication' do
+        expect { described_class.scrub_personal_info!(user) }.to change(user, :nasa_email_communication).to(false)
+      end
+
+      it 'scrubs the valid_email' do
+        expect { described_class.scrub_personal_info!(user) }.to change(user, :valid_email).to(false)
+      end
+
+      it 'scrubs the private_profile' do
+        expect { described_class.scrub_personal_info!(user) }.to change(user, :private_profile).to(true)
+      end
+
+      it 'scrubs the api_key' do
+        expect { described_class.scrub_personal_info!(user) }.to change(user, :api_key).to(nil)
+      end
+
+      it 'scrubs the tsv' do
+        expect { described_class.scrub_personal_info!(user) }.to change(user, :tsv).to(nil)
+      end
     end
 
     context "when a previous user has been deleted" do
