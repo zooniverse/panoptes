@@ -36,9 +36,9 @@ module JsonApiController
       # and thus the resulting query cache key is different and we get a different etag value here
       # vs the provided one.
       #
-      # https://api.rubyonrails.org/classes/ActiveRecord/Relation.html#method-i-cache_key
+      # https://api.rubyonrails.org/v5.0/classes/ActiveRecord/Integration.html#method-i-cache_key
       # as opposed to the ActiveRecord::Relation which depends on the query sql
-      # https://api.rubyonrails.org/classes/ActiveRecord/Relation.html#method-i-cache_key
+      # https://api.rubyonrails.org/v5.0/classes/ActiveRecord/Relation.html#method-i-cache_key
       current_etag = gen_etag(query.to_a)
       current_etag = "W/#{current_etag}" if weak_etag?(precondition)
       current_etag != precondition
