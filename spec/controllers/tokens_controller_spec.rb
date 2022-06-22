@@ -27,7 +27,7 @@ describe TokensController, type: :controller do
 
       context "when supplying invalid user credentials" do
         it "it should respond with 401" do
-          post :create, params.merge!(login: "fake_login_name", password: "sekret")
+          post :create, params.merge!('login' => 'fake_login_name', 'password' => 'sekret')
           expect(response.status).to eq(401)
         end
       end
