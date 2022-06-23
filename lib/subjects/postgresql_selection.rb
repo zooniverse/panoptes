@@ -29,7 +29,7 @@ module Subjects
                           # default mode: do not select from training sets
                           workflow.non_training_subject_sets.pluck(:id)
                         end
-      if Gem::Version.new(Rails.version) > Gem::Version.new('5.0')
+      if Gem::Version.new(Rails.version) > Gem::Version.new('5.0') && Gem::Version.new(Rails.version) < Gem::Version.new('5.1')
         # Handle a bug when the rails 5.0 AR scope bind params merge in rails 5.0 (works find in 4.2)
         #
         # failed fix 1 - ensure the subject_set_id param clause is before the id clause
