@@ -1,7 +1,7 @@
 class Api::V1::WorkflowsController < Api::ApiController
   include JsonApiController::PunditPolicy
   include SyncResourceTranslationStrings
-  include MediumResponse
+  include ExportMediumResponse
 
   require_authentication :update, :create, :destroy, :retire_subjects, :create_classifications_export, :unretire_subjects, scopes: [:project]
 
@@ -60,7 +60,7 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   def create_classifications_export
     medium = CreateClassificationsExport.with( api_user: api_user, object: controlled_resource ).run!(params)
-    medium_response(medium)
+    export_medium_response(medium)
   end
 
   def publish
