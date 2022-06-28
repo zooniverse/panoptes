@@ -584,14 +584,13 @@ spec:
       targetPort: 11211
   type: NodePort
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: panoptes-production-ingress
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
     nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
     nginx.ingress.kubernetes.io/proxy-body-size: 20m
     nginx.ingress.kubernetes.io/set-real-ip-from: "10.0.0.0/8"
@@ -606,26 +605,36 @@ spec:
   - host: panoptes.azure.zooniverse.org
     http:
       paths:
-      - backend:
-          serviceName: panoptes-production-app
-          servicePort: 80
-        path: /(.*)
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: panoptes-production-app
+            port:
+              number: 80
+
   - host: panoptes.zooniverse.org
     http:
       paths:
-      - backend:
-          serviceName: panoptes-production-app
-          servicePort: 80
-        path: /(.*)
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: panoptes-production-app
+            port:
+              number: 80
   - host: signin.zooniverse.org
     http:
       paths:
-      - backend:
-          serviceName: panoptes-production-app
-          servicePort: 80
-        path: /(.*)
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: panoptes-production-app
+            port:
+              number: 80
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: www-panoptes-production-ingress
@@ -645,10 +654,13 @@ spec:
   - host: www-panoptes.zooniverse.org
     http:
       paths:
-      - backend:
-          serviceName: panoptes-production-app
-          servicePort: 80
+      - pathType: Prefix
         path: /
+        backend:
+          service:
+            name: panoptes-production-app
+            port:
+              number: 80
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate

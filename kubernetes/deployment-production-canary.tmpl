@@ -1,21 +1,21 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: panoptes-staging-azure-canary-app
+  name: panoptes-production-canary-app
   labels:
-    app: panoptes-staging-azure-canary-app
+    app: panoptes-production-canary-app
 spec:
   replicas: 0
   selector:
     matchLabels:
-      app: panoptes-staging-azure-canary-app
+      app: panoptes-production-canary-app
   template:
     metadata:
       labels:
-        app: panoptes-staging-azure-canary-app
+        app: panoptes-production-canary-app
     spec:
       containers:
-        - name: panoptes-staging-azure-canary-app
+        - name: panoptes-production-canary-app
           image: ghcr.io/zooniverse/panoptes:__IMAGE_TAG__
           resources:
             requests:
@@ -23,7 +23,7 @@ spec:
               cpu: "50m"
             limits:
               memory: "700Mi"
-              cpu: "1000m"
+              cpu: "500m"
           livenessProbe:
             httpGet:
               path: /
@@ -43,27 +43,24 @@ spec:
           - name: PG_STATEMENT_TIMEOUT
             value: '65000'
           - name: STORAGE_ADAPTER
-            value: azure
-          - name:  STORAGE_URL
-            value: 'https://panoptes-uploads-staging.zooniverse.org/'
           envFrom:
           - secretRef:
               name: panoptes-common-env-vars
           - secretRef:
-              name: panoptes-staging-env-vars
+              name: panoptes-production-env-vars
           - configMapRef:
-              name: panoptes-staging-shared
+              name: panoptes-production-shared
           volumeMounts:
             - name: static-assets
               mountPath: "/static-assets"
-            - name: jwt-staging
+            - name: jwt-production
               mountPath: "/rails_app/config/keys"
               readOnly: true
           lifecycle:
             postStart:
               exec:
                 command: ["/bin/bash", "-c", "cp -R /rails_app/public/* /static-assets"]
-        - name: panoptes-staging-nginx
+        - name: panoptes-production-nginx
           image: zooniverse/nginx
           resources:
             requests:
@@ -106,35 +103,35 @@ spec:
         - name: static-assets
           hostPath:
             # directory location on host node temp disk
-            path: /mnt/panoptes-staging-app-static-assets
+            path: /mnt/panoptes-production-app-static-assets
             type: DirectoryOrCreate
         - name: panoptes-nginx-config
           configMap:
-            name: panoptes-nginx-conf-staging
+            name: panoptes-nginx-conf-production
         - name: panoptes-nginx-common
           configMap:
-            name: panoptes-nginx-common-conf-staging
-        - name: jwt-staging
+            name: panoptes-nginx-common-conf-production
+        - name: jwt-production
           secret:
-            secretName: panoptes-doorkeeper-jwt-staging
+            secretName: panoptes-doorkeeper-jwt-production
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: panoptes-staging-canary
+  name: panoptes-production-canary
 spec:
   selector:
-    app: panoptes-staging-azure-canary-app
+    app: panoptes-production-canary-app
   ports:
     - protocol: TCP
       port: 80
       targetPort: 80
   type: NodePort
 ---
-apiVersion: extensions/v1beta1
+aapiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: panoptes-staging-azure-canary-ingress
+  name: panoptes-production-canary-ingress
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/canary: "true"
@@ -143,13 +140,16 @@ metadata:
 spec:
   tls:
   - hosts:
-    - panoptes-staging.zooniverse.org
-    secretName: panoptes-staging-tls-secret
+    - panoptes.zooniverse.org
+    secretName: panoptes-production-tls-secret
   rules:
-  - host: panoptes-staging.zooniverse.org
+  - host: panoptes.zooniverse.org
     http:
       paths:
-      - backend:
-          serviceName: panoptes-staging-canary
-          servicePort: 80
-        path: /(.*)
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: panoptes-production-canary
+            port:
+              number: 80

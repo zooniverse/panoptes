@@ -557,10 +557,13 @@ spec:
   - host: panoptes-staging.zooniverse.org
     http:
       paths:
-      - backend:
-          serviceName: panoptes-staging-app
-          servicePort: 80
-        path: /(.*)
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: panoptes-staging-app
+            port:
+              number: 80
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
