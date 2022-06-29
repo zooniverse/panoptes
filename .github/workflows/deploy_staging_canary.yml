@@ -32,7 +32,7 @@ jobs:
         context: .
         file: Dockerfile.rails-next
         push: true
-        tags: ${{ github.sha }}-next,latest-next
+        tags: ghcr.io/zooniverse/panoptes:${{ github.sha }}-next
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
