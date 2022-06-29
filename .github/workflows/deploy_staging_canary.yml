@@ -45,5 +45,5 @@ jobs:
 
     - name: Modify & apply template
       run: |
-        sed "s/__IMAGE_TAG__/${{ github.sha }}/g" ./kubernetes/deployment-${{ inputs.environment }}-canary.tmpl \
+        sed "s/__IMAGE_TAG__/${{ github.sha }}/g" ./kubernetes/deployment-staging-canary.tmpl \
           | kubectl apply -f -
