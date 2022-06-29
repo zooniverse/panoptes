@@ -17,6 +17,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.rails-next
+      args:
+        RAILS_ENV: development
     volumes:
       - ./:/rails_app
       - gem_cache:/usr/local/bundle
