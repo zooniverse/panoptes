@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_and_push_image:
+  deploy_staging_canary:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
@@ -32,7 +32,7 @@ jobs:
         context: .
         file: Dockerfile.rails-next
         push: true
-        tags: ${{ github.sha }}-next,latest-next
+        tags: ghcr.io/zooniverse/panoptes:${{ github.sha }}-next
         cache-from: type=gha
         cache-to: type=gha,mode=max
 
