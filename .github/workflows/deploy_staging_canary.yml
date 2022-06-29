@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 jobs:
-  build_and_push_image:
+  deploy_staging_canary:
     runs-on: ubuntu-latest
     steps:
     - name: Checkout
