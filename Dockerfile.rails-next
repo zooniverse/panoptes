@@ -12,18 +12,23 @@ RUN apt-get update && apt-get -y upgrade && \
     && \
     apt-get clean
 
-ADD ./Gemfile /rails_app/
-ADD ./Gemfile.lock /rails_app/
+# set a default RAILS_ENV for the build scripts
+# this is required for the `rake assets:precompile` script
+# to write assets to target dir set in `config.assets.prefix`
+ARG RAILS_ENV=production
+ENV RAILS_ENV=$RAILS_ENV
+
+ADD ./Gemfile.next /rails_app/
+ADD ./Gemfile.next.lock /rails_app/
+
+ENV BUNDLE_GEMFILE=Gemfile.next
 
 RUN bundle config --global jobs `cat /proc/cpuinfo | grep processor | wc -l | xargs -I % expr % - 1` && \
     bundle install
 
-ADD ./Gemfile.next /rails_app/
-ADD ./Gemfile.next.lock /rails_app/
-RUN next bundle install
-
 ADD ./ /rails_app
 
 RUN (cd /rails_app && mkdir -p tmp/pids && rm -f tmp/pids/*.pid)
+RUN (cd /rails_app && SECRET_KEY_BASE=1a bundle exec rake assets:precompile)
 
 CMD ["/rails_app/scripts/docker/start.sh"]
