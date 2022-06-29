@@ -21,6 +21,7 @@ ENV RAILS_ENV=$RAILS_ENV
 ADD ./Gemfile.next /rails_app/
 ADD ./Gemfile.next.lock /rails_app/
 
+# ensure we use the rails-next gemfile setup to ensure we boot the upgraded libaries
 ENV BUNDLE_GEMFILE=Gemfile.next
 
 RUN bundle config --global jobs `cat /proc/cpuinfo | grep processor | wc -l | xargs -I % expr % - 1` && \
