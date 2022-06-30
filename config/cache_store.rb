@@ -1,5 +1,9 @@
 module Panoptes
   module Cache
+    def self.servers
+      ENV.fetch('MEMCACHE_SERVERS', '')
+    end
+
     def self.enabled?
       ENV.key?('MEMCACHE_SERVERS')
     end
