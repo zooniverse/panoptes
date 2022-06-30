@@ -47,9 +47,15 @@ module Panoptes
     config.middleware.use Flipper::Middleware::Memoizer
 
     if Panoptes::Cache.enabled?
-      # use ENV MEMCACHE_SERVERS var to configure the servers
-      # https://github.com/petergoldstein/dalli#usage-with-rails-3x-and-4x
-      config.cache_store = :dalli_store, nil, Panoptes::Cache.options
+      if (_rails4 = Gem::Version.new(Rails.version) < Gem::Version.new('5.0'))
+        # use ENV MEMCACHE_SERVERS var to configure the servers
+        # https://github.com/petergoldstein/dalli#usage-with-rails-3x-and-4x
+        config.cache_store = :dalli_store, nil, Panoptes::Cache.options
+      else
+        # Rails 5 configuration of memcache and dalli
+        # https://github.com/petergoldstein/dalli/wiki/Using-Dalli-with-Rails#cache-store
+        config.cache_store = :mem_cache_store, Panoptes::Cache.servers, Panoptes::Cache.options
+      end
     end
   end
 end
