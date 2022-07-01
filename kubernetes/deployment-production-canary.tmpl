@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
         - name: panoptes-production-canary-app
-          image: ghcr.io/zooniverse/panoptes:__IMAGE_TAG__
+          image: ghcr.io/zooniverse/panoptes:__IMAGE_TAG__-next
           resources:
             requests:
               memory: "700Mi"
@@ -43,9 +43,6 @@ spec:
           - name: PG_STATEMENT_TIMEOUT
             value: '65000'
           - name: STORAGE_ADAPTER
-            value: azure
-          - name:  STORAGE_URL
-            value: 'https://panoptes-uploads-canary.zooniverse.org/'
           envFrom:
           - secretRef:
               name: panoptes-common-env-vars
@@ -131,10 +128,10 @@ spec:
       targetPort: 80
   type: NodePort
 ---
-apiVersion: extensions/v1beta1
+aapiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: panoptes-production-azure-canary-ingress
+  name: panoptes-production-canary-ingress
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/canary: "true"
@@ -149,7 +146,10 @@ spec:
   - host: panoptes.zooniverse.org
     http:
       paths:
-      - backend:
-          serviceName: panoptes-production-canary
-          servicePort: 80
-        path: /(.*)
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: panoptes-production-canary
+            port:
+              number: 80

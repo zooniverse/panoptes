@@ -1,22 +1,22 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: panoptes-staging-azure-canary-app
+  name: panoptes-staging-canary-app
   labels:
-    app: panoptes-staging-azure-canary-app
+    app: panoptes-staging-canary-app
 spec:
-  replicas: 0
+  replicas: 1
   selector:
     matchLabels:
-      app: panoptes-staging-azure-canary-app
+      app: panoptes-staging-canary-app
   template:
     metadata:
       labels:
-        app: panoptes-staging-azure-canary-app
+        app: panoptes-staging-canary-app
     spec:
       containers:
-        - name: panoptes-staging-azure-canary-app
-          image: ghcr.io/zooniverse/panoptes:__IMAGE_TAG__
+        - name: panoptes-staging-canary-app
+          image: ghcr.io/zooniverse/panoptes:__IMAGE_TAG__-next
           resources:
             requests:
               memory: "700Mi"
@@ -42,10 +42,6 @@ spec:
           env:
           - name: PG_STATEMENT_TIMEOUT
             value: '65000'
-          - name: STORAGE_ADAPTER
-            value: azure
-          - name:  STORAGE_URL
-            value: 'https://panoptes-uploads-staging.zooniverse.org/'
           envFrom:
           - secretRef:
               name: panoptes-common-env-vars
@@ -124,17 +120,17 @@ metadata:
   name: panoptes-staging-canary
 spec:
   selector:
-    app: panoptes-staging-azure-canary-app
+    app: panoptes-staging-canary-app
   ports:
     - protocol: TCP
       port: 80
       targetPort: 80
   type: NodePort
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
-  name: panoptes-staging-azure-canary-ingress
+  name: panoptes-staging-canary-ingress
   annotations:
     kubernetes.io/ingress.class: nginx
     nginx.ingress.kubernetes.io/canary: "true"
@@ -149,7 +145,10 @@ spec:
   - host: panoptes-staging.zooniverse.org
     http:
       paths:
-      - backend:
-          serviceName: panoptes-staging-canary
-          servicePort: 80
-        path: /(.*)
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: panoptes-staging-canary
+            port:
+              number: 80
