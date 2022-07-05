@@ -17,7 +17,7 @@ describe DatabaseReplica do
 
     context 'with read replica feature flag on' do
       before do
-        Panoptes.flipper.enable(flipper_key)
+        Flipper.enable(flipper_key)
       end
 
       it 'uses standby gem to read from replica' do
@@ -54,7 +54,7 @@ describe DatabaseReplica do
 
     context 'with read replica feature flag on' do
       before do
-        Panoptes.flipper.enable(flipper_key)
+        Flipper.enable(flipper_key)
       end
 
       it 'uses standby gem to read from replica' do

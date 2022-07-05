@@ -65,7 +65,7 @@ RSpec.shared_examples 'dump worker' do |mailer_class, dump_type|
     end
 
     context "Dump workers are disabled" do
-      before { Panoptes.flipper[:dump_worker_exports].disable }
+      before { Flipper.disable(:dump_worker_exports) }
 
       it "raises an exception" do
         expect { worker.perform(resource.id, resource_type, medium.id) }.to raise_error(ApiErrors::FeatureDisabled)

@@ -32,6 +32,8 @@ RSpec.configure do |config|
 
   config.filter_run_excluding disabled: true
 
+  config.raise_errors_for_deprecations!
+
   Devise.mailer = Devise::Mailer
 
   # disable standby reads to deal with testing transaction isolation

@@ -9,7 +9,7 @@ class ClassificationsDumpWorker
   attr_reader :resource, :medium, :scope, :processor
 
   def perform(resource_id, resource_type, medium_id=nil, requester_id=nil, *args)
-    raise ApiErrors::FeatureDisabled unless Panoptes.flipper[:dump_worker_exports].enabled?
+    raise ApiErrors::FeatureDisabled unless Flipper.enabled?(:dump_worker_exports)
 
     if @resource = CsvDumps::FindsDumpResource.find(resource_type, resource_id)
       @medium = CsvDumps::FindsMedium.new(medium_id, @resource, dump_target).medium

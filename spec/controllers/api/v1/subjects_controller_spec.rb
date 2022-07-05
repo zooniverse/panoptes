@@ -508,7 +508,7 @@ describe Api::V1::SubjectsController, type: :controller do
     let(:api_resource_links) { [] }
     let(:sms) { create_list(:set_member_subject, 2, subject_set: subject_set) }
     let(:request_params) { { workflow_id: workflow.id.to_s, num_columns: 2, num_rows: 1, http_cache: 'true' } }
-    let(:flipper_feature) { Panoptes.flipper[:subject_group_selection].enable }
+    let(:flipper_feature) { Flipper.enable(:subject_group_selection) }
 
     before do
       ENV['SUBJECT_GROUP_UPLOADER_ID'] = workflow.owner.id.to_s
@@ -574,7 +574,7 @@ describe Api::V1::SubjectsController, type: :controller do
     end
 
     context 'when the feature flag is disabled for this end point' do
-      let(:flipper_feature) { Panoptes.flipper[:subject_group_selection].disable }
+      let(:flipper_feature) { Flipper.disable(:subject_group_selection) }
 
       it 'errors with 503' do
         expect(response.status).to eq(503)
@@ -594,7 +594,7 @@ describe Api::V1::SubjectsController, type: :controller do
     let(:request_params) do
       { workflow_id: workflow.id.to_s, ids: subject_ids.join(','), http_cache: 'true' }
     end
-    let(:flipper_feature) { Panoptes.flipper[:subject_selection_by_ids].enable }
+    let(:flipper_feature) { Flipper.enable(:subject_selection_by_ids) }
 
     before do
       subject_ids
@@ -630,7 +630,7 @@ describe Api::V1::SubjectsController, type: :controller do
     end
 
     context 'when the feature flag is disabled for this end point' do
-      let(:flipper_feature) { Panoptes.flipper[:subject_selection_by_ids].disable }
+      let(:flipper_feature) { Flipper.disable(:subject_selection_by_ids) }
 
       it 'errors with 503' do
         expect(response.status).to eq(503)
@@ -752,7 +752,7 @@ describe Api::V1::SubjectsController, type: :controller do
     end
 
     context "Uploading is disabled" do
-      before { Panoptes.flipper[:subject_uploading].disable }
+      before { Flipper.disable(:subject_uploading) }
 
       it "raises an error when uploading is disabled" do
         default_request user_id: authorized_user.id, scopes: scopes

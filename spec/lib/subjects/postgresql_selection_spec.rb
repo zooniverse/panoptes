@@ -8,7 +8,7 @@ RSpec.describe Subjects::PostgresqlSelection do
     end
   end
 
-  describe "selection" do
+  describe "selection", :focus do
     let(:user) { User.first }
     let(:workflow) { create(:workflow_with_subject_sets) }
     let(:sms) { SetMemberSubject.all }

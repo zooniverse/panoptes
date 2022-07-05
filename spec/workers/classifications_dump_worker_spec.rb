@@ -19,7 +19,7 @@ RSpec.describe ClassificationsDumpWorker do
 
     context "with standby read replica enabled" do
       before do
-        Panoptes.flipper["dump_data_from_read_replica"].enable
+        Flipper.enable(:dump_data_from_read_replica)
       end
 
       it_behaves_like "dump worker", ClassificationDataMailerWorker, "project_classifications_export" do

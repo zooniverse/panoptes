@@ -20,13 +20,13 @@ module Subjects
     private
 
     def select_non_retired
-      SetMemberSubject.non_retired_for_workflow(workflow)
+      SetMemberSubject.non_retired_for_workflow(workflow.id)
     end
 
     def select_non_retired_unseen_for_user
       SetMemberSubject.unseen_for_user_by_workflow(
-        user,
-        workflow
+        user.id,
+        workflow.id
       ).merge(select_non_retired)
     end
   end

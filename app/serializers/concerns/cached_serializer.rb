@@ -3,7 +3,7 @@ module CachedSerializer
 
   module ClassMethods
     def as_json(model, context)
-      if Panoptes.flipper["cached_serializer"].enabled?
+      if Flipper.enabled?(:cached_serializer)
         cache_key = serializer_cache_key(model, Digest::MD5.hexdigest(context.to_json))
 
         Rails.cache.fetch(cache_key) do

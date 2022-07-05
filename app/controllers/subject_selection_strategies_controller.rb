@@ -64,7 +64,7 @@ class SubjectSelectionStrategiesController < ApplicationController
   end
 
   def cache_response(expiration_time)
-    if Panoptes.flipper[:cellect_controller_caching].enabled?
+    if Flipper.enabled?(:cellect_controller_caching)
       expires_in expiration_time, public: true
     end
   end

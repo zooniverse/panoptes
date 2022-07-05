@@ -31,7 +31,7 @@ RSpec.describe SubjectMetadataWorker do
 
   describe "#perform" do
     it 'skips any work when the feature flag is on' do
-      Panoptes.flipper[:skip_subject_metadata_worker].enable
+      Flipper.enable(:skip_subject_metadata_worker)
       allow(ActiveRecord::Base).to receive(:connection)
       worker.perform(subject_set.id)
       expect(ActiveRecord::Base).not_to have_received(:connection)

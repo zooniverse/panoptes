@@ -38,7 +38,7 @@ describe SubjectSelectionStrategiesController, type: :controller do
       end
 
       it "returns a public cache header" do
-        Panoptes.flipper[:cellect_controller_caching].enable
+        Flipper.enable(:cellect_controller_caching)
         run_get
         cache_control = response.headers["Cache-Control"]
         expect(cache_control).to eq("max-age=600, public")
@@ -83,7 +83,7 @@ describe SubjectSelectionStrategiesController, type: :controller do
       end
 
       it "returns a public cache header" do
-        Panoptes.flipper[:cellect_controller_caching].enable
+        Flipper.enable(:cellect_controller_caching)
         run_get
         cache_control = response.headers["Cache-Control"]
         expect(cache_control).to eq("max-age=60, public")

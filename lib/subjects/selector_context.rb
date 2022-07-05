@@ -10,7 +10,7 @@ module Subjects
     end
 
     def format
-      if Panoptes.flipper[:skip_subject_selection_context].enabled?
+      if Flipper.enabled?(:skip_subject_selection_context)
         {}
       else
         {

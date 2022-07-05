@@ -6,7 +6,7 @@ class SubjectRemovalWorker
   sidekiq_options queue: :data_low
 
   def perform(subject_id)
-    if Panoptes.flipper["remove_orphan_subjects"].enabled?
+    if Flipper.enabled?(:remove_orphan_subjects)
       Subjects::Remover.new(subject_id).cleanup
     end
   end

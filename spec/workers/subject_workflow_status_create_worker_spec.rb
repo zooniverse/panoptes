@@ -12,7 +12,7 @@ RSpec.describe SubjectWorkflowStatusCreateWorker do
     SubjectWorkflowStatusCreateWorker.new
   end
 
-  before { Panoptes.flipper[:subject_workflow_status_create_worker].enable }
+  before { Flipper.enable(:subject_workflow_status_create_worker) }
 
   describe "#perform" do
     it "should not raise if the subject can't be found" do
