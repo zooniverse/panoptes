@@ -20,7 +20,7 @@ class SubjectSetImport::CsvImport
   end
 
   def each
-    return self.to_enum unless block_given?
+    return to_enum unless block_given?
 
     csv.each do |row|
       external_id = row['external_id']
