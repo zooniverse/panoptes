@@ -3,7 +3,7 @@
 require 'spec_helper'
 
 describe DatabaseReplica do
-  let(:flipper_key) { 'test_read_from_read_replica' }
+  let(:flipper_key) { :test_read_from_read_replica }
 
   before do
     allow(Standby).to receive(:on_standby).and_call_original
@@ -36,6 +36,12 @@ describe DatabaseReplica do
       allow(connection_double).to receive(:execute)
       connection_double
     end
+    let(:flipper_enabled_state) { false }
+
+    before do
+      # stub flipper here to avoid hitting the AR connection double we've got setup
+      allow(Flipper).to receive(:enabled?).with(flipper_key).and_return(flipper_enabled_state)
+    end
 
     it 'defaults to reading from the primary db' do
       described_class.read_without_timeout(flipper_key) { nil }
@@ -53,9 +59,7 @@ describe DatabaseReplica do
     # rubocop:enable RSpec/MultipleExpectations
 
     context 'with read replica feature flag on' do
-      before do
-        Flipper.enable(flipper_key)
-      end
+      let(:flipper_enabled_state) { true }
 
       it 'uses standby gem to read from replica' do
         described_class.read_without_timeout(flipper_key) { nil }
