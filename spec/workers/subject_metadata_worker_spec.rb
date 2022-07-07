@@ -31,7 +31,7 @@ RSpec.describe SubjectMetadataWorker do
 
   describe "#perform" do
     it 'skips any work when the feature flag is on' do
-      Flipper.enable(:skip_subject_metadata_worker)
+      allow(Flipper).to receive(:enabled?).with(:skip_subject_metadata_worker).and_return(true)
       allow(ActiveRecord::Base).to receive(:connection)
       worker.perform(subject_set.id)
       expect(ActiveRecord::Base).not_to have_received(:connection)
