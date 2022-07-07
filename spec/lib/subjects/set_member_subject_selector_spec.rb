@@ -43,7 +43,7 @@ describe Subjects::SetMemberSubjectSelector do
       it 'selects from the non retired remaining subjects' do
         allow(SetMemberSubject).to receive(:non_retired_for_workflow).and_call_original
         selector.set_member_subjects
-        expect(SetMemberSubject).to have_received(:non_retired_for_workflow) .with(workflow.id)
+        expect(SetMemberSubject).to have_received(:non_retired_for_workflow).with(workflow.id)
       end
     end
 
