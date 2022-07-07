@@ -136,6 +136,7 @@ class Api::V1::SubjectsController < Api::ApiController
 
   def create
     raise ApiErrors::FeatureDisabled unless Flipper.enabled?(:subject_uploading)
+
     super do |subject|
       user = subject.uploader
       user.increment_subjects_count_cache
