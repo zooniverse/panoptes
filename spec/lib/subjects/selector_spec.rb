@@ -152,7 +152,7 @@ RSpec.describe Subjects::Selector do
       end
 
       it "should notify selector to reload" do
-        Panoptes.flipper[:selector_sync_error_reload].enable
+        Flipper.enable(:selector_sync_error_reload)
         expect(NotifySubjectSelectorOfChangeWorker).to receive(:perform_async).with(workflow.id)
         subject.get_subject_ids
       end

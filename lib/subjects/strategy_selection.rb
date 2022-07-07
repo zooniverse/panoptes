@@ -15,7 +15,7 @@ module Subjects
     def select
       selected_ids = select_subject_ids.compact
 
-      if Panoptes.flipper[:remove_complete_subjects].enabled?
+      if Flipper.enabled?(:remove_complete_subjects)
         Subjects::CompleteRemover.new(
           user,
           workflow,

@@ -7,10 +7,7 @@ Rails.application.routes.draw do
 
   authenticate :user, lambda { |u| u.admin? } do
     mount Sidekiq::Web => '/sidekiq'
-    flipper_block = lambda {
-      Panoptes.flipper
-    }
-    mount Flipper::UI.app(flipper_block) => '/flipper'
+    mount Flipper::UI.app(Flipper) => '/flipper'
   end
 
   post '/graphql', to: 'graphql#execute'

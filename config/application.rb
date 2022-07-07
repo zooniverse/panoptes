@@ -43,9 +43,6 @@ module Panoptes
       end
     end
 
-    config.middleware.use Flipper::Middleware::SetupEnv, -> { Panoptes.flipper }
-    config.middleware.use Flipper::Middleware::Memoizer
-
     if Panoptes::Cache.enabled?
       if (_rails4 = Gem::Version.new(Rails.version) < Gem::Version.new('5.0'))
         # use ENV MEMCACHE_SERVERS var to configure the servers

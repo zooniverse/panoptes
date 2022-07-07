@@ -197,7 +197,7 @@ describe ClassificationLifecycle do
     end
 
     it "should notify the subject selector" do
-      allow(Panoptes.flipper).to receive(:enabled?).with("cellect").and_return(true)
+      allow(Flipper).to receive(:enabled?).with(:cellect).and_return(true)
 
       classification.subject_ids.each do |subject_id|
         expect(NotifySubjectSelectorOfSeenWorker).to receive(:perform_async).with(workflow.id, user.id, subject_id)

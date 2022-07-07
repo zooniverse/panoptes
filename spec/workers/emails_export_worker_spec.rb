@@ -16,7 +16,7 @@ describe EmailsExportWorker do
 
   context "with the export email feature enabled" do
     before do
-      Panoptes.flipper[:export_emails].enable
+      Flipper.enable(:export_emails)
       allow(EmailsUsersExportWorker).to receive(:perform_in)
       allow(EmailsUsersExportWorker).to receive(:perform_async)
       allow(EmailsProjectsExportWorker).to receive(:perform_in)

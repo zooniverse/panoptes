@@ -44,7 +44,7 @@ module Subjects
     end
 
     def enabled?
-      Panoptes.flipper['cellect'].enabled?
+      Flipper.enabled?(:cellect)
     end
   end
 end

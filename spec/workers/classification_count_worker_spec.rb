@@ -12,7 +12,7 @@ RSpec.describe ClassificationCountWorker do
 
       context "when the flipper flag is disabled" do
         it "should not run the counters" do
-          Panoptes.flipper["classification_counters"].disable
+          Flipper.disable(:classification_counters)
           expect(SubjectWorkflowStatus).not_to receive(:increment_counter)
           worker.perform(sms.subject_id, workflow_id)
         end

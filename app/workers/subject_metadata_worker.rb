@@ -5,7 +5,7 @@ class SubjectMetadataWorker
   sidekiq_options retry: 10, dead: false
 
   def perform(sms_ids)
-    return if Panoptes.flipper[:skip_subject_metadata_worker].enabled?
+    return if Flipper.enabled?(:skip_subject_metadata_worker)
 
     @sms_ids = sms_ids
     check_sms_resources_exist

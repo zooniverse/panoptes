@@ -6,7 +6,7 @@ RSpec.describe SubjectRemovalWorker do
   let(:remover) { instance_double(Subjects::Remover) }
 
   it 'should call the orphan remover cleanup when enabled' do
-    Panoptes.flipper[feature_name].enable
+    Flipper.enable(feature_name)
     expect(Subjects::Remover).to receive(:new).with(subject_id).and_return(remover)
     expect(remover).to receive(:cleanup)
     subject.perform(subject_id)
