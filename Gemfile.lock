@@ -498,7 +498,7 @@ DEPENDENCIES
   faraday (~> 0.17)
   faraday-http-cache (~> 2.2)
   faraday_middleware (~> 0.14)
-  flipper (~> 0.24.1)
+  flipper
   flipper-active_record
   flipper-ui
   graphiql-rails
