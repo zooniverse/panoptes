@@ -5,13 +5,13 @@ describe Flipper do
   describe 'feature flippin' do
     let(:feature_name) { :test_feature }
 
-    it "should not be enabled by default" do
-      expect(Flipper.enabled?(feature_name)).to be_falsey
+    it 'does not enable by default' do
+      expect(described_class.enabled?(feature_name)).to be(false)
     end
 
-    it "should enable features being turned on" do
-      Flipper.enable(feature_name)
-      expect(Flipper.enabled?(feature_name)).to be_truthy
+    it 'allows features to be turned on' do
+      described_class.enable(feature_name)
+      expect(described_class.enabled?(feature_name)).to be(true)
     end
   end
 end
