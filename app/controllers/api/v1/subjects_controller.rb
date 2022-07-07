@@ -55,7 +55,7 @@ class Api::V1::SubjectsController < Api::ApiController
   # special selection end point for known subject ids
   def selection
     # temporary feature flag in case we need a prod 'kill' switch for this feature
-    raise ApiErrors::FeatureDisabled unless Panoptes.flipper[:subject_selection_by_ids].enabled?
+    raise ApiErrors::FeatureDisabled unless Flipper.enabled?(:subject_selection_by_ids)
 
     skip_policy_scope
 
@@ -98,7 +98,7 @@ class Api::V1::SubjectsController < Api::ApiController
   # special selection end point create SubjectGroups
   def grouped
     # temporary feature flag in case we need a prod 'kill' switch for this feature
-    raise ApiErrors::FeatureDisabled unless Panoptes.flipper[:subject_group_selection].enabled?
+    raise ApiErrors::FeatureDisabled unless Flipper.enabled?(:subject_group_selection)
 
     skip_policy_scope
 
@@ -135,7 +135,8 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def create
-    raise ApiErrors::FeatureDisabled unless Panoptes.flipper[:subject_uploading].enabled?
+    raise ApiErrors::FeatureDisabled unless Flipper.enabled?(:subject_uploading)
+
     super do |subject|
       user = subject.uploader
       user.increment_subjects_count_cache

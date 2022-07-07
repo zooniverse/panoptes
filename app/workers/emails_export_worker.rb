@@ -10,13 +10,13 @@ class EmailsExportWorker
   recurrence { daily.hour_of_day(3) }
 
   def perform
-    if Panoptes.flipper[:export_emails].enabled?
-      EmailsUsersExportWorker.perform_async(:global)
-      EmailsUsersExportWorker.perform_in(BETA_DELAY, :beta)
-      EmailsUsersExportWorker.perform_in(NASA_DELAY, :nasa)
-      Project.launched.find_each do |p|
-        EmailsProjectsExportWorker.perform_in(PROJECT_SPREAD * rand, p.id)
-      end
+    return unless Flipper.enabled?(:export_emails)
+
+    EmailsUsersExportWorker.perform_async(:global)
+    EmailsUsersExportWorker.perform_in(BETA_DELAY, :beta)
+    EmailsUsersExportWorker.perform_in(NASA_DELAY, :nasa)
+    Project.launched.find_each do |p|
+      EmailsProjectsExportWorker.perform_in(PROJECT_SPREAD * rand, p.id)
     end
   end
 end

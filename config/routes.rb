@@ -7,10 +7,7 @@ Rails.application.routes.draw do
 
   authenticate :user, lambda { |u| u.admin? } do
     mount Sidekiq::Web => '/sidekiq'
-    flipper_block = lambda {
-      Panoptes.flipper
-    }
-    mount Flipper::UI.app(flipper_block) => '/flipper'
+    mount Flipper::UI.app(Flipper) => '/flipper'
   end
 
   post '/graphql', to: 'graphql#execute'
@@ -150,11 +147,6 @@ Rails.application.routes.draw do
 
       json_api_resources :subject_groups, only: %w[index show]
     end
-  end
-
-  scope "subject_selection_strategies/:strategy", as: "subject_selection_strategy", constraints: { format: 'json' } do
-    get "workflows", to: "subject_selection_strategies#workflows"
-    get "subjects", to: "subject_selection_strategies#subjects"
   end
 
   get "health_check", to: "home#index"

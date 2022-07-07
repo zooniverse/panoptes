@@ -4,7 +4,7 @@ module Panoptes
   end
 
   def self.disable_lifecycle_worker
-    Panoptes.flipper[:disable_lifecycle_worker].enabled?
+    Flipper.enabled?(:disable_lifecycle_worker)
   end
 
   def self.pg_statement_timeout

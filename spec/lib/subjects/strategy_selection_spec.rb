@@ -12,7 +12,7 @@ RSpec.describe Subjects::StrategySelection do
 
   describe "#select" do
     it "should not call the complete remover when disabled" do
-      Panoptes.flipper[:remove_complete_subjects].disable
+      Flipper.disable(:remove_complete_subjects)
       expect(Subjects::CompleteRemover).to_not receive(:new)
       subject.select
     end

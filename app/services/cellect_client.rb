@@ -21,7 +21,7 @@ module CellectClient
   end
 
   def self.reload_workflow(workflow_id)
-    return unless Panoptes.flipper.enabled? 'cellect'
+    return unless Flipper.enabled?(:cellect)
 
     path = "/workflows/#{workflow_id}/reload"
     Request.new.request(:post, path)
