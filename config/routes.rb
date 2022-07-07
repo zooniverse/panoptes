@@ -152,11 +152,6 @@ Rails.application.routes.draw do
     end
   end
 
-  scope "subject_selection_strategies/:strategy", as: "subject_selection_strategy", constraints: { format: 'json' } do
-    get "workflows", to: "subject_selection_strategies#workflows"
-    get "subjects", to: "subject_selection_strategies#subjects"
-  end
-
   get "health_check", to: "home#index"
   root to: "home#index"
 
