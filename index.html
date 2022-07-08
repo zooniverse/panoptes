@@ -205,11 +205,11 @@
     <a href="#" id="nav-button">
       <span>
         NAV
-        <img src="images/navbar.png" alt="Navbar" />
+        <img src="images/navbar.png" alt="" />
       </span>
     </a>
     <div class="toc-wrapper">
-      <img src="images/logo.png" class="logo" alt="Logo" />
+      <img src="images/logo.png" class="logo" alt="" />
         <div class="lang-selector">
               <a href="#" data-language-name="http">http</a>
               <a href="#" data-language-name="python">python</a>
@@ -358,7 +358,7 @@ Authentication Workflow).</p>
 </ul>
 <h2 id='example-using-postman'>Example using Postman</h2>
 <p><a href="https://www.getpostman.com/">Postman</a> is a graphical tool to help you make API calls.</p>
-<h3 id='how-do-you-get-a-token'>How do you get a token?</h3><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/oauth/token</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<h3 id='how-do-you-get-a-token'>How do you get a token?</h3><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/oauth/token</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 
 <span class="p">{</span><span class="w">
@@ -366,17 +366,17 @@ Authentication Workflow).</p>
   </span><span class="s2">"client_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"YOUR_CLIENT_ID"</span><span class="p">,</span><span class="w">
   </span><span class="s2">"client_secret"</span><span class="p">:</span><span class="w"> </span><span class="s2">"YOUR_CLIENT_SECRET"</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre><pre class="highlight python tab-python"><code><span class="kn">from</span> <span class="nn">panoptes_client</span> <span class="kn">import</span> <span class="n">Panoptes</span>
+</span></code></pre></div><div class="highlight"><pre class="highlight python tab-python"><code><span class="kn">from</span> <span class="nn">panoptes_client</span> <span class="kn">import</span> <span class="n">Panoptes</span>
 <span class="n">client</span> <span class="o">=</span> <span class="n">Panoptes</span><span class="o">.</span><span class="n">connect</span><span class="p">(</span><span class="n">username</span><span class="o">=</span><span class="s">''</span><span class="p">,</span> <span class="n">password</span><span class="o">=</span><span class="s">''</span><span class="p">)</span>
 <span class="k">print</span><span class="p">(</span><span class="n">client</span><span class="o">.</span><span class="n">get_bearer_token</span><span class="p">())</span>
-</code></pre><pre class="highlight ruby tab-ruby"><code><span class="nb">require</span> <span class="s1">'rubygems'</span>
+</code></pre></div><div class="highlight"><pre class="highlight ruby tab-ruby"><code><span class="nb">require</span> <span class="s1">'rubygems'</span>
 <span class="nb">require</span> <span class="s1">'panoptes-client'</span>
 <span class="n">client</span> <span class="o">=</span> <span class="no">Panoptes</span><span class="o">::</span><span class="no">Client</span><span class="p">.</span><span class="nf">new</span><span class="p">(</span><span class="ss">auth: </span><span class="p">{</span><span class="ss">client_id: </span><span class="no">CLIENT_ID</span><span class="p">,</span> <span class="ss">client_secret: </span><span class="no">CLIENT_SECRET</span><span class="p">})</span>
 <span class="n">response</span> <span class="o">=</span> <span class="n">client</span><span class="p">.</span><span class="nf">panoptes</span><span class="p">.</span><span class="nf">connection</span><span class="p">.</span><span class="nf">get</span><span class="p">(</span><span class="s1">'/me'</span><span class="p">)</span>
 <span class="n">auth</span> <span class="o">=</span> <span class="n">response</span><span class="p">.</span><span class="nf">env</span><span class="p">.</span><span class="nf">request_headers</span><span class="p">[</span><span class="s2">"Authorization"</span><span class="p">]</span>
 <span class="n">token</span> <span class="o">=</span> <span class="n">auth</span><span class="p">.</span><span class="nf">gsub</span><span class="p">(</span><span class="sr">/Bearer (.*)/</span><span class="p">,</span> <span class="s2">"</span><span class="se">\\</span><span class="s2">1"</span><span class="p">)</span>
 <span class="nb">puts</span> <span class="n">token</span>
-</code></pre>
+</code></pre></div>
 <p>There are multiple ways to get an OAuth bearer token from our authentication system, we support most of the OAuth grant types to convert credentials to a token. However our system restricts non-vetted apps from using particular flows, e.g. password (mostly to stop phishing sites harvesting our user credentials).</p>
 
 <p>The easiest to get started with is to use OAuth and the client credentials OAuth flow. To do this you will need to <a href="https://signin.zooniverse.org/oauth/applications/new">create an OAuth application with our system</a>.</p>
@@ -451,14 +451,14 @@ Authentication Workflow).</p>
   + Ensure the scopes match exactly, OAuth app has user selected, scopes should be ‘user public’
 0. Get a 404 on /api/* endpoints request
   + Ensure the extra Accept and content-type headers are set on the requests, without them the API won’t route requests properly.</p>
-<h1 id='json-api-conventions'>JSON-API conventions</h1><h2 id='resource-s-themselves'>Resource(s) themselves</h2><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+<h1 id='json-api-conventions'>JSON-API conventions</h1><h2 id='resource-s-themselves'>Resource(s) themselves</h2><div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
   </span><span class="s2">"users"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w">
     </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">123</span><span class="p">,</span><span class="w">
     </span><span class="err">...</span><span class="w">
   </span><span class="p">}],</span><span class="w">
   </span><span class="err">...</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre>
+</span></code></pre></div>
 <p>If you request a resource, you will find the results under a top-level key with
 the plural name of the resource. So for instance, if you a single specific user,
 you will find the user record under the <code>users</code> key.</p>
@@ -468,7 +468,7 @@ Resources will always be returned an array. If you requested a single specific
 resource (usually by passing in its <code>id</code>), you can rely on this being an array
 with at most one element.
 </aside>
-<h2 id='links'>Links</h2><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+<h2 id='links'>Links</h2><div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
   </span><span class="s2">"projects"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w">
     </span><span class="err">...</span><span class="p">,</span><span class="w">
     </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
@@ -489,11 +489,11 @@ with at most one element.
     </span><span class="err">...</span><span class="w">
   </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre>
+</span></code></pre></div>
 <p>Any resource returned will specify a list of linked resources under its <code>links</code>
 attribute. Definition on where to request those linked resources can be found
 under the top-level <code>links</code> key (as opposed to the per-resource <code>links</code>).</p>
-<h2 id='pagination'>Pagination</h2><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+<h2 id='pagination'>Pagination</h2><div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
   </span><span class="s2">"page"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
   </span><span class="s2">"page_size"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
   </span><span class="s2">"count"</span><span class="p">:</span><span class="w"> </span><span class="mi">28</span><span class="p">,</span><span class="w">
@@ -506,14 +506,14 @@ under the top-level <code>links</code> key (as opposed to the per-resource <code
   </span><span class="s2">"next_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/users?page=2&amp;page_size=2"</span><span class="p">,</span><span class="w">
   </span><span class="s2">"last_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/users?page=14&amp;page_size=2"</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre>
+</span></code></pre></div>
 <p>When requesting a list of resources, rather than a single resource, the
 response will include a top-level <code>meta</code> key. For performance reasons, results
 are returned in pages. You can use the data under the <code>meta</code> key to
 automatically navigate these paginated results.</p>
 <h2 id='including-linked-resources'>Including linked resources</h2>
 <p>TODO</p>
-<h1 id='projects'>Projects</h1><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+<h1 id='projects'>Projects</h1><div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"projects"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w">
         </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1"</span><span class="p">,</span><span class="w">
         </span><span class="s2">"display_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Galaxy Zoo"</span><span class="p">,</span><span class="w">
@@ -578,7 +578,7 @@ automatically navigate these paginated results.</p>
         </span><span class="p">}</span><span class="w">
     </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre>
+</span></code></pre></div>
 <p>A Project is a collection of subjects and task workflows that a
 volunteer performs on subjects. The project also holds supplementary
 text describing the tasks volunteers perform.</p>
@@ -727,10 +727,10 @@ are a collaborator on.</li>
 <li>classifications (read-only)</li>
 <li>owner (read-only)</li>
 </ul>
-<h2 id='list-all-projects'>List All Projects</h2><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/projects</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<h2 id='list-all-projects'>List All Projects</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/projects</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
-</code></pre>
+</code></pre></div>
 <ul>
 <li>Parameters
 
@@ -746,10 +746,10 @@ are a collaborator on.</li>
 <li>include (optional, string) ... comma separated list of linked resources to include in the response</li>
 </ul></li>
 </ul>
-<h2 id='retrieve-a-single-project'>Retrieve a single Project</h2><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/projects/123</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<h2 id='retrieve-a-single-project'>Retrieve a single Project</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/projects/123</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
-</code></pre>
+</code></pre></div>
 <ul>
 <li>Parameters
 
@@ -761,7 +761,7 @@ are a collaborator on.</li>
 <li>live (boolean) ... live state filter</li>
 </ul></li>
 </ul>
-<h2 id='create-a-project'>Create a Project</h2><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/projects</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<h2 id='create-a-project'>Create a Project</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/projects</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 
@@ -782,11 +782,11 @@ are a collaborator on.</li>
         </span><span class="p">}</span><span class="w">
     </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre>
+</span></code></pre></div>
 <p>Requires at least a <em>display_name</em>, <em>description</em>, <em>primary_language</em> and <em>private</em>. Workflows
 and SubjectSets added as links will be copied and their new ids
 returned.</p>
-<h2 id='edit-a-single-project'>Edit a single Project</h2><pre class="highlight http tab-http"><code><span class="nf">PUT</span> <span class="nn">/api/projects/123</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<h2 id='edit-a-single-project'>Edit a single Project</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">PUT</span> <span class="nn">/api/projects/123</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 
@@ -799,7 +799,7 @@ returned.</p>
         </span><span class="p">}</span><span class="w">
     </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre>
+</span></code></pre></div>
 <p>A User must be the owner of a project or have update
 permissions to edit the resource. Workflow and Subject Set links may be
 edited. Removing a subject set or workflow causes the subject set or
@@ -808,10 +808,10 @@ the original to be copied and a new id to be returned.</p>
 
 <p>Setting has may links through a PUT, while supported, is not
 recommended. Instead, use the link endpoints explained below.</p>
-<h2 id='destroy-a-single-project'>Destroy a single Project</h2><pre class="highlight http tab-http"><code><span class="nf">DELETE</span> <span class="nn">/api/projects/123</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<h2 id='destroy-a-single-project'>Destroy a single Project</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">DELETE</span> <span class="nn">/api/projects/123</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
-</code></pre>
+</code></pre></div>
 <p>A user may destroy a project they own or have destroy permissions for.</p>
 
 <p>Response will be an HTTP 204.</p>
@@ -845,7 +845,7 @@ recommended. Instead, use the link endpoints explained below.</p>
 </ul></li>
 <li>The <code>SubjectSetImport</code> resource API end point response can be polled for information on the progress and state of an import (see python example above or &#39;Retrieve a single import&#39; below).</li>
 </ol>
-<h2 id='zooniverse-api-feature-description'>Zooniverse API Feature Description</h2><h3 id='creating-a-new-subject-set-import'>Creating a new subject set import</h3><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/subject_set_imports</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<h2 id='zooniverse-api-feature-description'>Zooniverse API Feature Description</h2><h3 id='creating-a-new-subject-set-import'>Creating a new subject set import</h3><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/subject_set_imports</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 
@@ -857,12 +857,12 @@ recommended. Instead, use the link endpoints explained below.</p>
        </span><span class="p">}</span><span class="w">
     </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre>
+</span></code></pre></div>
 <p>Returns a SubjectSetImport resource with an ID. This resource can be polled in order to get the status of the import.</p>
-<h3 id='retrieve-a-single-import'>Retrieve a single import</h3><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/subject_set_imports/1</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<h3 id='retrieve-a-single-import'>Retrieve a single import</h3><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/subject_set_imports/1</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
-</code></pre>
+</code></pre></div>
 <ul>
 <li>Parameters
 
@@ -870,10 +870,10 @@ recommended. Instead, use the link endpoints explained below.</p>
 <li>id (required, integer) ... integer id of the resource to retrieve</li>
 </ul></li>
 </ul>
-<h2 id='manifest-csv-format'>Manifest CSV format</h2><pre class="highlight plaintext"><code>external_id,location:1,location:2,metadata:size,metadata:cuteness
+<h2 id='manifest-csv-format'>Manifest CSV format</h2><div class="highlight"><pre class="highlight plaintext"><code>external_id,location:1,location:2,metadata:size,metadata:cuteness
 1,https://placekitten.com/200/300.jpg,https://placekitten.com/200/100.jpg,small,cute
 2,https://placekitten.com/400/900.jpg,https://placekitten.com/500/100.jpg,large,cute
-</code></pre>
+</code></pre></div>
 <p>The manifest.csv file is contains one row per subject. See the example to the right. It is expected to have
 the following columns:</p>
 
@@ -901,7 +901,7 @@ otherwise ignored). Supported mimetypes currently are:</p>
 <li><p><code>metadata:</code> - Zero or more columns that begin with <code>metadata:</code> (including the colon), followed by
 the key of the specific metadata in this column.</p></li>
 </ul>
-<h1 id='users'>Users</h1><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+<h1 id='users'>Users</h1><div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"users"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w">
         </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
         </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2014-03-20T00:15:47Z"</span><span class="p">,</span><span class="w">
@@ -934,7 +934,7 @@ the key of the specific metadata in this column.</p></li>
         </span><span class="p">}</span><span class="w">
     </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre>
+</span></code></pre></div>
 <p>A User is representation of the identity and contributions of a volunteer.</p>
 
 <table><thead>
@@ -1013,10 +1013,10 @@ user.</p>
 <li>subjects</li>
 <li>collections</li>
 </ul>
-<h2 id='list-users'>List Users</h2><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/users</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<h2 id='list-users'>List Users</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/users</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
-</code></pre>
+</code></pre></div>
 <p>Parameters:</p>
 
 <ul>
@@ -1025,10 +1025,10 @@ user.</p>
 <li>sort (optional, string) ... fields to sort collection by. id is default</li>
 <li>include (optional, string) ... comma separated list of linked resources to include</li>
 </ul>
-<h2 id='retrieve-a-single-user'>Retrieve a single user</h2><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/users/1</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<h2 id='retrieve-a-single-user'>Retrieve a single user</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/users/1</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
-</code></pre>
+</code></pre></div>
 <table><thead>
 <tr>
 <th>Parameter</th>
@@ -1044,7 +1044,7 @@ user.</p>
 <td>ID of the User as an integer key</td>
 </tr>
 </tbody></table>
-<h2 id='edit-a-single-user'>Edit a single User</h2><pre class="highlight http tab-http"><code><span class="nf">PUT</span> <span class="nn">/api/users/123</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<h2 id='edit-a-single-user'>Edit a single User</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">PUT</span> <span class="nn">/api/users/123</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 
@@ -1053,12 +1053,12 @@ user.</p>
         </span><span class="s2">"credited_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Dr. Stuart Lynn, DDS"</span><span class="w">
     </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre>
+</span></code></pre></div>
 <p>The currently logged in User may edit their record by sending a
 partial representation of the resource including their changes. A User
 cannot edit linked resources.</p>
-<h2 id='destroy-a-single-user'>Destroy a single User</h2><pre class="highlight http tab-http"><code><span class="nf">DELETE</span> <span class="nn">/users/123</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
-</code></pre>
+<h2 id='destroy-a-single-user'>Destroy a single User</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">DELETE</span> <span class="nn">/users/123</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+</code></pre></div>
 <p>The current logged in User may delete themself. This does not fully
 remove the user resource; instead, it deactivates their projects
 and removes personally identifying information including the
