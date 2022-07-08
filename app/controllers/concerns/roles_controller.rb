@@ -5,10 +5,10 @@ module RolesController
     resource_actions :default
     schema_type :strong_params
 
-    before_filter :format_filter_params, only: :index
-    before_filter :filter_by_user_id, only: :index
+    before_action :format_filter_params, only: :index
+    before_action :filter_by_user_id, only: :index
 
-    skip_before_filter :check_destroy_class_matches_controller, only: :destroy
+    skip_before_action :check_destroy_class_matches_controller, only: :destroy
 
     include BuildOverride
   end
