@@ -1,5 +1,6 @@
 class SessionsController < Devise::SessionsController
-  skip_before_action :verify_authenticity_token, only: [:destroy], if: :json_request?
+  skip_before_action :verify_authenticity_token, 
+    if: -> { json_request? && action_name == "destroy" }
   after_action :set_csrf_headers, only: %i[create destroy]
   after_action :set_csrf_headers, only: :new, if: :json_request?
 
