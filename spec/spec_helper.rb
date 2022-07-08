@@ -8,8 +8,6 @@ require File.expand_path("../../config/environment", __FILE__)
 require "rspec/rails"
 require "sidekiq/testing"
 require 'flipper/adapters/memory'
-require 'mock_redis'
-require 'database_cleaner'
 
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
