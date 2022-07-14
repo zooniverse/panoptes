@@ -1,6 +1,6 @@
 class ApplicationsController < Doorkeeper::ApplicationsController
-  skip_before_filter :authenticate_admin!
-  before_filter :authenticate_user!
+  skip_before_action :authenticate_admin!
+  before_action :authenticate_user!
   before_action :add_public_scope, only: [:create, :update]
 
   respond_to :html

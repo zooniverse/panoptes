@@ -11,7 +11,7 @@ module Pages
     allowed_params :create, :url_key, :title, :content, :language
     allowed_params :update, :url_key, :title, :content, :language
 
-    before_filter :set_language_if_missing, only: [:index]
+    before_action :set_language_if_missing, only: [:index]
 
     # Methods defined here in order to avoid being overridden by resource modules
     define_method(:link_header) do |resource|
