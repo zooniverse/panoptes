@@ -1,0 +1,26 @@
+name: Deploy Production Canary
+
+on:
+  push:
+    tags:
+      - production-release
+  workflow_dispatch:
+
+jobs:
+  deploy_production_canary:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+
+    - name: Set the target AKS cluster
+      uses: Azure/aks-set-context@v1
+      with:
+        creds: '${{ secrets.AZURE_AKS }}'
+        cluster-name: microservices
+        resource-group: kubernetes
+
+    - name: Modify & apply template
+      run: |
+        sed "s/__IMAGE_TAG__/${{ github.sha }}/g" ./kubernetes/deployment-production-canary.tmpl \
+          | kubectl apply -f -
