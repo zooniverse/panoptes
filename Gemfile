@@ -87,7 +87,6 @@ group :test do
   gem 'guard-rspec', require: false
   gem 'listen', '~> 3.7'
   gem 'mock_redis'
-  gem 'rails-controller-testing' if next?
   gem 'rspec'
   gem 'rspec-its'
   gem 'rspec-rails'

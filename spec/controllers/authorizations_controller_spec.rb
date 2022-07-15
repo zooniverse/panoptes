@@ -6,10 +6,6 @@ shared_examples "restricted scopes" do
       req
       expect(response.status).to eq(200)
     end
-
-    it 'should render the approval page' do
-      expect(req).to render_template(:new)
-    end
   end
 
   context 'requesting greater scopes' do
@@ -21,10 +17,12 @@ shared_examples "restricted scopes" do
   end
 
   context 'requesting no scopes' do
-    it 'should create a page with the apps default scopes' do
+    it 'uses the apps default scopes' do
       params.delete('scope')
+      allow(app).to receive(:default_scope).and_call_original
+      allow(controller).to receive(:client).and_return(app)
       req
-      expect(assigns(:pre_auth).scopes).to eq(['public', 'project', 'classification'])
+      expect(app).to have_received(:default_scope).at_least(1).time
     end
   end
 end
@@ -50,7 +48,7 @@ describe AuthorizationsController, type: :controller do
     end
   end
 
-  context "an implicit grant by an insecure application" do
+  context 'with an insecure application using an implicit grant' do
     let!(:app) { create(:application, owner: owner) }
     let(:req) { get :new, token_params }
 
