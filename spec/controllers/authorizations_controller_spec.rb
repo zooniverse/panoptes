@@ -48,7 +48,7 @@ describe AuthorizationsController, type: :controller do
     end
   end
 
-  context "an implicit grant by an insecure application" do
+  context 'with an insecure application using an implicit grant' do
     let!(:app) { create(:application, owner: owner) }
     let(:req) { get :new, token_params }
 
