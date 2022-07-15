@@ -5,24 +5,35 @@ describe ApplicationsController, type: :controller do
   let(:admin_user)  { create(:user, admin: true) }
 
   describe '#index' do
-    it 'shows your own application' do
-      application1 = create(:application, owner: normal_user)
-      application2 = create(:application)
+    context 'when logged in as a normal user' do
+      before do
+        create(:application, owner: normal_user)
+        create(:application)
+        allow(normal_user).to receive(:oauth_applications)
+        allow(controller).to receive(:current_user).and_return(normal_user)
+      end
 
-      sign_in normal_user
-      get :index
-      expect(response).to be_ok
-      expect(assigns[:applications]).to eq([application1])
+      it 'shows only the logged in users applications', :aggregate_failures do
+        sign_in normal_user
+        get :index
+        expect(response).to be_ok
+        expect(normal_user).to have_received(:oauth_applications)
+      end
     end
 
-    it 'lets admins see all applications' do
-      application1 = create(:application)
-      application2 = create(:application)
+    context 'when logged in as an admin user' do
+      before do
+        create(:application)
+        create(:application)
+        allow(Doorkeeper::Application).to receive(:all).and_call_original
+      end
 
-      sign_in admin_user
-      get :index
-      expect(response).to be_ok
-      expect(assigns[:applications]).to eq([application1, application2])
+      it 'returns all applications for admins', :aggregate_failures do
+        sign_in admin_user
+        get :index
+        expect(response).to be_ok
+        expect(Doorkeeper::Application).to have_received(:all).once
+      end
     end
   end
 
