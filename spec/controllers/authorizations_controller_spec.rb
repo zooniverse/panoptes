@@ -6,10 +6,6 @@ shared_examples "restricted scopes" do
       req
       expect(response.status).to eq(200)
     end
-
-    it 'should render the approval page' do
-      expect(req).to render_template(:new)
-    end
   end
 
   context 'requesting greater scopes' do
@@ -52,7 +48,7 @@ describe AuthorizationsController, type: :controller do
     end
   end
 
-  context "an implicit grant by an insecure application", :focus do
+  context "an implicit grant by an insecure application" do
     let!(:app) { create(:application, owner: owner) }
     let(:req) { get :new, token_params }
 
