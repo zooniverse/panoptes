@@ -13,6 +13,7 @@ jobs:
     with:
       repo_name: panoptes
       commit_id: ${{ github.sha }}
+      file: Dockerfile.rails-next
       latest: true
 
   db_migration_staging:
