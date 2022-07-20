@@ -7,6 +7,13 @@ on:
   workflow_dispatch:
 
 jobs:
+  build_and_push_image:
+      name: Build and Push Image
+      uses: zooniverse/ci-cd/.github/workflows/build_and_push_image.yaml@main
+      with:
+        repo_name: panoptes
+        commit_id: ${{ github.sha }}
+  
   deploy_production:
     name: Deploy to Production
     uses: zooniverse/ci-cd/.github/workflows/deploy_app.yaml@main
