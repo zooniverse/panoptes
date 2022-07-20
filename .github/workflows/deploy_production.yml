@@ -13,7 +13,6 @@ jobs:
       with:
         repo_name: panoptes
         commit_id: ${{ github.sha }}
-        latest: true
   
   deploy_production:
     name: Deploy to Production
