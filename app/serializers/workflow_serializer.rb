@@ -18,6 +18,8 @@ class WorkflowSerializer
 
   can_filter_by :active, :mobile_friendly
 
+  can_sort_by :completeness
+
   preload :subject_sets, :attached_images, :classifications_export, :published_version
 
   def self.paging_scope(params, scope, context)
