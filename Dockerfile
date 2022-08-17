@@ -1,5 +1,3 @@
-# debian stretch has libjemalloc1 https://packages.debian.org/stretch/libjemalloc1
-FROM ruby:2.5-slim-stretch
 
 WORKDIR /rails_app
 
