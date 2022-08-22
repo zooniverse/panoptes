@@ -48,7 +48,7 @@ gem 'rack-cors', '~> 1.0', require: 'rack/cors'
 if next?
   gem 'rails', '~> 5.0'
 else
-  gem 'rails', '~> 4.2.11'
+  gem 'rails', '~> 5.0'
 end
 gem 'ranked-model', '~> 0.4.8'
 gem 'restpack_serializer', git: 'https://github.com/zooniverse/restpack_serializer.git', branch: 'panoptes-api-version', ref: 'cef0969cef'

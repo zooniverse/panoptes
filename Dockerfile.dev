@@ -1,4 +1,4 @@
-FROM ruby:2.5-slim-buster
+FROM ruby:2.6-slim-buster
 
 WORKDIR /rails_app
 
