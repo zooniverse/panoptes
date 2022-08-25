@@ -46,9 +46,9 @@ gem 'puma', '~> 5.6.4'
 gem 'pundit', '~> 2.2.0'
 gem 'rack-cors', '~> 1.0', require: 'rack/cors'
 if next?
-  gem 'rails', '~> 5.0'
+  gem 'rails', '~> 5.2'
 else
-  gem 'rails', '~> 5.0'
+  gem 'rails', '~> 5.2'
 end
 gem 'ranked-model', '~> 0.4.8'
 gem 'redis', '~> 4.5'
