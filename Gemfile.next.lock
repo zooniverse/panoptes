@@ -534,6 +534,7 @@ DEPENDENCIES
   rack-cors (~> 1.0)
   rails (~> 5.0)
   ranked-model (~> 0.4.8)
+  redis (~> 4.5)
   restpack_serializer!
   rspec
   rspec-its
