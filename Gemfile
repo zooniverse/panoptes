@@ -51,6 +51,7 @@ else
   gem 'rails', '~> 5.0'
 end
 gem 'ranked-model', '~> 0.4.8'
+gem 'redis', '~> 4.5'
 gem 'restpack_serializer', git: 'https://github.com/zooniverse/restpack_serializer.git', branch: 'panoptes-api-version', ref: 'cef0969cef'
 gem 'schema_plus_pg_indexes', '~> 0.1'
 gem 'scientist', '~> 1.6.3'
@@ -64,7 +65,6 @@ gem 'strong_migrations'
 gem 'uglifier', '~> 4.2'
 gem 'versionist', '~> 2.0'
 gem 'zoo_stream', '~> 1.0.1'
-gem 'redis', '~> 4.5'
 
 group :production, :staging do
   gem 'newrelic_rpm'
