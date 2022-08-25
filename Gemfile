@@ -64,6 +64,7 @@ gem 'strong_migrations'
 gem 'uglifier', '~> 4.2'
 gem 'versionist', '~> 2.0'
 gem 'zoo_stream', '~> 1.0.1'
+gem 'redis', '~> 4.5'
 
 group :production, :staging do
   gem 'newrelic_rpm'
