@@ -2,6 +2,7 @@ ActionDispatch::Routing::Mapper.send :include, Routes::JsonApiRoutes
 
 # require 'sidekiq/web' via
 require 'sidekiq_unique_jobs/web'
+require 'sidekiq/cron/web'
 
 Rails.application.routes.draw do
 

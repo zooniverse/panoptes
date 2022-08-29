@@ -1,0 +1,11 @@
+# Here is a list of jobs that are scheduled to run periodically.
+# We use a UNIX cron notation to specify execution schedule.
+#
+# Please read here for more information:
+# https://github.com/ondrejbartas/sidekiq-cron#adding-cron-job
+
+calculate_activity_worker:
+  cron: "0 0 * * *"
+  class: "CalculateActivityWorker"
+  queue: "default"
+  description: "Daily worker scheduled at midnight that calls CalculateProjectActivityWorker"
