@@ -4,9 +4,6 @@ module SidekiqConfig
   end
 end
 
-require 'redis'
-Redis.exists_returns_integer = false
-
 Sidekiq.configure_client do |config|
   config.redis = { url: SidekiqConfig.redis_url }
 end
@@ -25,10 +22,3 @@ Sidekiq.configure_server do |config|
 end
 
 Sidekiq::Extensions.enable_delay!
-
-require 'sidetiq'
-Sidetiq.configure do |config|
-  config.utc = true
-end
-
-require 'sidetiq/web'
