@@ -4,10 +4,6 @@ describe EmailsExportWorker do
   let(:worker) { described_class.new }
   it { is_expected.to be_a Sidekiq::Worker }
 
-  it "should be scheduled to run daily at 3am" do
-    expect(worker.class.schedule.to_s).to eq("Daily on the 3rd hour of the day")
-  end
-
   it 'should not do any work if disabled' do
     expect(EmailsUsersExportWorker).not_to receive(:perform_async)
     expect(EmailsProjectsExportWorker).not_to receive(:perform_in)

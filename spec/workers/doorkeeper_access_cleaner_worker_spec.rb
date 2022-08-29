@@ -5,12 +5,6 @@ describe DoorkeeperAccessCleanerWorker do
 
   it{ is_expected.to be_a Sidekiq::Worker }
 
-  describe 'schedule' do
-    it "should have a valid schedule" do
-      expect(described_class.schedule.to_s).to match(/Daily/)
-    end
-  end
-
   describe "perform" do
     let(:cleaner) { instance_double(Doorkeeper::AccessCleanup) }
 

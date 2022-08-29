@@ -6,12 +6,6 @@ RSpec.describe ClassificationHeartbeatWorker do
 
   it{ is_expected.to be_a Sidekiq::Worker }
 
-  describe 'schedule' do
-    it "should have a valid schedule" do
-      expect(described_class.schedule.to_s).to match(/Hourly on the 0th, 15th, 30th, and 45th minutes of the hour/)
-    end
-  end
-
   describe "#perform" do
     let(:offset) { Panoptes::ClassificationHeartbeat.window_period.seconds - 5.minutes }
 
