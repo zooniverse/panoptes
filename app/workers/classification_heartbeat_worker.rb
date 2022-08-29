@@ -3,8 +3,6 @@ class ClassificationHeartbeatWorker
 
   sidekiq_options queue: :data_medium
 
-  recurrence { hourly.minute_of_hour(0, 15, 30, 45) }
-
   def perform
     if heartbeat_check? && missing_classifications?
       ClassificationHeartbeatMailer.missing_classifications(emails, window_period).deliver
