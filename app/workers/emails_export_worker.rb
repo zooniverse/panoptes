@@ -1,13 +1,10 @@
 class EmailsExportWorker
   include Sidekiq::Worker
-  include Sidetiq::Schedulable
 
   sidekiq_options queue: :data_medium
   BETA_DELAY = 15.minutes.freeze
   NASA_DELAY = 30.minutes.freeze
   PROJECT_SPREAD = 1.hour.freeze
-
-  recurrence { daily.hour_of_day(3) }
 
   def perform
     return unless Flipper.enabled?(:export_emails)

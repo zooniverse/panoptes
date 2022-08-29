@@ -1,6 +1,5 @@
 class ClassificationHeartbeatWorker
   include Sidekiq::Worker
-  include Sidetiq::Schedulable
 
   sidekiq_options queue: :data_medium
 
