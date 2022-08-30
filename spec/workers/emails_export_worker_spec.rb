@@ -1,6 +1,5 @@
 require 'spec_helper'
 require 'sidekiq-cron'
-require 'sidekiq'
 
 describe EmailsExportWorker do
   let(:worker) { described_class.new }
@@ -12,7 +11,7 @@ describe EmailsExportWorker do
     worker.perform
   end
 
-  context 'with sidekiq-cron scheduler' do
+  context 'schedule' do
     let(:job) { Sidekiq::Cron::Job.new(name: 'emails_export_worker', cron: '0 3 * * *', class: described_class.name) }
 
     it 'gets queued daily at 3 am UTC' do
@@ -25,7 +24,7 @@ describe EmailsExportWorker do
 
     it 'does not get enqueued if outside of 3 am UTC' do
       now = Time.now.utc
-      outside_time = Time.new(now.year, now.month, now.day, 6, 0, 0).utc
+      outside_time = Time.new(now.year, now.month, now.day, 2, 0, 0).utc
 
       expect(job.should_enque?(outside_time)).to be false
     end
