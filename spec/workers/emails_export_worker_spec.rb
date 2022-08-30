@@ -17,17 +17,17 @@ describe EmailsExportWorker do
 
     it 'gets queued daily at 3 am UTC' do
       now = Time.now.utc
-      #sidekiq-cron has 10 second delay
-      enqueued_time = Time.new(now.year, now.month, now.day, 3, 0, 0).utc + 10 
+      # sidekiq-cron has 10 second delay
+      enqueued_time = Time.new(now.year, now.month, now.day, 3, 0, 0).utc + 10
 
-      expect(job.should_enque? enqueued_time).to be true
+      expect(job.should_enque?(enqueued_time)).to be true
     end
 
     it 'does not get enqueued if outside of 3 am UTC' do
       now = Time.now.utc
       outside_time = Time.new(now.year, now.month, now.day, 6, 0, 0).utc
 
-      expect(job.should_enque? outside_time).to be false
+      expect(job.should_enque?(outside_time)).to be false
     end
   end
 
