@@ -13,7 +13,7 @@ describe EmailsExportWorker do
   end
 
   context 'with sidekiq-cron scheduler' do
-    let(:job)  { Sidekiq::Cron::Job.new(name: 'emails_export_worker', cron: '0 3 * * *', class: described_class.name) }
+    let(:job) { Sidekiq::Cron::Job.new(name: 'emails_export_worker', cron: '0 3 * * *', class: described_class.name) }
 
     it 'gets queued daily at 3 am UTC' do
       now = Time.now.utc
