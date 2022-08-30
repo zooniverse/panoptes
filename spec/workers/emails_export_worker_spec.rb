@@ -1,4 +1,6 @@
 require 'spec_helper'
+require 'sidekiq-cron'
+require 'sidekiq'
 
 describe EmailsExportWorker do
   let(:worker) { described_class.new }
@@ -8,6 +10,25 @@ describe EmailsExportWorker do
     expect(EmailsUsersExportWorker).not_to receive(:perform_async)
     expect(EmailsProjectsExportWorker).not_to receive(:perform_in)
     worker.perform
+  end
+
+  context 'with sidekiq-cron scheduler' do
+    let(:job)  { Sidekiq::Cron::Job.new(name: 'emails_export_worker', cron: "0 3 * * *", class: described_class.name) }
+
+    it 'should queue worker if 3 am UTC' do
+      now = Time.now.utc
+      #sidekiq-cron has 10 second delay
+      enqueued_time = Time.new(now.year, now.month, now.day, 3, 0, 0).utc + 10 
+
+      expect(job.should_enque? enqueued_time).to be true
+    end
+
+    it 'should not enqueue worker if outside of 3 am UTC' do
+      now = Time.now.utc
+      outside_time = Time.new(now.year, now.month, now.day, 6, 0, 0).utc
+
+      expect(job.should_enque? outside_time).to be false
+    end
   end
 
   context "with the export email feature enabled" do
