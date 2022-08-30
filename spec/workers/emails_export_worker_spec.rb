@@ -13,9 +13,9 @@ describe EmailsExportWorker do
   end
 
   context 'with sidekiq-cron scheduler' do
-    let(:job)  { Sidekiq::Cron::Job.new(name: 'emails_export_worker', cron: "0 3 * * *", class: described_class.name) }
+    let(:job)  { Sidekiq::Cron::Job.new(name: 'emails_export_worker', cron: '0 3 * * *', class: described_class.name) }
 
-    it 'should queue worker if 3 am UTC' do
+    it 'gets queued daily at 3 am UTC' do
       now = Time.now.utc
       #sidekiq-cron has 10 second delay
       enqueued_time = Time.new(now.year, now.month, now.day, 3, 0, 0).utc + 10 
@@ -23,7 +23,7 @@ describe EmailsExportWorker do
       expect(job.should_enque? enqueued_time).to be true
     end
 
-    it 'should not enqueue worker if outside of 3 am UTC' do
+    it 'does not get enqueued if outside of 3 am UTC' do
       now = Time.now.utc
       outside_time = Time.new(now.year, now.month, now.day, 6, 0, 0).utc
 
