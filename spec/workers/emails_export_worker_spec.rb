@@ -11,23 +11,11 @@ describe EmailsExportWorker do
     worker.perform
   end
 
-  context 'schedule' do
-    let(:job) { Sidekiq::Cron::Job.new(name: 'emails_export_worker', cron: '0 3 * * *', class: described_class.name) }
-
-    it 'gets queued daily at 3 am UTC' do
-      now = Time.now.utc
-      # sidekiq-cron has 10 second delay
-      enqueued_time = Time.new(now.year, now.month, now.day, 3, 0, 0).utc + 10
-
-      expect(job.should_enque?(enqueued_time)).to be true
-    end
-
-    it 'does not get enqueued if outside of 3 am UTC' do
-      now = Time.now.utc
-      outside_time = Time.new(now.year, now.month, now.day, 2, 0, 0).utc
-
-      expect(job.should_enque?(outside_time)).to be false
-    end
+  it_behaves_like 'is schedulable' do
+    let(:now) { Time.now.utc }
+    let(:cron_sched) { '0 3 * * *' }
+    let(:class_name) { described_class.name }
+    let(:enqueued_time) { Time.new(now.year, now.month, now.day, 3, 0, 0).utc }
   end
 
   context "with the export email feature enabled" do
