@@ -15,7 +15,7 @@ describe EmailsExportWorker do
     let(:now) { Time.now.utc }
     let(:cron_sched) { '0 3 * * *' }
     let(:class_name) { described_class.name }
-    let(:enqueued_time) { Time.new(now.year, now.month, now.day, 3, 0, 0).utc }
+    let(:enqueued_times) { [Time.new(now.year, now.month, now.day, 3, 0, 0).utc] }
   end
 
   context "with the export email feature enabled" do
