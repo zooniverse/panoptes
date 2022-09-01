@@ -1,0 +1,36 @@
+# Here is a list of jobs that are scheduled to run periodically.
+# We use a UNIX cron notation to specify execution schedule.
+#
+# Please read here for more information:
+# https://github.com/ondrejbartas/sidekiq-cron#adding-cron-job
+
+calculate_activity_worker:
+  cron: "0 0 * * *"
+  class: "CalculateActivityWorker"
+  queue: "default"
+  description: "Daily worker scheduled at midnight that calls CalculateProjectActivityWorker"
+calculate_completeness_worker:
+  cron: "0 * * * *"
+  class: "CalculateCompletenessWorker"
+  queue: "default"
+  description: "Hourly worker that calls CalculateProjectCompletenessWorker on the 0th minute of the hour"
+classification_heartbeat_worker:
+  cron: "*/15 * * * *"
+  class: "ClassificationHeartbeatWorker"
+  queue: "default"
+  description: "Heartbeat check for missing classification data during window period. Runs every 15 minutes"
+doorkeeper_access_cleaner_worker:
+  cron: "0 0 * * *"
+  class: "DoorkeeperAccessCleanerWorker"
+  queue: "default"
+  description: "Daily worker that cleans Doorkeeper access"
+emails_export_worker:
+  cron: "0 3 * * *"
+  class: "EmailsExportWorker"
+  queue: "default"
+  description: "Daily worker that runs the email dump exporter. Runs every 3rd hour of the day."
+requeue_classifications_worker:
+  cron: "*/15 * * * *"
+  class: "RequeueClassificationsWorker"
+  queue: "default"
+  description: "Queues ClassificationWorker on any non-lifecycles classifications found. Runs every 15 minutes."

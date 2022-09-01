@@ -10,9 +10,18 @@ describe RequeueClassificationsWorker do
   it{ is_expected.to be_a Sidekiq::Worker }
 
   describe 'schedule' do
-    it "should have a valid schedule" do
-      expect(described_class.schedule.to_s)
-      .to match(/Hourly on the 0th, 15th, 30th, and 45th minutes of the hour/)
+    it_behaves_like 'is schedulable' do
+      let(:now) { Time.now.utc }
+      let(:cron_sched) { '*/15 * * * *' }
+      let(:class_name) { described_class.name }
+      let(:enqueued_times) {
+        [
+          Time.new(now.year, now.month, now.day, now.hour, 0, 0).utc,
+          Time.new(now.year, now.month, now.day, now.hour, 15, 0).utc,
+          Time.new(now.year, now.month, now.day, now.hour, 30, 0).utc,
+          Time.new(now.year, now.month, now.day, now.hour, 45, 0).utc
+        ]
+      }
     end
   end
 
