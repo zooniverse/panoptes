@@ -45,7 +45,7 @@ Rails.application.configure do
 
   #hack to fix issue with doorkeeper not loading ControllerHelpers in test env
   # https://github.com/doorkeeper-gem/doorkeeper/issues/375
-  config.active_support.to_prepare do
+  ActiveSupport::Reloader.to_prepare do
     Doorkeeper::ApplicationsController.helper Doorkeeper::Helpers::Controller
   end
 
