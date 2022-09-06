@@ -136,7 +136,7 @@ GEM
     faraday_middleware (0.14.0)
       faraday (>= 0.7.4, < 1.0)
     ffi (1.15.5)
-    flipper (0.25.1)
+    flipper (0.25.2)
     flipper-active_record (0.25.1)
       activerecord (>= 4.2, < 8)
       flipper (~> 0.25.1)
