@@ -27,7 +27,7 @@ module RateLimitDumpWorker
 
       user = User.find(requester_id)
       # false - disable congestion if user is admin
-      # true - emable congestion if they are a normal user
+      # true - enable congestion if they are a normal user
       user.is_admin? ? false : true
     rescue ActiveRecord::RecordNotFound
       # if the user ID can't then enable congestion rate limiting
