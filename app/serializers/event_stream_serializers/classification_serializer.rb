@@ -12,6 +12,7 @@ module EventStreamSerializers
     belongs_to :user,             serializer: EventStreamSerializers::UserSerializer
     belongs_to :workflow,         serializer: EventStreamSerializers::WorkflowSerializer
     has_many   :subjects,         serializer: EventStreamSerializers::SubjectSerializer
+    type 'classifications'
 
     def user_ip
       object.user_ip.to_s

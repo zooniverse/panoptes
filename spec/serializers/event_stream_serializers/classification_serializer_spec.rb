@@ -8,7 +8,7 @@ describe EventStreamSerializers::ClassificationSerializer do
   it 'can process includes' do
     subject = create(:subject)
     classification.subject_ids = [subject.id]
-    adapter = described_class.serialize(classification, include: ['subjects'])
+    adapter = described_class.serialize(classification, { include: ['subjects'] })
     expect(adapter.as_json[:linked]['subjects'].size).to eq(1)
   end
 end

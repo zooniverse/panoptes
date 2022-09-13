@@ -1,11 +1,17 @@
 require 'active_model/serializer/adapter/json_api/fragment_cache'
 
 module Serialization
-  class V1Adapter < ActiveModel::Serializer::Adapter
+  # class V1Adapter < ActiveModel::Serializer::Adapter
+  class V1Adapter < ActiveModel::Serializer::Adapter::Base
+    # include ActiveModel::Serializer::Adapter 
+
     def initialize(serializer, options = {})
       super
       serializer.root = true
-      @hash = { serializer.type => [] }
+      #rc2
+      # @hash = { serializer.type => [] }
+      @hash = { serializer._type => [] }
+      @options = options
 
       if fields = options.delete(:fields)
         @fieldset = ActiveModel::Serializer::Fieldset.new(fields, serializer.json_key)
@@ -16,9 +22,11 @@ module Serialization
 
     def serializable_hash(options = {})
       if serializer.respond_to?(:each)
+        binding.pry
         serializer.each do |s|
           result = self.class.new(s, @options.merge(fieldset: @fieldset)).serializable_hash
-          @hash[serializer.type] << result[serializer.type]
+          # @hash[serializer.type] << result[serializer.type]
+          @hash[serializer._type] << result[serializer._type]
 
           if result[:linked]
             result[:linked].each do |type, data|
@@ -29,8 +37,12 @@ module Serialization
           end
         end
       else
-        @hash[serializer.type] = [attributes_for_serializer(serializer, @options)]
-        add_resource_links(@hash[serializer.type][0], serializer)
+        # @hash[serializer.type] = [attributes_for_serializer(serializer, @options)]
+        @hash[serializer._type] = [attributes_for_serializer(serializer, @options)]
+         #should hit here
+         binding.pry
+        # add_resource_links(@hash[serializer.type][0], serializer)
+        add_resource_links(@hash[serializer._type][0], serializer)
       end
       @hash
     end
@@ -70,13 +82,16 @@ module Serialization
 
           add_resource_links(attrs, serializer, add_included: false)
 
-          @hash[:linked][serializer.type] ||= []
-          @hash[:linked][serializer.type].push(attrs) unless @hash[:linked][serializer.type].include?(attrs)
+          # @hash[:linked][serializer.type] ||= []
+          # @hash[:linked][serializer.type].push(attrs) unless @hash[:linked][serializer.type].include?(attrs)
+
+          @hash[:linked][serializer._type] ||= []
+          @hash[:linked][serializer._type].push(attrs) unless @hash[:linked][serializer._type].include?(attrs)
         end
       end
 
       serializers.each do |serializer|
-        serializer.each_association do |name, association, opts|
+        serializer.associations.each do |name, association, opts|
           add_included(name, association, resource_path) if association
         end if include_nested_assoc? resource_path
       end
@@ -85,24 +100,33 @@ module Serialization
     def attributes_for_serializer(serializer, options)
       if serializer.respond_to?(:each)
         result = []
+        puts "MDY114 HELLOOOOO"
         serializer.each do |object|
+          binding.pry
+          puts "mdy114 #{options}"
+          puts "mdy114 object #{object}"
           options[:fields] = @fieldset && @fieldset.fields_for(serializer)
           result << cache_check(object) do
             options[:required_fields] = [:id, :type]
             attributes = object.attributes(options)
             attributes[:id] = attributes[:id].to_s
-            attributes[:href] = "/#{serializer.type}/#{object.id}"
+            # attributes[:href] = "/#{serializer.type}/#{object.id}"
+            attributes[:href] = "/#{serializer._type}/#{object.id}"
             attributes.delete(:type)
             result << attributes
           end
         end
       else
+        puts "mdy114 else in v1 adapter in attrbutes for serializer"
+        binding.pry
         options[:fields] = @fieldset && @fieldset.fields_for(serializer)
         options[:required_fields] = [:id, :type]
         result = cache_check(serializer) do
+          binding.pry
           result = serializer.attributes(options)
           result[:id] = result[:id].to_s
-          result[:href] = "/#{serializer.type}/#{serializer.id}"
+          # result[:href] = "/#{serializer.type}/#{serializer.id}"
+          result[:href] = "/#{serializer._type}/#{serializer.object.id}"
           result.delete(:type)
           result
         end
@@ -129,13 +153,15 @@ module Serialization
     end
 
     def add_resource_links(attrs, serializer, options = {})
+      binding.pry
       options[:add_included] = options.fetch(:add_included, true)
 
-      serializer.each_association do |name, association, opts|
+      serializer.associations.each do |association|
+        binding.pry
         attrs[:links] ||= {}
 
         if association.respond_to?(:each)
-          add_links(attrs, name, association)
+          add_links(association, association.name, association.serializer)
         else
           if opts[:virtual_value]
             add_link(attrs, name, nil, opts[:virtual_value])
