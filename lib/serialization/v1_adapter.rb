@@ -101,7 +101,7 @@ module Serialization
         options[:fields] = @fieldset && @fieldset.fields_for(serializer)
         options[:required_fields] = [:id, :type]
         result = cache_check(serializer) do
-          result = serializer.attributes(options)
+          result = serializer.attributes
           result[:id] = result[:id].to_s
           result[:href] = "/#{serializer._type}/#{serializer.object.id}"
           result.delete(:type)
