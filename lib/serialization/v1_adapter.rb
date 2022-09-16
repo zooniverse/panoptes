@@ -88,7 +88,7 @@ module Serialization
         result = []
         serializer.each do |object|
           options[:fields] = @fieldset && @fieldset.fields_for(serializer)
-          result << cache_check(object) do
+          result << object.fetch(self) do
             options[:required_fields] = [:id, :type]
             attributes = object.attributes(options)
             attributes[:id] = attributes[:id].to_s
@@ -100,7 +100,7 @@ module Serialization
       else
         options[:fields] = @fieldset && @fieldset.fields_for(serializer)
         options[:required_fields] = [:id, :type]
-        result = cache_check(serializer) do
+        result = serializer.fetch(self) do
           result = serializer.attributes
           result[:id] = result[:id].to_s
           result[:href] = "/#{serializer._type}/#{serializer.object.id}"
