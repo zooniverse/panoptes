@@ -77,9 +77,9 @@ module Serialization
       end
 
       serializers.each do |serializer|
-        serializer.associations.each do |association|
+        serializer.associations.each { |association|
           add_included(association.name, association, resource_path) if association
-        end if include_nested_assoc? resource_path
+         } if include_nested_assoc? resource_path
       end
     end
 
