@@ -53,7 +53,7 @@ module Serialization
       resource[:links][name] = nil
 
       if serializer && serializer.object
-        resource[:links][name]= serializer.object.id.to_s
+        resource[:links][name] = serializer.object.id.to_s
       end
     end
 
