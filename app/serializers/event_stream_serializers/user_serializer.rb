@@ -1,6 +1,6 @@
 module EventStreamSerializers
   class UserSerializer < ActiveModel::Serializer
     attributes :id, :login
-    type 'users'
+    type :users
   end
 end
