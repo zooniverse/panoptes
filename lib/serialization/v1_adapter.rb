@@ -1,7 +1,7 @@
-require 'active_model/serializer/adapter/json_api/fragment_cache'
+require 'active_model_serializers/adapter/json_api'
 
 module Serialization
-  class V1Adapter < ActiveModel::Serializer::Adapter::Base
+  class V1Adapter < ActiveModelSerializers::Adapter::Base
     def initialize(serializer, options = {})
       super
       serializer.root = true
@@ -38,7 +38,7 @@ module Serialization
 
     def fragment_cache(cached_hash, non_cached_hash)
       root = false if @options.include?(:include)
-      JsonApi::FragmentCache.new().fragment_cache(root, cached_hash, non_cached_hash)
+      JsonApi.new().fragment_cache(root, cached_hash, non_cached_hash)
     end
 
     private
