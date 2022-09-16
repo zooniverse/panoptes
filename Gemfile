@@ -41,7 +41,7 @@ gem 'p3p', '~> 2.0'
 gem 'panoptes-client'
 gem 'pg', '~> 0.21'
 gem 'pg_search'
-gem 'puma', '~> 5.6.4'
+gem 'puma', '~> 5.6.5'
 gem 'pundit', '~> 2.2.0'
 gem 'rack-cors', '~> 1.0', require: 'rack/cors'
 if next?
