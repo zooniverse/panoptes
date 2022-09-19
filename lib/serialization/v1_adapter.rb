@@ -135,18 +135,18 @@ module Serialization
       serializer.associations.each do |association|
         attrs[:links] ||= {}
 
-        if association.serializer.respond_to?(:each)
-          add_links(attrs, association.name, association.serializer)
+        if association.lazy_association.serializer.respond_to?(:each)
+          add_links(attrs, association.name, association.lazy_association.serializer)
         else
-          if association.options[:virtual_value]
-            add_link(attrs, association.name, nil, association.options[:virtual_value])
+          if association.reflection.options[:virtual_value]
+            add_link(attrs, association.name, nil, association.reflection.options[:virtual_value])
           else
-            add_link(attrs, association.name, association.serializer)
+            add_link(attrs, association.name, association.lazy_association.serializer)
           end
         end
 
         if options[:add_included]
-          Array(association.serializer).each do |associated_serializer|
+          Array(association.lazy_association.serializer).each do |associated_serializer|
             add_included(association.name, associated_serializer)
           end
         end
