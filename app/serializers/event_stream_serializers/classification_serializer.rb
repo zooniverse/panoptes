@@ -7,7 +7,7 @@ module EventStreamSerializers
 
     attributes :id, :created_at, :updated_at, :user_ip, :workflow_version, :gold_standard,
                :expert_classifier, :annotations, :metadata
-    
+
     type :classifications
 
     belongs_to :project,          serializer: EventStreamSerializers::ProjectSerializer
