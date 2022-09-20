@@ -1,11 +1,8 @@
-require 'active_model_serializers/adapter/json_api'
-
 module Serialization
   class V1Adapter < ActiveModelSerializers::Adapter::Base
     def initialize(serializer, options = {})
       super
-      serializer.root = true
-      @hash = { serializer._type => [] }
+      @hash = { serializer.json_key => [] }
       @options = options
 
       if fields = options.delete(:fields)
@@ -19,7 +16,7 @@ module Serialization
       if serializer.respond_to?(:each)
         serializer.each do |s|
           result = self.class.new(s, @options.merge(fieldset: @fieldset)).serializable_hash
-          @hash[serializer._type] << result[serializer._type]
+          @hash[serializer.json_key] << result[serializer.json_key]
 
           if result[:linked]
             result[:linked].each do |type, data|
@@ -30,8 +27,8 @@ module Serialization
           end
         end
       else
-        @hash[serializer._type] = [attributes_for_serializer(serializer, @options)]
-        add_resource_links(@hash[serializer._type][0], serializer)
+        @hash[serializer.json_key] = [attributes_for_serializer(serializer, @options)]
+        add_resource_links(@hash[serializer.json_key][0], serializer)
       end
       @hash
     end
@@ -71,8 +68,8 @@ module Serialization
 
           add_resource_links(attrs, serializer, add_included: false)
 
-          @hash[:linked][serializer._type] ||= []
-          @hash[:linked][serializer._type].push(attrs) unless @hash[:linked][serializer._type].include?(attrs)
+          @hash[:linked][serializer.json_key] ||= []
+          @hash[:linked][serializer.json_key].push(attrs) unless @hash[:linked][serializer.json_key].include?(attrs)
         end
       end
 
@@ -92,7 +89,7 @@ module Serialization
             options[:required_fields] = [:id, :type]
             attributes = object.attributes(options)
             attributes[:id] = attributes[:id].to_s
-            attributes[:href] = "/#{serializer._type}/#{object.id}"
+            attributes[:href] = "/#{serializer.json_key}/#{object.id}"
             attributes.delete(:type)
             result << attributes
           end
@@ -103,7 +100,7 @@ module Serialization
         result = serializer.fetch(self) do
           result = serializer.attributes
           result[:id] = result[:id].to_s
-          result[:href] = "/#{serializer._type}/#{serializer.object.id}"
+          result[:href] = "/#{serializer.json_key}/#{serializer.object.id}"
           result.delete(:type)
           result
         end
@@ -146,7 +143,7 @@ module Serialization
         end
 
         if options[:add_included]
-          Array(association.lazy_association.serializer).each do |associated_serializer|
+          Array.wrap(association.lazy_association.serializer).each do |associated_serializer|
             add_included(association.name, associated_serializer)
           end
         end
