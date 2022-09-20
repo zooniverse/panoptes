@@ -43,12 +43,6 @@ Rails.application.configure do
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
 
-  #hack to fix issue with doorkeeper not loading ControllerHelpers in test env
-  # https://github.com/doorkeeper-gem/doorkeeper/issues/375
-  ActiveSupport::Reloader.to_prepare do
-    Doorkeeper::ApplicationsController.helper Doorkeeper::Helpers::Controller
-  end
-
   if ENV['DISABLE_TEST_LOGGING']
     # rubocop:disable Rails/Output
     puts 'Logs are being suppressed to speed up the test suite. ' \
