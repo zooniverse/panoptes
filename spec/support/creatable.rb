@@ -4,7 +4,7 @@ shared_examples "is creatable" do |action=:create|
   context "a logged in user" do
     before(:each) do
       default_request scopes: scopes, user_id: authorized_user.id
-      post action, create_params
+      post action, params: create_params
     end
 
     it "should return created" do
@@ -44,7 +44,7 @@ shared_examples "is creatable" do |action=:create|
   context "a non-logged in user" do
     before(:each) do
       default_request
-      post action, create_params
+      post action, params: create_params
     end
 
     it "should return unauthorized" do

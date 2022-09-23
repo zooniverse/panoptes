@@ -89,7 +89,7 @@ RSpec.shared_examples "supports update_links" do
       test_relation => test_relation_ids,
       resource_id => resource.id
     }
-    post :update_links, params
+    post :update_links, params: params
   end
 
   it 'should update any included links' do
@@ -114,7 +114,7 @@ RSpec.shared_examples "supports update_links via a copy of the original" do
       test_relation => test_relation_ids,
       resource_id => resource.id
     }
-    post :update_links, params
+    post :update_links, params: params
   end
 
   it 'should have resources to copy' do

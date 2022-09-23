@@ -19,7 +19,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
         context "when #{media_type} exists" do
           before(:each) do
             default_request user_id: authorized_user.id, scopes: scopes
-            get :index, :"#{parent_name}_id" => parent.id, :media_name => media_type
+            get :index, params: { :"#{parent_name}_id" => parent.id, :media_name => media_type } 
           end
 
           it 'should return ok' do
@@ -39,7 +39,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
           before(:each) do
             parent.send(media_type).destroy
             default_request user_id: authorized_user.id, scopes: scopes
-            get :index, :"#{parent_name}_id" => parent.id, :media_name => media_type
+            get :index, params: { :"#{parent_name}_id" => parent.id, :media_name => media_type }
           end
 
           it 'should return 404' do
@@ -59,8 +59,8 @@ RSpec.describe Api::V1::MediaController, type: :controller do
         context "when #{media_type} exists" do
           before(:each) do
             default_request user_id: authorized_user.id, scopes: scopes
-            get :show, :"#{parent_name}_id" => parent.id, :media_name => media_type,
-              :id => resources.first.id
+            get :show, params: { :"#{parent_name}_id" => parent.id, :media_name => media_type,
+              :id => resources.first.id }
           end
 
           it 'should return ok' do
@@ -78,8 +78,8 @@ RSpec.describe Api::V1::MediaController, type: :controller do
           let(:media_id) {(Medium.last.id + 100)}
           before(:each) do
             default_request user_id: authorized_user.id, scopes: scopes
-            get :show, :"#{parent_name}_id" => parent.id, :media_name => media_type,
-              :id => media_id
+            get :show, params: { :"#{parent_name}_id" => parent.id, :media_name => media_type,
+              :id => media_id }
           end
 
           it 'should return 404' do
@@ -105,7 +105,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
           { :id => resource.id, :"#{parent_name}_id" => parent.id, :media_name => media_type, test: 1 }
         end
         let(:destroy_action) do
-          delete :destroy, params
+          delete :destroy, params: params
         end
 
         it "should return 204" do
@@ -174,7 +174,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
       describe "#index" do
         let(:get_index) do
           default_request user_id: authorized_user.id, scopes: scopes
-          get :index, :"#{parent_name}_id" => parent.id, :media_name => media_type
+          get :index, params: { :"#{parent_name}_id" => parent.id, :media_name => media_type }
         end
 
         context "when #{media_type} exists" do
@@ -247,7 +247,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
 
         it "should return the medium's put url" do
           default_request user_id: authorized_user.id, scopes: scopes
-          post :create, create_params
+          post :create, params: create_params
           expect(json_response["media"][0]["src"]).to eq(new_resource.put_url)
         end
 
@@ -267,7 +267,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
 
           it "should create an externally hosted media resource" do
             default_request user_id: authorized_user.id, scopes: scopes
-            post :create, external_media_payload
+            post :create, params: external_media_payload
             media_location = json_response["media"][0]["src"]
             expect(media_location).to eq(
               external_media_payload.dig(:media, :src)
@@ -278,7 +278,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
         describe "updates relationship" do
           before(:each) do
             default_request user_id: authorized_user.id, scopes: scopes
-            post :create, create_params
+            post :create, params: create_params
           end
 
           it "should replace the old #{media_type}" do
@@ -300,7 +300,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
           set_preconditions
         end
         let(:destroy_action) do
-          delete :destroy, :"#{parent_name}_id" => parent.id, media_name: media_type
+          delete :destroy, params: { :"#{parent_name}_id" => parent.id, media_name: media_type }
         end
 
         it "should return 204" do
@@ -343,12 +343,12 @@ RSpec.describe Api::V1::MediaController, type: :controller do
 
         it 'should return 404 without an authorized_user' do
           default_request user_id: create(:user).id, scopes: scopes
-          get :index, project_id: parent.id, media_name: "classifications_export"
+          get :index, params: { project_id: parent.id, media_name: "classifications_export" }
           expect(response).to have_http_status(:not_found)
         end
 
         it 'should return 404 without a user' do
-          get :index, project_id: parent.id, media_name: "classifications_export"
+          get :index, params: { project_id: parent.id, media_name: "classifications_export" }
           expect(response).to have_http_status(:not_found)
         end
       end
@@ -370,12 +370,12 @@ RSpec.describe Api::V1::MediaController, type: :controller do
 
         it 'should return 404 without an authorized_user' do
           default_request user_id: create(:user).id, scopes: scopes
-          get :index, project_id: parent.id, media_name: "classifications_export"
+          get :index, params: { project_id: parent.id, media_name: "classifications_export" }
           expect(response).to have_http_status(:not_found)
         end
 
         it 'should return 404 without a user' do
-          get :index, project_id: parent.id, media_name: "classifications_export"
+          get :index, params: { project_id: parent.id, media_name: "classifications_export" }
           expect(response).to have_http_status(:not_found)
         end
       end

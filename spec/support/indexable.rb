@@ -13,7 +13,7 @@ RSpec.shared_examples "is indexable" do |private_test=true|
     end
 
     def run_get
-      get :index, ips
+      get :index, params: ips
     end
 
     it 'should return 200' do
@@ -52,14 +52,14 @@ RSpec.shared_examples "is indexable" do |private_test=true|
 
       context 'when an admin param is set' do
         it 'should include the non-visible resource' do
-          get :index, ips.merge(admin: 'literally_anything!')
+          get :index, params: ips.merge(admin: 'literally_anything!')
           expect(resource_ids).to include private_resource.id
         end
       end
 
       context 'when no admin param is set' do
         it 'should not include the non-visible resource' do
-          get :index, ips
+          get :index, params: ips
           expect(resource_ids).to_not include private_resource.id
         end
       end

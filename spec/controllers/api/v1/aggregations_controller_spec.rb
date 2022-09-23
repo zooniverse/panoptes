@@ -23,7 +23,7 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
         let(:workflow) { create(:workflow) }
 
         it "should return an empty resource set" do
-          get :index, workflow_id: workflow.id
+          get :index, params: { workflow_id: workflow.id }
           expect(json_response[api_resource_name].length).to eq(0)
         end
       end
@@ -35,7 +35,7 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
         end
 
         it "should return all the aggregated data for the supplied workflow" do
-          get :index, workflow_id: workflow.id
+          get :index, params: { workflow_id: workflow.id }
           expect(json_response[api_resource_name].length).to eq n_visible
         end
 
@@ -50,7 +50,7 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
         context "when supplying just the non public workflow ids" do
 
           it "should return no results" do
-            get :index, workflow_id: "#{private_resource.workflow_id}"
+            get :index, params: { workflow_id: "#{private_resource.workflow_id}" }
             expect(json_response[api_resource_name].length).to eq(0)
           end
         end
@@ -59,7 +59,7 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
 
           it "should only return the resources for the public workflow" do
             ids = [ workflow.id, private_resource.workflow_id ]
-            get :index, workflow_ids: ids.join(",")
+            get :index, params: { workflow_ids: ids.join(",") }
             expect(result_workflow_ids).to match_array( [ "#{workflow.id}" ])
           end
         end
@@ -68,7 +68,7 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
           let(:subject_id) { "#{aggregations.last.subject_id}" }
 
           it "should return all the aggregated data for the supplied workflow" do
-            get :index, workflow_id: workflow.id, subject_id: subject_id
+            get :index, params: { workflow_id: workflow.id, subject_id: subject_id }
             aggregate_failures "filtering" do
               resources = json_response[api_resource_name]
               expect(resources.length).to eq(1)
@@ -93,7 +93,7 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
         let(:workflow) { create(:workflow) }
 
         it "should return not_found" do
-          get :show, id: resource.id
+          get :show, params: { id: resource.id }
           expect(response).to have_http_status(:not_found)
         end
       end
@@ -102,7 +102,7 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
 
         it "should return the aggregated resource with a public workflow" do
           resource.workflow.update_column(:aggregation, { public: true })
-          get :show, id: resource.id
+          get :show, params: { id: resource.id }
           aggregate_failures "public show" do
             expect(json_response[api_resource_name].length).to eq(1)
             expect(created_instance(api_resource_name)["id"]).to eq("#{resource.id}")

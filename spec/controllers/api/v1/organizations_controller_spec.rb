@@ -85,7 +85,7 @@ describe Api::V1::OrganizationsController, type: :controller do
           owned_unlisted_organization.save
 
           default_request scopes: scopes, user_id: authorized_user.id
-          get :index, index_options
+          get :index, params: index_options
           expect(json_response["organizations"].length).to eq(1)
         end
       end
@@ -126,7 +126,7 @@ describe Api::V1::OrganizationsController, type: :controller do
         context "a logged in user" do
           before(:each) do
             default_request scopes: scopes, user_id: authorized_user.id
-            post :create, create_params
+            post :create, params: create_params
           end
           let(:test_attr) { :categories }
           let(:expected_categories) do
@@ -222,7 +222,7 @@ describe Api::V1::OrganizationsController, type: :controller do
 
         it "successfully updates with incomplete params", :aggregate_failures do
           params = incomplete_params.merge(id: organization.id)
-          put :update, params
+          put :update, params: params
         end
 
         it "successfully updates with nested params", :aggregate_failures do
@@ -232,7 +232,7 @@ describe Api::V1::OrganizationsController, type: :controller do
             {label: "Slog", url: "http://whattasite.net"},
             {label: "Krog", url: "http://potatosalad.yum"}
           ]
-          put :update, params
+          put :update, params: params
         end
       end
 
@@ -243,7 +243,7 @@ describe Api::V1::OrganizationsController, type: :controller do
         end
 
         def run_update(params)
-          put :update, params
+          put :update, params: params
         end
 
         it "updates the title to match the display name" do
