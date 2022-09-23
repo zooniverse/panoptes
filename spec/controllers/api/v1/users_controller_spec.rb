@@ -382,7 +382,6 @@ describe Api::V1::UsersController, type: :controller do
     end
 
     it "should have the zooniverse_id for the user" do
-      binding.pry
       result = user_response["zooniverse_id"]
       expect(result).to eq(user.zooniverse_id)
     end
