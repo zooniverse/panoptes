@@ -13,7 +13,7 @@ describe ProjectSerializer do
 
   describe 'preloading associations for page' do
     it 'preloads avatars only with cards context' do
-      expect_any_instance_of(Project::ActiveRecord_Relation)
+      expect_any_instance_of(Project.const_get('ActiveRecord_Relation'))
         .to receive(:preload)
         .with(:avatar)
         .and_call_original
@@ -21,7 +21,7 @@ describe ProjectSerializer do
     end
 
     it 'preloads the specified associations by default' do
-      expect_any_instance_of(Project::ActiveRecord_Relation)
+      expect_any_instance_of(Project.const_get('ActiveRecord_Relation'))
         .to receive(:preload)
         .with(*ProjectSerializer.preloads)
         .and_call_original

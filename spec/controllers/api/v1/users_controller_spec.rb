@@ -50,7 +50,7 @@ describe Api::V1::UsersController, type: :controller do
 
       before(:each) do
         default_request(scopes: scopes, user_id: user.id)
-        get :index, index_options
+        get :index, params: index_options
       end
 
       it_behaves_like "filter by display_name"
@@ -225,9 +225,9 @@ describe Api::V1::UsersController, type: :controller do
           let(:index_options){ { search: '@some&@!_(   )user' } }
 
           it 'should strip the invalid characters' do
-            expect_any_instance_of(User::ActiveRecord_Relation)
+            expect_any_instance_of(User.const_get('ActiveRecord_Relation'))
               .to receive(:full_search_login).with('some_user').and_call_original
-            get :index, index_options
+            get :index, params: index_options
           end
         end
 
@@ -235,10 +235,10 @@ describe Api::V1::UsersController, type: :controller do
           let(:index_options){ { search: 'me' } }
 
           it 'should abort the query', :aggregate_failures do
-            expect_any_instance_of(User::ActiveRecord_Relation)
+            expect_any_instance_of(User.const_get('ActiveRecord_Relation'))
               .to_not receive(:full_search_login)
             expect(User).to receive(:none).and_call_original
-            get :index, index_options
+            get :index, params: index_options
           end
 
           context 'when a user has that login' do
@@ -259,7 +259,7 @@ describe Api::V1::UsersController, type: :controller do
 
       before(:each) do
         create(:classification, user: user)
-        get :index, { login: user.login }
+        get :index, params: { login: user.login }
       end
       it "should respond with the no model links" do
         expect(json_response[api_resource_name][0]['links']).to eq({})
@@ -273,7 +273,7 @@ describe Api::V1::UsersController, type: :controller do
 
       before(:each) do
         default_request(scopes: scopes, user_id: users.first.id)
-        get :show, id: users.first.id
+        get :show, params: { id: users.first.id }
       end
 
       it "should return 200" do
@@ -308,7 +308,7 @@ describe Api::V1::UsersController, type: :controller do
       before(:each) do
         allow_any_instance_of(User).to receive(:admin).and_return(true)
         default_request(scopes: scopes, user_id: requesting_user_id)
-        get :show, id: show_id
+        get :show, params: { id: show_id }
       end
 
       context "when showing the a different user to the requesting user" do
@@ -382,6 +382,7 @@ describe Api::V1::UsersController, type: :controller do
     end
 
     it "should have the zooniverse_id for the user" do
+      binding.pry
       result = user_response["zooniverse_id"]
       expect(result).to eq(user.zooniverse_id)
     end
@@ -402,7 +403,7 @@ describe Api::V1::UsersController, type: :controller do
       default_request(scopes: scopes, user_id: user.id)
       params = put_operations || Hash.new
       params[:id] = user_id
-      put :update, params
+      put :update, params: params
     end
 
     shared_examples 'admin only attribute' do |attribute, value|
@@ -629,11 +630,11 @@ describe Api::V1::UsersController, type: :controller do
 
     it "should call the UserInfoScrubber with the user" do
       expect(UserInfoScrubber).to receive(:scrub_personal_info!).with(user)
-      delete :destroy, id: user_id
+      delete :destroy, params: { id: user_id }
     end
 
     it "should revoke the request doorkeeper token" do
-      delete :destroy, id: user_id
+      delete :destroy, params: { id: user_id }
       expect(access_token.reload.revoked?).to eq(true)
     end
 

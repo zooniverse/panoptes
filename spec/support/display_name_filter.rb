@@ -1,6 +1,6 @@
 RSpec.shared_examples "filter by display_name" do
   before(:each) do
-    get :index, index_options
+    get :index, params: index_options
   end
 
   describe "filter by display_name" do

@@ -15,7 +15,7 @@ shared_examples "a panoptes restpack serializer" do |test_owner_include=false, t
     end
 
     it "should not preload when none set" do
-      expect_any_instance_of(resource.class::ActiveRecord_Relation).not_to receive(:preload)
+      expect_any_instance_of(resource.class.const_get('ActiveRecord_Relation')).not_to receive(:preload)
       described_class.instance_variable_set(:@preloads, [])
       described_class.page({}, scope, {})
     end
@@ -29,7 +29,7 @@ shared_examples "a panoptes restpack serializer" do |test_owner_include=false, t
 
     it "should preload valid preloads" do
       expectation = preloads.empty? ? :not_to : :to
-      expect_any_instance_of(resource.class::ActiveRecord_Relation)
+      expect_any_instance_of(resource.class.const_get('ActiveRecord_Relation'))
         .send(expectation, receive(:preload))
         .with(*preloads)
         .and_call_original
@@ -47,13 +47,13 @@ shared_examples "a panoptes restpack serializer" do |test_owner_include=false, t
     end
 
     it "should not preload when no included relations" do
-      expect_any_instance_of(resource.class::ActiveRecord_Relation).not_to receive(:preload)
+      expect_any_instance_of(resource.class.const_get('ActiveRecord_Relation')).not_to receive(:preload)
       described_class.page({}, scope, {})
     end
 
     it "should handle preloading included relations" do
       expectation = includes.empty? ? :not_to : :to
-      expect_any_instance_of(resource.class::ActiveRecord_Relation)
+      expect_any_instance_of(resource.class.const_get('ActiveRecord_Relation'))
         .send(expectation, receive(:preload))
         .with(*includes)
         .and_call_original
@@ -80,7 +80,7 @@ shared_examples "a panoptes restpack serializer" do |test_owner_include=false, t
 
           it "should handle the special owner relation include param" do
             expect_any_instance_of(
-              resource.class::ActiveRecord_Relation
+              resource.class.const_get('ActiveRecord_Relation')
             ).to receive(:preload)
             .with(*expected_includes)
             .and_call_original
