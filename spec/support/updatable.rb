@@ -11,7 +11,7 @@ shared_examples "is updatable" do
     before(:each) do
       default_request scopes: scopes, user_id: authorized_user.id
       params = update_params.merge(id: resource.id)
-      put :update, params
+      put :update, params: params
     end
 
     it 'should update supplied attributes' do
@@ -46,7 +46,7 @@ shared_examples "is updatable" do
 
       default_request scopes: scopes, user_id: user.id
       params = update_params.merge(id: resource.id)
-      put :update, params
+      put :update, params: params
     end
 
     it 'should return not found' do
@@ -66,7 +66,7 @@ RSpec.shared_examples "has updatable links" do
   before(:each) do
     default_request scopes: scopes, user_id: authorized_user.id
     params = update_params.merge(id: resource.id)
-    put :update, params
+    put :update, params: params
   end
 
   it 'should update any included links' do
