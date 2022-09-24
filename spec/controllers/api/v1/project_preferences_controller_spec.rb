@@ -25,7 +25,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
     describe "include projects" do
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
-        get :index, include: "project"
+        get :index, params: { include: "project" }
       end
 
       it 'should be able to include linked projects' do
@@ -39,7 +39,6 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
   end
 
   describe "#show" do
-
     it_behaves_like "is showable"
   end
 
@@ -94,7 +93,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
         }
       }
     end
-    let(:run_update) { post :update_settings, settings_params }
+    let(:run_update) { post :update_settings, params: settings_params }
 
     before(:each) do
       default_request user_id: authorized_user.id, scopes: scopes

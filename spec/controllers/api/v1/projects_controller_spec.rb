@@ -68,7 +68,7 @@ describe Api::V1::ProjectsController, type: :controller do
         let(:resource) { new_project }
         let(:ids) { json_response["projects"].map{ |p| p["id"] } }
         let(:index_request) do
-          get :index, index_options
+          get :index, params: index_options
         end
 
         before(:each) do
@@ -244,7 +244,7 @@ describe Api::V1::ProjectsController, type: :controller do
       describe "include params" do
         before do
           project
-          get :index, { include: includes }
+          get :index, params: { include: includes }
         end
 
         describe "include avatar and background" do
@@ -310,7 +310,7 @@ describe Api::V1::ProjectsController, type: :controller do
 
     it_behaves_like "an api response" do
       before do
-        get :show, id: resource.id
+        get :show, params: { id: resource.id } 
       end
     end
 
@@ -396,14 +396,14 @@ describe Api::V1::ProjectsController, type: :controller do
           .to receive(:perform_async)
           .with(be_kind_of(Integer))
         default_request scopes: scopes, user_id: authorized_user.id
-        post :create, create_params
+        post :create, params: create_params
       end
     end
 
     describe "correct serializer configuration" do
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
-        post :create, create_params
+        post :create, params: create_params
       end
 
       context "without commas in the display name" do
@@ -449,7 +449,7 @@ describe Api::V1::ProjectsController, type: :controller do
 
       def tag_request
         default_request scopes: scopes, user_id: authorized_user.id
-        post :create, create_params
+        post :create, params: create_params
       end
 
       context "when the tags did not exist" do
@@ -483,7 +483,7 @@ describe Api::V1::ProjectsController, type: :controller do
         it "should not orphan an ACL instance when the model is invalid" do
           default_request scopes: scopes, user_id: authorized_user.id
           create_params[:projects] = create_params[:projects].except(:primary_language)
-          expect{ post :create, create_params }.not_to change{ AccessControlList.count }
+          expect{ post :create, params: create_params }.not_to change{ AccessControlList.count }
         end
       end
     end
@@ -503,7 +503,7 @@ describe Api::V1::ProjectsController, type: :controller do
       context "user is not the current user" do
         let(:req) do
           default_request scopes: scopes, user_id: authorized_user.id
-          post :create, create_params
+          post :create, params: create_params
         end
 
 
@@ -543,7 +543,7 @@ describe Api::V1::ProjectsController, type: :controller do
 
       it 'should have the user group as its owner' do
         default_request scopes: scopes, user_id: authorized_user.id
-        post :create, create_params
+        post :create, params: create_params
         project = Project.find(json_response['projects'][0]['id'])
         expect(project.owner).to eq(owner)
       end
@@ -615,20 +615,20 @@ describe Api::V1::ProjectsController, type: :controller do
         let(:authorized_user) { create(:admin_user) }
 
         it "should update the project" do
-          put :update, ps.merge(id: resource.id)
+          put :update, params: ps.merge(id: resource.id)
           expect(response).to have_http_status(:ok)
         end
 
         it "should record the launch_date" do
           expect(resource.launch_date).to be_nil
-          put :update, ps.merge(id: resource.id)
+          put :update, params: ps.merge(id: resource.id)
           expect(resource.reload.launch_date).not_to be_nil
         end
 
         it "should not record the launch_date if it's already been set" do
           resource.update_column(:launch_date, Time.zone.now)
           ld = resource.reload.launch_date
-          put :update, ps.merge(id: resource.id)
+          put :update, params: ps.merge(id: resource.id)
           expect(resource.reload.launch_date).to eq(ld)
         end
       end
@@ -636,7 +636,7 @@ describe Api::V1::ProjectsController, type: :controller do
       context "when the user is not an admin" do
         let(:authorized_user) { create(:user) }
         it "should not update the project" do
-          put :update, ps.merge(id: resource.id)
+          put :update, params: ps.merge(id: resource.id)
           expect(response).to have_http_status(:unprocessable_entity)
         end
       end
@@ -655,33 +655,33 @@ describe Api::V1::ProjectsController, type: :controller do
 
       it 'should update the title' do
         params[:projects][test_attr] = test_attr_value
-        put :update, params
+        put :update, params: params
         project.reload
         expect(project.title).to eq(test_attr_value)
       end
 
       it 'should update the description changes' do
-        put :update, params
+        put :update, params: params
         project.reload
         expect(project.description).to eq('SC')
         expect(json_response['projects'][0]['description']).to eq('SC')
       end
 
       it 'should extract labels from the urls' do
-        put :update, params
+        put :update, params: params
         project.reload
         expect(project.urls).to eq([{"label" => "0.label", "url" => "https://zooniverse.org/about"}])
       end
 
       it 'should save labels' do
-        put :update, params
+        put :update, params: params
         project.reload
         expect(project.url_labels).to eq({"0.label" => "About"})
       end
 
       it "should touch the project resource to modify the cache_key / etag" do
         expect {
-          put :update, params
+          put :update, params: params
         }.to change { resource.reload.updated_at }
       end
     end
@@ -696,19 +696,19 @@ describe Api::V1::ProjectsController, type: :controller do
       context 'copy linked workflow' do
         it 'copies the workflow using the WorkflowCopier' do
           allow(WorkflowCopier).to receive(:copy).and_call_original
-          put :update, params
+          put :update, params: params
           expect(WorkflowCopier).to have_received(:copy).with(workflow, resource.id)
         end
 
         it 'has a different id to the original workflow' do
-          put :update, params
+          put :update, params: params
           expect(resource.workflows.first.id).to_not eq(workflow.id)
         end
       end
 
       context 'copy linked subject_set' do
         before do
-          put :update, params
+          put :update, params: params
         end
 
         it 'should have the same name' do
@@ -840,7 +840,7 @@ describe Api::V1::ProjectsController, type: :controller do
       create(:private_project, owner: authorized_user, configuration: { template: true })
     end
     let(:copy_params) { { project_id: resource.id } }
-    let(:req) { post :copy, copy_params }
+    let(:req) { post :copy, params: copy_params }
     let(:requesting_user) { authorized_user }
 
     before do

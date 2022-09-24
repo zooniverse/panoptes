@@ -29,7 +29,7 @@ describe Api::V1::FieldGuidesController, type: :controller do
       before(:each) do
         setup_field_guide
         default_request user_id: authorized_user.id, scopes: scopes
-        get :index, filter_params
+        get :index, params: filter_params
       end
 
       context "by project id" do

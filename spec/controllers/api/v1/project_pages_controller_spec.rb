@@ -35,7 +35,7 @@ describe Api::V1::ProjectPagesController, type: :controller do
 
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
-        get :index, project_id: private_project.id
+        get :index, params: { project_id: private_project.id }
       end
 
       context "authorized user" do
@@ -60,7 +60,7 @@ describe Api::V1::ProjectPagesController, type: :controller do
         index_params.merge!(filter_opts)
         default_request scopes: scopes, user_id: authorized_user.id
         request.env.merge!(headers)
-        get :index, index_params
+        get :index, params: index_params
       end
 
       describe "filter by url_key" do
@@ -110,7 +110,7 @@ describe Api::V1::ProjectPagesController, type: :controller do
     describe "paging" do
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
-        get :index, index_params
+        get :index, params: index_params
       end
 
       it 'should use correct paging links' do
@@ -145,7 +145,7 @@ describe Api::V1::ProjectPagesController, type: :controller do
 
     it 'should set project from the project_id param' do
       default_request scopes: scopes, user_id: authorized_user.id
-      post :create, create_params
+      post :create, params: create_params
       expect(json_response[api_resource_name][0]["links"]["project"]).to eq(project.id.to_s)
     end
 

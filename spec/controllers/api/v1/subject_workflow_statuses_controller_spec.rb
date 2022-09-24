@@ -35,7 +35,7 @@ RSpec.describe Api::V1::SubjectWorkflowStatusesController, type: :controller do
         let(:subject_id) { swcs.last.subject_id }
 
         it "should return all the swc data for the supplied subject_id" do
-          get :index, workflow_id: workflow.id, subject_id: subject_id
+          get :index, params: { workflow_id: workflow.id, subject_id: subject_id }
           resources = json_response[api_resource_name]
           expect(resources.length).to eq(1)
           expect(resources.first["links"]["subject"]).to eq(subject_id.to_s)
@@ -45,7 +45,7 @@ RSpec.describe Api::V1::SubjectWorkflowStatusesController, type: :controller do
       context "workflow_id" do
 
         it "should return all the swc data for the supplied workflow_id" do
-          get :index, workflow_id: workflow.id
+          get :index, params: { workflow_id: workflow.id }
           resources = json_response[api_resource_name]
           expect(resources.length).to eq(2)
           expected = resources.map { |r| r.dig("links", "workflow") }.uniq

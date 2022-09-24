@@ -39,7 +39,7 @@ RSpec.describe Api::V1::OrganizationRolesController, type: :controller do
 
         before(:each) do
           default_request scopes: scopes, user_id: authorized_user.id if authorized_user
-          get :index, index_options
+          get :index, params: index_options
         end
 
         describe "filter by organization_id" do
@@ -103,7 +103,7 @@ RSpec.describe Api::V1::OrganizationRolesController, type: :controller do
 
       before(:each) do
         default_request user_id: authorized_user.id, scopes: scopes
-        post :create, create_params
+        post :create, params: create_params
       end
 
       it 'should return 400' do
@@ -119,7 +119,7 @@ RSpec.describe Api::V1::OrganizationRolesController, type: :controller do
     shared_examples "no user" do
       before(:each) do
         default_request user_id: authorized_user.id, scopes: scopes
-        post :create, create_params
+        post :create, params: create_params
       end
 
       it 'should return 422' do

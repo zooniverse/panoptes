@@ -48,7 +48,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
 
     it "is filterable by metadata" do
       subject_set = create(:subject_set, metadata: { artist: "Edvard Munch"})
-      get :index, "metadata.artist" => "Edvard Munch"
+      get :index, params: { "metadata.artist" => "Edvard Munch" }
       expect(json_response["subject_sets"][0]["id"]).to eq(subject_set.id.to_s)
     end
 
@@ -68,13 +68,13 @@ describe Api::V1::SubjectSetsController, type: :controller do
       end
 
       it "is not sorted by default" do
-        get :index, sort: "display_name"
+        get :index, params: { sort: "display_name" }
         names = named_subject_sets.map(&:display_name)
         expect([set_display_names.first]).to_not include(names)
       end
 
       it "is sortable by display name", :aggregate_failures do
-        get :index, sort: "display_name"
+        get :index, params: { sort: "display_name" } 
         expect(set_display_names.first).to eq("An awesome set")
         expect(set_display_names.last).to eq("Ze best set")
       end
@@ -130,7 +130,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
           .with(resource.id)
         default_request scopes: scopes, user_id: authorized_user.id
         update_params[:subject_sets][:links][:subjects] = subjects.map(&:id)
-        put :update, update_params.merge(id: resource.id)
+        put :update, params: update_params.merge(id: resource.id)
         expect(resource.subjects.count).to eq(subjects.size)
       end
     end
@@ -144,7 +144,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
           test_relation => test_relation_ids,
           resource_id => resource.id
         }
-        post :update_links, params
+        post :update_links, params: params
       end
 
       it "should queue the counter worker" do
@@ -210,7 +210,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
         default_request user_id: authorized_user.id, scopes: scopes
         update_params[:subject_sets][:links].merge!(workflow: '1')
         update_params.merge!(id: resource.id)
-        put :update, update_params
+        put :update, params: update_params
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
@@ -228,7 +228,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
         after do
           default_request scopes: scopes, user_id: authorized_user.id
           update_params[:subject_sets][:links].delete(:workflows)
-          put :update, update_params.merge(id: resource.id)
+          put :update, params: update_params.merge(id: resource.id)
         end
 
         it 'should notify the subject selector' do
@@ -242,7 +242,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
         after do
           default_request scopes: scopes, user_id: authorized_user.id
           update_params[:subject_sets][:links].delete(:workflows)
-          put :update, update_params.merge(id: resource.id)
+          put :update, params: update_params.merge(id: resource.id)
         end
 
         it 'should notify subject selector' do
@@ -258,7 +258,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
         after do
           default_request scopes: scopes, user_id: authorized_user.id
           update_params[:subject_sets][:links].delete(:workflows)
-          put :update, update_params.merge(id: resource.id)
+          put :update, params: update_params.merge(id: resource.id)
         end
 
         it 'should not attempt to call cellect', :aggregate_failures do
@@ -271,7 +271,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
         after do
           default_request scopes: scopes, user_id: authorized_user.id
           update_params[:subject_sets].delete(:links)
-          put :update, update_params.merge(id: resource.id)
+          put :update, params: update_params.merge(id: resource.id)
         end
 
         it 'should not attempt to call cellect', :aggregate_failures do
@@ -306,7 +306,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
         allow(SubjectSetSubjectCounterWorker).to receive(:perform_async)
         default_request scopes: scopes, user_id: authorized_user.id
         create_params[:subject_sets][:links][:subjects] = subjects.map(&:id)
-        post(:create, create_params)
+        post(:create, params: create_params)
         resource = JSON.parse(response.body)["subject_sets"].first
         expect(SubjectSetSubjectCounterWorker).to have_received(:perform_async).with(resource["id"].to_i)
         expect(SubjectSet.last.subjects.count).to eq(subjects.size)
@@ -317,7 +317,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
       it 'should return 422' do
         default_request user_id: authorized_user.id, scopes: scopes
         create_params[:subject_sets][:links].merge!(workflow: '1')
-        post :create, create_params
+        post :create, params: create_params
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
@@ -331,7 +331,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
         ps = create_params
         ps[:subject_sets][:links][:collection] = collection.id.to_s
         default_request user_id: authorized_user.id, scopes: scopes
-        post :create, ps
+        post :create, params: ps
       end
 
       context "when a user can access the collection" do
@@ -355,7 +355,7 @@ describe Api::V1::SubjectSetsController, type: :controller do
     let(:resource) { subject_set }
     let(:sms) { resource.set_member_subjects }
     let(:delete_resources) do
-      delete :destroy, id: subject_set.id
+      delete :destroy, params: { id: subject_set.id }
     end
     let(:linked_sms_ids) { sms.map(&:id) }
     let(:linked_subject_sets_workflows_ids) do
@@ -391,9 +391,9 @@ describe Api::V1::SubjectSetsController, type: :controller do
 
       let(:delete_resources) do
         delete :destroy_links,
-          subject_set_id: subject_set.id,
+          params:  { subject_set_id: subject_set.id,
           link_relation: :subjects,
-          link_ids: subject_set.subjects.pluck(:id).join(',')
+          link_ids: subject_set.subjects.pluck(:id).join(',') } 
       end
 
       it_behaves_like "cleans up the linked set member subjects"

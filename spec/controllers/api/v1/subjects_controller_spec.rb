@@ -470,7 +470,7 @@ describe Api::V1::SubjectsController, type: :controller do
             workflow.subjects.map do |subject|
               create(:subject_workflow_status, workflow: workflow, subject: subject, retired_at: Time.zone.now)
             end
-            get :queued, request_params
+            get :queued, params: request_params
           end
 
           it 'should return user finished_workflow as true for each subject' do
