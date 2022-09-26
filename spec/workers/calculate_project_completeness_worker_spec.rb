@@ -198,10 +198,8 @@ describe CalculateProjectCompletenessWorker do
     context "when the project is active and complete" do
       before do
         allow(project)
-        .to receive(:active_workflows)
-        .and_return(
-          [build_stubbed(:workflow, completeness: 1.0, real_set_member_subjects_count: 10, retired_set_member_subjects_count: 10)]
-        )
+          .to receive(:active_workflows)
+          .and_return([build_stubbed(:workflow, completeness: 1.0, real_set_member_subjects_count: 10, retired_set_member_subjects_count: 10)])
       end
 
       it "should move it to paused" do
