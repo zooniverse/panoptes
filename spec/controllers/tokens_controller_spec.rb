@@ -27,7 +27,7 @@ describe TokensController, type: :controller do
 
       context "when supplying invalid user credentials" do
         it "it should respond with 401" do
-          post :create, params.merge!('login' => 'fake_login_name', 'password' => 'sekret')
+          post :create, params: params.merge!('login' => 'fake_login_name', 'password' => 'sekret')
           expect(response.status).to eq(401)
         end
       end
@@ -35,19 +35,19 @@ describe TokensController, type: :controller do
       context "when supplying missing and blank application client_id" do
 
         it "it should respond with 422" do
-          post :create, params.merge!("client_id" => '')
+          post :create, params: params.merge!("client_id" => '')
           expect(response).to have_http_status(:unprocessable_entity)
         end
 
         it "it should respond with 422" do
-          post :create, params.except("client_id")
+          post :create, params: params.except("client_id")
           expect(response).to have_http_status(:unprocessable_entity)
         end
       end
 
       context "when supplying valid user credentials" do
         let(:valid_creds) { params.merge!('login' => owner.login, 'password' => owner.password) }
-        let(:req) { post :create, valid_creds }
+        let(:req) { post :create, params: valid_creds }
 
         it_behaves_like "a valid login"
 
@@ -89,7 +89,7 @@ describe TokensController, type: :controller do
           @request.env['devise.mapping'] = Devise.mappings[:user]
           sign_in owner
           params.delete("client_secret")
-          post :create, params
+          post :create, params: params
         end
 
         it_behaves_like "a valid login"
@@ -100,7 +100,7 @@ describe TokensController, type: :controller do
       let!(:app) { create(:application, owner: owner) }
 
       it 'should reject the token request with unprocessable entity' do
-        post :create, params
+        post :create, params: params
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
@@ -109,7 +109,7 @@ describe TokensController, type: :controller do
       let!(:app) { create(:secure_app, owner: owner) }
 
       it 'should reject the token request with unprocessable entity' do
-        post :create, params
+        post :create, params: params
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
@@ -123,7 +123,7 @@ describe TokensController, type: :controller do
 
     let(:token_response) { json_response['access_token'] }
     let(:token) { Doorkeeper::AccessToken.find_by(token: token_response) }
-    let(:req) { post :create, params }
+    let(:req) { post :create, params: params }
 
     before(:each) { req }
 

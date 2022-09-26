@@ -9,8 +9,8 @@ RSpec.describe 'handle BadLinkParams errors', type: :request do
   let!(:subject_set) { create(:subject_set, project: project) }
 
   before(:each) do
-    post "/api/workflows/#{workflow.id}/links/subject_sets", { subject_set_id: subject_set.id.to_s }.to_json,
-         { "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
+    post "/api/workflows/#{workflow.id}/links/subject_sets", params: { subject_set_id: subject_set.id.to_s }.to_json,
+         headers: { "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
            "CONTENT_TYPE" => "application/json",
            "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}" }
   end

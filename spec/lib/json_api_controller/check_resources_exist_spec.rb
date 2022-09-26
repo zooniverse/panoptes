@@ -51,14 +51,14 @@ describe JsonApiController::CheckResourcesExist, type: :controller do
 
     context "route with access control using it's own name" do
       it 'should return 200' do
-        put :update, id: controlled.id
+        put :update, params: { id: controlled.id }
         expect(response.status).to eq(200)
       end
     end
 
     context "route with access control using a different method" do
       it 'should return 200' do
-        get :show, id: controlled.id
+        get :show, params: { id: controlled.id }
         expect(response.status).to eq(200)
       end
     end
@@ -66,7 +66,7 @@ describe JsonApiController::CheckResourcesExist, type: :controller do
 
   describe "user is not enrolled on controlled object" do
     it 'should raise an AccessDenied error' do
-      expect{ put :update, id: controlled.id }.to raise_error(JsonApiController::AccessDenied)
+      expect{ put :update, params: { id: controlled.id } }.to raise_error(JsonApiController::AccessDenied)
     end
   end
 
@@ -83,7 +83,7 @@ describe JsonApiController::CheckResourcesExist, type: :controller do
       # lookup in JsonApiController::CheckResourcesExist.resources_exist?
       allow(controller).to receive(:policy_scoped?).and_return(true)
       expect{
-        get :index, id: nil
+        get :index, params: { id: nil }
       }.not_to raise_error
     end
   end
