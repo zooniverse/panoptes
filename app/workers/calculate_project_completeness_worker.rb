@@ -42,11 +42,10 @@ class CalculateProjectCompletenessWorker
     # return the sum of the proportional completeness metrics
     project.active_workflows.sum(0.0) do |active_workflow|
       # as each workflow has a proportion of the total subjects
-      # we can use this proportion to weight the each workflow's completeness metric to the total for the project
+      # we can weight each workflow's completeness metric to the total for the project
       subject_proportion = active_workflow.subjects_count.to_d / project_subjects_count
 
-      # the summated proportion metrics will be clamped to the 0.0..1.0 range
-      # by the fraction of subjects / total subjects
+      # the summated proportion metrics will be clamped to the 0.0..1.0 range by subjects / total subjects fraction
       active_workflow.completeness * subject_proportion
     end
   end
