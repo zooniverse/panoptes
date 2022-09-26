@@ -50,12 +50,10 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   def retire_subjects
     operation.run!(params)
-    render nothing: true, status: 204
   end
 
   def unretire_subjects
     operation.run!(params)
-    render nothing: true, status: 204
   end
 
   def create_classifications_export

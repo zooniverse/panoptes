@@ -29,7 +29,7 @@ describe Api::V1::TutorialsController, type: :controller do
         default_request user_id: authorized_user.id, scopes: scopes
       end
       let(:get_request) do
-        get :index, filter_params
+        get :index, params: filter_params
       end
 
       context "by project id" do

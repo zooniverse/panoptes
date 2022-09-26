@@ -42,7 +42,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       before(:each) do
         filterable_resources
         default_request user_id: user.id, scopes: scopes
-        get :index, filter_opts
+        get :index, params: filter_opts
       end
 
       context "filter by activated" do
@@ -67,7 +67,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       end
 
       it 'should return only serialize the specified fields' do
-        get :index, fields: 'display_name,subjects_count,does_not_exist'
+        get :index, params: { fields: 'display_name,subjects_count,does_not_exist' }
         response_keys = json_response['workflows'].map(&:keys).uniq.flatten
         expect(response_keys).to match_array ['id', 'links', 'display_name', 'subjects_count']
       end
@@ -77,7 +77,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       it 'should return the published version of records' do
         filterable_resources[0].publish!
         filterable_resources[0].update! tasks: {}, strings: {}
-        get :index, published: true
+        get :index, params: { published: true }
         expect(json_response[api_resource_name].first["tasks"]).to be_present
       end
     end
@@ -143,7 +143,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
       it 'creates versions' do
         update_params[:id] = resource.id
-        expect { put :update, update_params }.to change { resource.workflow_versions.count }.by(1)
+        expect { put :update, params: update_params }.to change { resource.workflow_versions.count }.by(1)
       end
     end
 
@@ -156,7 +156,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       end
 
       it 'should replace "Draw a circle" with Contemplate', :aggregate_failures do
-        put :update, update_params
+        put :update, params: update_params
         instance = Workflow.find(created_instance_id(api_resource_name))
         expect(instance.tasks["interest"]["question"]).to eq("interest.question")
         expect(instance.strings["interest.question"]).to eq(new_question)
@@ -173,14 +173,14 @@ describe Api::V1::WorkflowsController, type: :controller do
 
         it "should touch the workflow resource" do
           expect {
-            put :update, task_only_update_params
+            put :update, params: task_only_update_params
           }.to change {
             resource.reload.updated_at
           }
         end
 
         it 'should update the strings' do
-          put :update, task_only_update_params
+          put :update, params: task_only_update_params
           instance = Workflow.find(created_instance_id(api_resource_name))
           expect(instance.strings["interest.question"]).to eq(new_question)
         end
@@ -196,7 +196,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
         it "should update the workflow active state" do
           expect {
-            put :update, no_task_update_params
+            put :update, params: no_task_update_params
           }.to change {
             resource.reload.active
           }.to(true)
@@ -204,7 +204,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
         it "should not update the workflow tasks" do
           expect {
-            put :update, no_task_update_params
+            put :update, params: no_task_update_params
           }.not_to change {
             resource.reload.tasks
           }
@@ -212,7 +212,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
         it "should not update the strings" do
           expect {
-            put :update, no_task_update_params
+            put :update, params: no_task_update_params
           }.not_to change {
             resource.reload.strings
           }
@@ -228,7 +228,7 @@ describe Api::V1::WorkflowsController, type: :controller do
         project.save!
 
         default_request user_id: authorized_user.id, scopes: scopes
-        put :update, id: resource.id, workflows: update_params
+        put :update, params: { id: resource.id, workflows: update_params }
       end
 
       context "when the update requests tasks to change" do
@@ -313,14 +313,14 @@ describe Api::V1::WorkflowsController, type: :controller do
       end
 
       it "should update the primary content task strings" do
-        put :update, params
+        put :update, params: params
         response_tasks = json_response['workflows'][0]['tasks']
         expect(response_tasks).to eq(tasks.deep_stringify_keys)
       end
 
       it "should touch the workflow resource to modify the cache_key / etag" do
         expect {
-          put :update, params
+          put :update, params: params
         }.to change { resource.reload.updated_at }
       end
     end
@@ -339,7 +339,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       context "with authorized user" do
         after do
           default_request scopes: scopes, user_id: authorized_user.id
-          post :update_links, update_link_params
+          post :update_links, params: update_link_params
         end
 
         it 'should run refresh workflow status worker' do
@@ -394,7 +394,7 @@ describe Api::V1::WorkflowsController, type: :controller do
           test_relation => test_relation_ids,
           resource_id => resource.id
         }
-        post :update_links, params
+        post :update_links, params: params
       end
 
       it "should handle non-array link formats" do
@@ -404,7 +404,7 @@ describe Api::V1::WorkflowsController, type: :controller do
           test_relation => linked_resource.id.to_s,
           resource_id => resource.id
         }
-        post :update_links, params
+        post :update_links, params: params
         linked_subject_set_ids = resource.subject_sets.pluck(:id)
         expect(linked_subject_set_ids).to eq([linked_resource.id])
       end
@@ -551,7 +551,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       end
 
       it 'creates versions' do
-        post :create, create_params
+        post :create, params: create_params
         instance = Workflow.find(created_instance_id(api_resource_name))
         expect(instance.workflow_versions.count).to eq(1)
       end
@@ -560,7 +560,7 @@ describe Api::V1::WorkflowsController, type: :controller do
     context "extracts strings from workflow" do
       it 'should replace "Draw a circle" with 0' do
         default_request scopes: scopes, user_id: authorized_user.id
-        post :create, create_params
+        post :create, params: create_params
         instance = Workflow.find(created_instance_id(api_resource_name))
         expect(instance.tasks["interest"]["question"]).to eq("interest.question")
         expect(instance.strings["interest.question"]).to eq("Draw a Circle")
@@ -573,7 +573,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
         create_params[:workflows][:links][:tutorial_subject] = tut_sub
-        post :create, create_params
+        post :create, params: create_params
       end
 
       it 'responds with tutorial subject link' do
@@ -589,7 +589,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       before(:each) do
         allow_any_instance_of(Project).to receive(:live).and_return(true)
         default_request scopes: scopes, user_id: authorized_user.id
-        post :create, create_params
+        post :create, params: create_params
       end
 
       it 'sets the workflow active to false' do
@@ -647,7 +647,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
       it "should unlink the subject set from the workflow" do
         expect(workflow.subject_sets).to match_array(linked_resources)
-        delete :destroy_links, destroy_link_params
+        delete :destroy_links, params: destroy_link_params
         expect(still_linked_sets).to match_array(remaining_linked_resource)
       end
 
@@ -658,14 +658,14 @@ describe Api::V1::WorkflowsController, type: :controller do
         expect(RefreshWorkflowStatusWorker)
           .to receive(:perform_async)
           .with(workflow.id)
-        delete :destroy_links, destroy_link_params
+        delete :destroy_links, params: destroy_link_params
       end
 
       context "with link_ids as a comma separated list" do
         let(:link_ids) { linked_resources.map(&:id).join(',') }
 
         it "should unlink the subject set from the workflow" do
-          delete :destroy_links, destroy_link_params
+          delete :destroy_links, params: destroy_link_params
           expect(still_linked_sets).to match_array([])
         end
       end
@@ -699,17 +699,17 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:subject) { create(:subject, subject_sets: [subject_set]) }
 
     it 'returns a 204 status' do
-      post :retire_subjects, workflow_id: workflow.id, subject_id: subject.id
+      post :retire_subjects, params: { workflow_id: workflow.id, subject_id: subject.id }
       expect(response.status).to eq(204)
     end
 
     it 'queues a retire subject worker' do
       expect(RetireSubjectWorker).to receive(:perform_async).with(workflow.id, [subject.id], nil)
-      post :retire_subjects, workflow_id: workflow.id, subject_id: subject.id
+      post :retire_subjects, params: { workflow_id: workflow.id, subject_id: subject.id }
     end
 
     it 'throws an unpermitted params error when retired_reason is invalid', :aggregate_failures do
-      post :retire_subjects, workflow_id: workflow.id, subject_id: subject.id, retirement_reason: "notreal"
+      post :retire_subjects, params: { workflow_id: workflow.id, subject_id: subject.id, retirement_reason: "notreal" }
       expect(json_response['errors'][0]['message'])
         .to eq("Retirement reason is not included in the list")
       expect(response.status).to eq(422)
@@ -727,13 +727,13 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:subject1) { subject_set.subjects.first }
 
     it 'returns a 204 status' do
-      post :unretire_subjects, workflow_id: workflow.id, subject_id: subject1.id
+      post :unretire_subjects, params: { workflow_id: workflow.id, subject_id: subject1.id }
       expect(response.status).to eq(204)
     end
 
     it 'queues an unretire subject worker' do
       allow(UnretireSubjectWorker).to receive(:perform_async).with(workflow.id, [subject1.id])
-      post :unretire_subjects, workflow_id: workflow.id, subject_id: subject1.id
+      post :unretire_subjects, params: { workflow_id: workflow.id, subject_id: subject1.id }
       expect(UnretireSubjectWorker).to have_received(:perform_async).with(workflow.id, [subject1.id])
     end
   end

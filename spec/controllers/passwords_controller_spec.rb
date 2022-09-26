@@ -10,7 +10,7 @@ describe PasswordsController, type: [ :controller, :mailer ] do
       it 'should redirect ' do
         test_base_url = "http://localhost:2727/#/reset-password"
         token = "asdfasdfasdf"
-        get :edit, reset_password_token: token
+        get :edit, params: { reset_password_token: token }
         expect(response).to redirect_to("#{test_base_url}?reset_password_token=#{token}")
       end
     end
@@ -28,14 +28,14 @@ describe PasswordsController, type: [ :controller, :mailer ] do
       let(:user_email_attrs) { { user: email_attributes } }
 
       it "should return 422 with no email" do
-        post :create, user: { email: nil }
+        post :create, params: { user: { email: nil } }
         expect(response.status).to eq(422)
       end
 
       context "using an email address that doesn't belong to a user" do
 
         before(:each) do
-          post :create, user: { email: 'not_a_user@test.com' }
+          post :create, params: { user: { email: 'not_a_user@test.com' } }
         end
 
         it "should return 200" do
@@ -51,7 +51,7 @@ describe PasswordsController, type: [ :controller, :mailer ] do
         let!(:disable_user) { user.disable! }
 
         it "should respond with 200" do
-          post :create, user_email_attrs
+          post :create, params: user_email_attrs
           expect(response.status).to eq(200)
         end
 
@@ -68,7 +68,7 @@ describe PasswordsController, type: [ :controller, :mailer ] do
         end
 
         it "should respond with 200" do
-          post :create, user_email_attrs
+          post :create, params: user_email_attrs
           expect(response.status).to eq(200)
         end
 
@@ -82,14 +82,14 @@ describe PasswordsController, type: [ :controller, :mailer ] do
         it "should queue the email for delayed sending" do
           prev_mailer = Devise.mailer
           Devise.mailer = Devise::BackgroundMailer
-          expect { post :create, user_email_attrs }
+          expect { post :create, params: user_email_attrs }
             .to change { Sidekiq::Extensions::DelayedMailer.jobs.size }
             .from(0).to(1)
           Devise.mailer = prev_mailer
         end
 
         it "should return 200" do
-          post :create, user_email_attrs
+          post :create, params: user_email_attrs
           expect(response.status).to eq(200)
         end
 
@@ -99,28 +99,28 @@ describe PasswordsController, type: [ :controller, :mailer ] do
           expect(User)
             .to receive(:send_reset_password_instructions)
             .and_call_original
-          post :create, user_email_attrs
+          post :create, params: user_email_attrs
         end
 
         it "should send an email" do
-          post :create, user_email_attrs
+          post :create, params: user_email_attrs
           expect(ActionMailer::Base.deliveries).to_not be_empty
         end
 
         it "should send an email from the no-reply email address" do
-          post :create, user_email_attrs
+          post :create, params: user_email_attrs
           email = ActionMailer::Base.deliveries.first
           expect(email.from).to include("no-reply@zooniverse.org")
         end
 
         it "should send an email to the account email address" do
-          post :create, user_email_attrs
+          post :create, params: user_email_attrs
           email = ActionMailer::Base.deliveries.first
           expect(email.to).to include(user.email)
         end
 
         it "should contain the correct route url for the server" do
-          post :create, user_email_attrs
+          post :create, params: user_email_attrs
           email = ActionMailer::Base.deliveries.first
           url = "https://panoptes_test.zooniverse.org/users/password/edit?reset_password_token="
           expect(email.body.raw_source).to include(url)
@@ -142,7 +142,7 @@ describe PasswordsController, type: [ :controller, :mailer ] do
 
       context "when not supplying a valid reset token" do
         before do
-          put :update, user: passwords.merge(reset_password_token: "ABCDEFGHIJKLMNOPQRSTUVWXYZ")
+          put :update, params: { user: passwords.merge(reset_password_token: "ABCDEFGHIJKLMNOPQRSTUVWXYZ") }
         end
 
         it "should return return 422 and a meaningful error response body" do
@@ -158,12 +158,12 @@ describe PasswordsController, type: [ :controller, :mailer ] do
 
         context "with a database user" do
           it "should return 200" do
-            put :update, valid_attrs
+            put :update, params: valid_attrs
             expect(response.status).to eq(200)
           end
 
           it "should update the password" do
-            put :update, valid_attrs
+            put :update, params: valid_attrs
             user.reload
             expect(user.valid_password?(new_password)).to eq(true)
           end
@@ -175,7 +175,7 @@ describe PasswordsController, type: [ :controller, :mailer ] do
             end
 
             it "should return a meaningful error response body" do
-              put :update, user: passwords.merge(reset_password_token: valid_token)
+              put :update, params: { user: passwords.merge(reset_password_token: valid_token) }
               expect(response.status).to eq(422)
               error = JSON.parse(response.body)["errors"].first
               expect(error["message"]).to eq("Password is too short (minimum is 8 characters)")
@@ -202,7 +202,7 @@ describe PasswordsController, type: [ :controller, :mailer ] do
 
       context "when not supplying a valid reset token" do
         before(:each) do
-          put :update, user: { reset_password_token: "ABCDEFGHIJKLMNOPQRSTUVWXYZ" }
+          put :update, params: { user: { reset_password_token: "ABCDEFGHIJKLMNOPQRSTUVWXYZ" } }
         end
 
         it "should return 200" do
@@ -221,7 +221,7 @@ describe PasswordsController, type: [ :controller, :mailer ] do
         context "with a database user" do
 
           before(:each) do
-            put :update, user: passwords.merge(reset_password_token: valid_token)
+            put :update, params: { user: passwords.merge(reset_password_token: valid_token) }
           end
 
           it "should return 302 redirect" do
