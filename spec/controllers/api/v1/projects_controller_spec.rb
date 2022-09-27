@@ -9,12 +9,12 @@ describe Api::V1::ProjectsController, type: :controller do
 
   let(:api_resource_name) { 'projects' }
   let(:api_resource_attributes) do
-    ['id', 'display_name', 'classifications_count', 'subjects_count',
-     'updated_at', 'created_at', 'available_languages', 'title',
-     'description', 'introduction', 'migrated','private', 'live',
-     'retired_subjects_count', 'urls', 'classifiers_count', 'redirect',
-     'workflow_description', 'tags', 'experimental_tools',
-     'completeness', 'activity', 'state', 'mobile_friendly' ]
+    %w[id display_name classifications_count subjects_count
+     updated_at created_at available_languages title
+     description introduction migrated private live
+     retired_subjects_count urls classifiers_count redirect
+     workflow_description tags experimental_tools
+     completeness activity state mobile_friendly]
   end
   let(:api_resource_links) do
     [ 'projects.workflows',
@@ -79,7 +79,7 @@ describe Api::V1::ProjectsController, type: :controller do
           it_behaves_like 'filter by display_name'
 
           describe 'filter by display_name substring' do
-            let(:index_options) { {search: resource.display_name[0..2]} }
+            let(:index_options) { { search: resource.display_name[0..2] } }
 
             it 'should respond with the most relevant item first' do
               index_request
@@ -206,7 +206,7 @@ describe Api::V1::ProjectsController, type: :controller do
               end
 
               let(:index_options) do
-                {owner: owner.login, slug: filtered_project.slug}
+                { owner: owner.login, slug: filtered_project.slug }
               end
 
               it 'should respond with 1 item' do
@@ -336,8 +336,8 @@ describe Api::V1::ProjectsController, type: :controller do
                    description: 'A new Zoo for you!',
                    primary_language: 'en',
                    workflow_description: 'some more text',
-                   urls: [{label: 'Twitter', url: 'http://twitter.com/example'}],
-                   tags: ['astro', 'gastro'],
+                   urls: [{ label: 'Twitter', url: 'http://twitter.com/example' }],
+                   tags: %w[astro gastro],
                    configuration: {
                                    an_option: 'a setting'
                                   },
@@ -430,8 +430,8 @@ describe Api::V1::ProjectsController, type: :controller do
         let(:project) { Project.find(created_project_id) }
 
         it 'should extract labels from the urls' do
-          expect(project.urls).to eq([{'label' => '0.label', 'url' => 'http://twitter.com/example'}])
-          expect(project.url_labels).to eq({'0.label' => 'Twitter'})
+          expect(project.urls).to eq([{ 'label' => '0.label', 'url' => 'http://twitter.com/example' }])
+          expect(project.url_labels).to eq({ '0.label' => 'Twitter' })
         end
 
         it 'should set the contents title do' do
@@ -445,7 +445,7 @@ describe Api::V1::ProjectsController, type: :controller do
     end
 
     describe 'tags' do
-      let(:tags) { Tag.where(name: ['astro', 'gastro']) }
+      let(:tags) { Tag.where(name: %w[astro gastro]) }
 
       def tag_request
         default_request scopes: scopes, user_id: authorized_user.id
@@ -584,7 +584,7 @@ describe Api::V1::ProjectsController, type: :controller do
 
     it_behaves_like 'is updatable'
     it_behaves_like 'has updatable tags' do
-      let(:tag_array) { ['astro', 'gastro'] }
+      let(:tag_array) { %w[astro gastro] }
       let(:tag_params) do
         { projects: { tags: tag_array }, id: resource.id }
       end
@@ -596,7 +596,7 @@ describe Api::V1::ProjectsController, type: :controller do
       let(:translated_language) { resource.primary_language }
       let(:controller_action) { :update }
       let(:translatable_action_params) { update_params.merge(id: resource.id) }
-      let(:non_translatable_action_params) { {id: resource.id, projects: {tags: ['cats']}} }
+      let(:non_translatable_action_params) { { id: resource.id, projects: { tags: ['cats'] } } }
     end
 
     describe 'launch_approved' do
@@ -614,12 +614,12 @@ describe Api::V1::ProjectsController, type: :controller do
       context 'when the user is an admin' do
         let(:authorized_user) { create(:admin_user) }
 
-        it 'should update the project' do
+        it 'updates the project' do
           put :update, params: ps.merge(id: resource.id)
           expect(response).to have_http_status(:ok)
         end
 
-        it 'should record the launch_date' do
+        it 'records the launch_date' do
           expect(resource.launch_date).to be_nil
           put :update, params: ps.merge(id: resource.id)
           expect(resource.reload.launch_date).not_to be_nil
@@ -635,16 +635,16 @@ describe Api::V1::ProjectsController, type: :controller do
 
       context 'when the user is not an admin' do
         let(:authorized_user) { create(:user) }
-        it 'should not update the project' do
+        it 'does not update the project' do
           put :update, params: ps.merge(id: resource.id)
           expect(response).to have_http_status(:unprocessable_entity)
         end
       end
     end
 
-    context 'contents fields' do
+    context 'with contents fields' do
       let(:params) do
-        { projects: { description: 'SC', urls: [{label: 'About', url: 'https://zooniverse.org/about'}] }, id: resource.id }
+        { projects: { description: 'SC', urls: [{ label: 'About', url: 'https://zooniverse.org/about' }] }, id: resource.id }
       end
 
       let(:project) { resource }
@@ -670,16 +670,16 @@ describe Api::V1::ProjectsController, type: :controller do
       it 'should extract labels from the urls' do
         put :update, params: params
         project.reload
-        expect(project.urls).to eq([{'label' => '0.label', 'url' => 'https://zooniverse.org/about'}])
+        expect(project.urls).to eq([{ 'label' => '0.label', 'url' => 'https://zooniverse.org/about' }])
       end
 
       it 'should save labels' do
         put :update, params: params
         project.reload
-        expect(project.url_labels).to eq({'0.label' => 'About'})
+        expect(project.url_labels).to eq({ '0.label' => 'About' })
       end
 
-      it 'should touch the project resource to modify the cache_key / etag' do
+      it 'touches the project resource to modify the cache_key / etag' do
         expect {
           put :update, params: params
         }.to change { resource.reload.updated_at }
@@ -784,13 +784,13 @@ describe Api::V1::ProjectsController, type: :controller do
     end
   end
 
-  context 'creating exports' do
+  context 'when creating exports' do
     let(:project) { create(:full_project, owner: user) }
     let(:test_attr) { :type }
     let(:new_resource) { Medium.find(created_instance_id(api_resource_name)) }
     let(:api_resource_name) { 'media' }
     let(:api_resource_attributes) do
-      ['id', 'src', 'created_at', 'content_type', 'media_type', 'href']
+      %w[id src created_at content_type media_type href]
     end
     let(:api_resource_links) { [] }
     let(:resource_class) { Medium }
