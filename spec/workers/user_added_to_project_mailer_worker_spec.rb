@@ -11,15 +11,15 @@ RSpec.describe UserAddedToProjectMailerWorker do
 
   context "missing attributes" do
     it "is missing a user and doesn't send" do
-      expect{ subject.perform(nil, project, roles) }.to_not change{ ActionMailer::Base.deliveries.count }
+      expect{ subject.perform(nil, project.id, roles) }.to_not change{ ActionMailer::Base.deliveries.count }
     end
 
     it "is missing a project and doesn't send" do
-      expect{ subject.perform(user, nil, roles) }.to_not change{ ActionMailer::Base.deliveries.count }
+      expect{ subject.perform(user.id, nil, roles) }.to_not change{ ActionMailer::Base.deliveries.count }
     end
 
     it "is missing roles and doesn't send" do
-      expect{ subject.perform(user, project, nil) }.to_not change{ ActionMailer::Base.deliveries.count }
+      expect{ subject.perform(user.id, project.id, nil) }.to_not change{ ActionMailer::Base.deliveries.count }
     end
   end
 
