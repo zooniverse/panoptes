@@ -9,7 +9,7 @@ describe Api::V1::WorkflowsController, type: :controller do
   let(:api_resource_name){ 'workflows' }
   let(:resource_class) { Workflow }
   let(:authorized_user) { owner }
-  let(:default_params) { {format: :json} }
+  let(:default_params) { { format: :json } }
 
   let(:api_resource_attributes) do
     %w(id display_name tasks classifications_count subjects_count
@@ -47,7 +47,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
       context 'filter by activated' do
         let!(:inactive_workflow) { create(:workflow, active: false) }
-        let(:filter_opts) { {active: true} }
+        let(:filter_opts) { { active: true } }
 
         it 'should only return activated workflows', :aggregate_failures do
           expect(json_response[api_resource_name].length).to eq(2)
@@ -97,7 +97,7 @@ describe Api::V1::WorkflowsController, type: :controller do
         workflows: {
           display_name: 'A Better Name',
           active: false,
-          retirement: {criteria: 'classification_count'},
+          retirement: { criteria: 'classification_count' },
           aggregation: {},
           configuration: {},
           public_gold_standard: true,
@@ -107,9 +107,9 @@ describe Api::V1::WorkflowsController, type: :controller do
              question: 'Draw a Circle',
              next: 'shape',
              tools: [
-               {value: 'red', label: 'Red', type: 'point', color: 'red'},
-               {value: 'green', label: 'Green', type: 'point', color: 'lime'},
-               {value: 'blue', label: 'Blue', type: 'point', color: 'blue'}
+               { value: 'red', label: 'Red', type: 'point', color: 'red' },
+               { value: 'green', label: 'Green', type: 'point', color: 'lime' },
+               { value: 'blue', label: 'Blue', type: 'point', color: 'blue' }
              ]
            }
            },
@@ -133,10 +133,10 @@ describe Api::V1::WorkflowsController, type: :controller do
       let(:translated_language) { resource.primary_language }
       let(:controller_action) { :update }
       let(:translatable_action_params) { update_params.merge(id: resource.id) }
-      let(:non_translatable_action_params) { {id: resource.id, workflows: {active: false}} }
+      let(:non_translatable_action_params) { { id: resource.id, workflows: { active: false } } }
     end
 
-    context 'workflow versions' do
+    context 'with workflow versions' do
       before do
         default_request scopes: scopes, user_id: authorized_user.id
       end
@@ -147,7 +147,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       end
     end
 
-    context 'extracts strings from workflow' do
+    context 'when extracting strings from workflow' do
       let(:new_question) { 'Contemplate' }
       before do
         default_request scopes: scopes, user_id: authorized_user.id
@@ -240,8 +240,8 @@ describe Api::V1::WorkflowsController, type: :controller do
                 question: 'Draw a Circle',
                 next: 'shape',
                 tools: [
-                  {value: 'red', label: 'Red', type: 'point', color: 'red'},
-                  {value: 'green', label: 'Green', type: 'point', color: 'lime'}
+                  { value: 'red', label: 'Red', type: 'point', color: 'red' },
+                  { value: 'green', label: 'Green', type: 'point', color: 'lime' }
                 ]
               }
             }
@@ -289,7 +289,7 @@ describe Api::V1::WorkflowsController, type: :controller do
         let(:update_params) do
           tasks = resource.tasks
           tasks['interest']['help'] = 'Something new'
-          {tasks: tasks}
+          { tasks: tasks }
         end
 
         it 'should return 200' do
@@ -485,18 +485,18 @@ describe Api::V1::WorkflowsController, type: :controller do
           question: 'Draw a Circle',
           next: 'shape',
           tools: [
-            {value: 'red', label: 'Red', type: 'point', color: 'red'},
-            {value: 'green', label: 'Green', type: 'point', color: 'lime'},
-            {value: 'blue', label: 'Blue', type: 'point', color: 'blue'}
+            { value: 'red', label: 'Red', type: 'point', color: 'red' },
+            { value: 'green', label: 'Green', type: 'point', color: 'lime' },
+            { value: 'blue', label: 'Blue', type: 'point', color: 'blue' }
           ]
         },
         shape: {
           type: 'multiple',
           question: 'What shape is this galaxy?',
           answers: [
-            {value: 'smooth', label: 'Smooth'},
-            {value: 'features', label: 'Features'},
-            {value: 'other', label: 'Star or artifact'}
+            { value: 'smooth', label: 'Smooth' },
+            { value: 'features', label: 'Features' },
+            { value: 'other', label: 'Star or artifact' }
           ],
           next: nil
         }
@@ -509,9 +509,9 @@ describe Api::V1::WorkflowsController, type: :controller do
           display_name: 'Test workflow',
           first_task: 'interest',
           active: true,
-          retirement: {criteria: 'classification_count'},
-          aggregation: {public: true},
-          configuration: {autoplay_subjects: true},
+          retirement: { criteria: 'classification_count' },
+          aggregation: { public: true },
+          configuration: { autoplay_subjects: true },
           public_gold_standard: true,
           tasks: create_task_params,
           grouped: true,
@@ -519,7 +519,7 @@ describe Api::V1::WorkflowsController, type: :controller do
           primary_language: 'en',
           display_order_position: 1,
           steps: [],
-          links: {project: project.id.to_s}
+          links: { project: project.id.to_s }
         }
       }
     end
@@ -567,7 +567,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       end
     end
 
-    context 'includes a tutorial subject' do
+    context 'when workflow includes a tutorial subject' do
       let(:tut_sub) { create(:subject, project: project).id.to_s }
 
       before(:each) do
@@ -620,7 +620,7 @@ describe Api::V1::WorkflowsController, type: :controller do
   end
 
   describe '#destroy_links' do
-    context 'removing a subject set from the workflow' do
+    context 'when removing a subject set from the workflow' do
       let!(:linked_resources) do
         [
           create(:subject_set_with_subjects, workflows: [workflow], project: project),
@@ -645,13 +645,13 @@ describe Api::V1::WorkflowsController, type: :controller do
         default_request scopes: scopes, user_id: authorized_user.id
       end
 
-      it 'should unlink the subject set from the workflow' do
+      it 'unlinks the subject set from the workflow' do
         expect(workflow.subject_sets).to match_array(linked_resources)
         delete :destroy_links, params: destroy_link_params
         expect(still_linked_sets).to match_array(remaining_linked_resource)
       end
 
-      it 'should call the appropriate workers' do
+      it 'calls the appropriate workers' do
         expect(NotifySubjectSelectorOfChangeWorker)
           .to receive(:perform_async)
           .with(workflow.id)
@@ -664,7 +664,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       context 'with link_ids as a comma separated list' do
         let(:link_ids) { linked_resources.map(&:id).join(',') }
 
-        it 'should unlink the subject set from the workflow' do
+        it 'unlinks the subject set from the workflow' do
           delete :destroy_links, params: destroy_link_params
           expect(still_linked_sets).to match_array([])
         end
@@ -676,16 +676,6 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:resource) { workflows.first }
 
     it_behaves_like 'is showable'
-
-    describe 'http caching' do
-      let(:action) { :show }
-      let(:private_resource) do
-        project = create(:private_project, owner: authorized_user)
-        create(:workflow, project: project)
-      end
-      let(:private_resource_id) { private_resource.id }
-      let(:public_resource_id) { resource.id }
-    end
   end
 
   describe '#retired_subjects' do
