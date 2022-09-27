@@ -81,7 +81,7 @@ describe Api::V1::ProjectsController, type: :controller do
           describe 'filter by display_name substring' do
             let(:index_options) { { search: resource.display_name[0..2] } }
 
-            it 'should respond with the most relevant item first' do
+            it 'responds with the most relevant item first' do
               index_request
               expect(json_response[api_resource_name].length).to eq(1)
             end
@@ -94,7 +94,7 @@ describe Api::V1::ProjectsController, type: :controller do
             %w(id display_name description slug redirect avatar_src links updated_at classifications_count launch_approved state completeness)
           end
 
-          it 'should return only serialise the card data' do
+          it 'returns only serialise the card data' do
             index_request
             card_keys = json_response[api_resource_name].map(&:keys).uniq.flatten
             expect(card_keys).to match_array(card_attrs)
@@ -127,11 +127,11 @@ describe Api::V1::ProjectsController, type: :controller do
                   { beta_approved: 'true' }
                 end
 
-                it 'should respond with the beta project' do
+                it 'responds with the beta project' do
                   expect(Project.find(ids)).to include(beta_resource)
                 end
 
-                it 'should return projects in project rank order' do
+                it 'returns projects in project rank order' do
                   ranked_ids = Project.where(beta_approved: true, private: false).rank(:beta_row_order).pluck(:id).map(&:to_s)
                   expect(ids).to match_array(ranked_ids)
                 end
@@ -140,7 +140,7 @@ describe Api::V1::ProjectsController, type: :controller do
               context 'for non-beta projects' do
                 let(:index_options) { { beta_approved: 'false' } }
 
-                it 'should not have beta projects' do
+                it 'does not have beta projects' do
                   ids = json_response['projects'].map { |p| p['id'] }
                   expect(Project.find(ids)).not_to include(beta_resource)
                 end
@@ -154,18 +154,18 @@ describe Api::V1::ProjectsController, type: :controller do
                   { launch_approved: 'false' }
                 end
 
-                it 'should respond with the unapproved project' do
+                it 'responds with the unapproved project' do
                   expect(Project.find(ids)).to include(unapproved_resource)
                 end
               end
 
               context 'for approved projects' do
                 let(:index_options) { { launch_approved: 'true' } }
-                it 'should not have unapproved projects' do
+                it 'does not have unapproved projects' do
                   expect(Project.find(ids)).not_to include(unapproved_resource)
                 end
 
-                it 'should return projects in project rank order' do
+                it 'returns projects in project rank order' do
                   ranked_ids = Project.active.where(launch_approved: true, private: false).rank(:launched_row_order).pluck(:id).map(&:to_s)
                   expect(ids).to match_array(ranked_ids)
                 end
@@ -175,11 +175,11 @@ describe Api::V1::ProjectsController, type: :controller do
             describe 'display_name' do
               let(:index_options) { { display_name: new_project.display_name } }
 
-              it 'should respond with 1 item' do
+              it 'responds with 1 item' do
                 expect(json_response[api_resource_name].length).to eq(1)
               end
 
-              it 'should respond with the correct item' do
+              it 'responds with the correct item' do
                 project_name = json_response[api_resource_name][0]['display_name']
                 expect(project_name).to eq(new_project.display_name)
               end
@@ -188,11 +188,11 @@ describe Api::V1::ProjectsController, type: :controller do
             describe 'slug' do
               let(:index_options) { { slug: new_project.slug } }
 
-              it 'should respond with 1 item' do
+              it 'responds with 1 item' do
                 expect(json_response[api_resource_name].length).to eq(1)
               end
 
-              it 'should respond with the correct item' do
+              it 'responds with the correct item' do
                 project_slug = json_response[api_resource_name][0]['slug']
                 expect(project_slug).to eq(new_project.slug)
               end
@@ -209,11 +209,11 @@ describe Api::V1::ProjectsController, type: :controller do
                 { owner: owner.login, slug: filtered_project.slug }
               end
 
-              it 'should respond with 1 item' do
+              it 'responds with 1 item' do
                 expect(json_response[api_resource_name].length).to eq(1)
               end
 
-              it 'should respond with the correct item' do
+              it 'responds with the correct item' do
                 project_name = json_response[api_resource_name][0]['display_name']
                 expect(project_name).to eq(filtered_project.display_name)
               end
@@ -228,11 +228,11 @@ describe Api::V1::ProjectsController, type: :controller do
               let(:filtered_project) { projects.first }
               let(:index_options) { { state: 'paused' } }
 
-              it 'should respond with 1 item' do
+              it 'responds with 1 item' do
                 expect(json_response[api_resource_name].length).to eq(1)
               end
 
-              it 'should respond with the correct item' do
+              it 'responds with the correct item' do
                 project_state = json_response[api_resource_name][0]['state']
                 expect(project_state).to eq(filtered_project.state)
               end
@@ -253,12 +253,12 @@ describe Api::V1::ProjectsController, type: :controller do
           end
           let(:includes) { 'avatar,background' }
 
-          it 'should include avatar' do
+          it 'includes avatar' do
             expect(json_response['linked']['avatars'].map { |r| r['id'] })
             .to include(project.avatar.id.to_s)
           end
 
-          it 'should include background' do
+          it 'includes background' do
             expect(json_response['linked']['backgrounds'].map { |r| r['id'] })
             .to include(project.background.id.to_s)
           end
@@ -267,7 +267,7 @@ describe Api::V1::ProjectsController, type: :controller do
         describe 'include classifications_export' do
           let(:includes) { 'classifications_export' }
 
-          it 'should not allow classifications_export to be included' do
+          it 'does not allow classifications_export to be included' do
             expect(response).to have_http_status(:unprocessable_entity)
           end
         end
@@ -278,7 +278,7 @@ describe Api::V1::ProjectsController, type: :controller do
           end
           let(:includes) { included_models.join(',') }
 
-          it 'should include the relations in the response as linked' do
+          it 'includes the relations in the response as linked' do
             expect(json_response['linked'].keys).to match_array(included_models)
           end
         end
@@ -286,7 +286,7 @@ describe Api::V1::ProjectsController, type: :controller do
         context 'when the serializer model is polymorphic' do
           let(:includes) { 'owners' }
 
-          it 'should include the owners in the response as linked' do
+          it 'includes the owners in the response as linked' do
             expect(json_response['linked'].keys).to match_array([includes])
           end
         end
@@ -294,7 +294,7 @@ describe Api::V1::ProjectsController, type: :controller do
         context 'when the included model is invalid' do
           let(:includes) { 'unknown_model_plural' }
 
-          it 'should return an error body in the response' do
+          it 'returns an error body in the response' do
             error_message = ':unknown_model_plural is not a valid include for Project'
             expect(response.body).to eq(json_error_message(error_message))
           end
@@ -391,7 +391,7 @@ describe Api::V1::ProjectsController, type: :controller do
     end
 
     describe 'create talk admin' do
-      it 'should queue a talk admin create worker' do
+      it 'queues a talk admin create worker' do
         expect(TalkAdminCreateWorker)
           .to receive(:perform_async)
           .with(be_kind_of(Integer))
@@ -407,7 +407,7 @@ describe Api::V1::ProjectsController, type: :controller do
       end
 
       context 'without commas in the display name' do
-        it 'should return the correct resource in the response' do
+        it 'returns the correct resource in the response' do
           expect(json_response['projects']).not_to be_empty
         end
       end
@@ -415,13 +415,13 @@ describe Api::V1::ProjectsController, type: :controller do
       context 'when the display name has commas in it' do
         let!(:display_name) { 'My parents, Steve McQueen, and God' }
 
-        it 'should return a created response' do
+        it 'returns a created response' do
           expect(json_response['projects']).not_to be_empty
         end
       end
 
       describe 'owner links' do
-        it 'should include the link' do
+        it 'includes the link' do
           expect(json_response['linked']['owners']).not_to be_nil
         end
       end
@@ -429,16 +429,16 @@ describe Api::V1::ProjectsController, type: :controller do
       describe 'project contents' do
         let(:project) { Project.find(created_project_id) }
 
-        it 'should extract labels from the urls' do
+        it 'extracts labels from the urls' do
           expect(project.urls).to eq([{ 'label' => '0.label', 'url' => 'http://twitter.com/example' }])
           expect(project.url_labels).to eq({ '0.label' => 'Twitter' })
         end
 
-        it 'should set the contents title do' do
+        it 'sets the contents title do' do
           expect(project.title).to eq('New Zoo')
         end
 
-        it 'should set the description' do
+        it 'sets the description' do
           expect(project.description).to eq('A new Zoo for you!')
         end
       end
@@ -453,25 +453,25 @@ describe Api::V1::ProjectsController, type: :controller do
       end
 
       context 'when the tags did not exist' do
-        it 'should create tag models for the project tags' do
+        it 'create tag models for the project tags' do
           tag_request
-          expect(tags.pluck(:tagged_resources_count)).to all( eq(1) )
+          expect(tags.pluck(:tagged_resources_count)).to all(eq(1))
         end
       end
 
       context 'when the tags did exist' do
-        it 'should reuse existing tags' do
+        it 'reuses existing tags' do
           create(:tag, name: 'astro')
           create(:tag, name: 'gastro')
           tag_request
-          expect(tags.pluck(:tagged_resources_count)).to all( eq(2) )
+          expect(tags.pluck(:tagged_resources_count)).to all(eq(2))
         end
       end
 
-      it 'should associate the tags with the project' do
+      it 'associate the tags with the project' do
         tag_request
         resource_id = json_response[api_resource_name][0]['id'].to_i
-        expect(tags.flat_map { |t| t.projects.pluck(:id) }).to all( eq(resource_id) )
+        expect(tags.flat_map { |t| t.projects.pluck(:id) }).to all(eq(resource_id))
       end
     end
 
@@ -480,7 +480,7 @@ describe Api::V1::ProjectsController, type: :controller do
 
       context 'with invalid create params' do
 
-        it 'should not orphan an ACL instance when the model is invalid' do
+        it 'does not orphan an ACL instance when the model is invalid' do
           default_request scopes: scopes, user_id: authorized_user.id
           create_params[:projects] = create_params[:projects].except(:primary_language)
           expect { post :create, params: create_params }.not_to change(AccessControlList, :count)
@@ -533,7 +533,7 @@ describe Api::V1::ProjectsController, type: :controller do
                                  user: user,
                                  user_group: owner,
                                  roles: ['group_admin'])
-}      
+      }
 
       let(:owner_params) do
         {
@@ -542,7 +542,7 @@ describe Api::V1::ProjectsController, type: :controller do
         }
       end
 
-      it 'should have the user group as its owner' do
+      it 'has the user group as its owner' do
         default_request scopes: scopes, user_id: authorized_user.id
         post :create, params: create_params
         project = Project.find(json_response['projects'][0]['id'])
@@ -626,7 +626,7 @@ describe Api::V1::ProjectsController, type: :controller do
           expect(resource.reload.launch_date).not_to be_nil
         end
 
-        it "should not record the launch_date if it's already been set" do
+        it "does not record the launch_date if it's already been set" do
           resource.update_column(:launch_date, Time.zone.now)
           ld = resource.reload.launch_date
           put :update, params: ps.merge(id: resource.id)
@@ -654,27 +654,27 @@ describe Api::V1::ProjectsController, type: :controller do
         default_request scopes: scopes, user_id: authorized_user.id
       end
 
-      it 'should update the title' do
+      it 'updates the title' do
         params[:projects][test_attr] = test_attr_value
         put :update, params: params
         project.reload
         expect(project.title).to eq(test_attr_value)
       end
 
-      it 'should update the description changes' do
+      it 'updates the description changes' do
         put :update, params: params
         project.reload
         expect(project.description).to eq('SC')
         expect(json_response['projects'][0]['description']).to eq('SC')
       end
 
-      it 'should extract labels from the urls' do
+      it 'extracts labels from the urls' do
         put :update, params: params
         project.reload
         expect(project.urls).to eq([{ 'label' => '0.label', 'url' => 'https://zooniverse.org/about' }])
       end
 
-      it 'should save labels' do
+      it 'saves labels' do
         put :update, params: params
         project.reload
         expect(project.url_labels).to eq({ '0.label' => 'About' })
@@ -712,11 +712,11 @@ describe Api::V1::ProjectsController, type: :controller do
           put :update, params: params
         end
 
-        it 'should have the same name' do
+        it 'has the same name' do
           expect(resource.subject_sets.first.display_name).to eq(subject_set.display_name)
         end
 
-        it 'should have a different id' do
+        it 'has a different id' do
           expect(resource.subject_sets.first.id).not_to eq(subject_set.id)
         end
       end
@@ -747,7 +747,7 @@ describe Api::V1::ProjectsController, type: :controller do
             expect(copied_resource.display_name).to include("#{linked_resource.display_name} (copy:")
           end
 
-          it 'should belong to the correct project' do
+          it 'belongs to the correct project' do
             update_via_links
             expect(copied_resource.project_id).to eq(resource.id)
           end
@@ -767,17 +767,17 @@ describe Api::V1::ProjectsController, type: :controller do
 
         it_behaves_like 'supports update_links via a copy of the original' do
 
-          it 'should have the same name' do
+          it 'has the same name' do
             update_via_links
             expect(copied_resource.display_name).to eq(linked_resource.display_name)
           end
 
-          it 'should belong to the correct project' do
+          it 'belongs to the correct project' do
             update_via_links
             expect(copied_resource.project_id).to eq(resource.id)
           end
 
-          it 'should create copies of every subject via set_member_subjects' do
+          it 'creates copies of every subject via set_member_subjects' do
             expect { update_via_links }.to change(SetMemberSubject, :count).by(expected_copies_count)
           end
         end

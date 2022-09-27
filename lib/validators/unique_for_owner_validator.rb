@@ -6,11 +6,11 @@ module Validators
       if records
         unique_fields_for(record).each do |field|
           if record_exists?(records, record, field)
-            record.errors.add(field, "Must be unique for owner")
+            record.errors.add(field, 'Must be unique for owner')
           end
         end
       else
-        record.errors.add(:owner, "Must not be nil")
+        record.errors.add(:owner, 'Must not be nil')
       end
     end
 
