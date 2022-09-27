@@ -313,15 +313,6 @@ describe Api::V1::ProjectsController, type: :controller do
         get :show, params: { id: resource.id }
       end
     end
-
-    describe 'http caching' do
-      let(:action) { :show }
-      let(:private_resource) do
-        create(:project, owner: user, private: true)
-      end
-      let(:private_resource_id) { private_resource.id }
-      let(:public_resource_id) { resource.id }
-    end
   end
 
   describe '#create' do

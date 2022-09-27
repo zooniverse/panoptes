@@ -646,18 +646,6 @@ describe Api::V1::SubjectsController, type: :controller do
     let(:resource) { create(:subject) }
 
     it_behaves_like "is showable"
-
-    describe "http caching" do
-      let(:action) { :show }
-      let(:private_resource) do
-        project = create(:project, private: true) do |p|
-          p.owner = user
-        end
-        create(:subject, project: project)
-      end
-      let(:private_resource_id) { private_resource.id }
-      let(:public_resource_id) { resource.id }
-    end
   end
 
   describe "#update" do
