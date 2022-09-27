@@ -142,7 +142,7 @@ describe Api::V1::ProjectsController, type: :controller do
 
                 it 'should not have beta projects' do
                   ids = json_response['projects'].map { |p| p['id'] }
-                  expect(Project.find(ids)).to_not include(beta_resource)
+                  expect(Project.find(ids)).not_to include(beta_resource)
                 end
               end
             end
@@ -162,7 +162,7 @@ describe Api::V1::ProjectsController, type: :controller do
               context 'for approved projects' do
                 let(:index_options) { { launch_approved: 'true' } }
                 it 'should not have unapproved projects' do
-                  expect(Project.find(ids)).to_not include(unapproved_resource)
+                  expect(Project.find(ids)).not_to include(unapproved_resource)
                 end
 
                 it 'should return projects in project rank order' do
@@ -333,16 +333,16 @@ describe Api::V1::ProjectsController, type: :controller do
 
     let(:default_create_params) do
       { projects: { display_name: display_name,
-                   description: 'A new Zoo for you!',
-                   primary_language: 'en',
-                   workflow_description: 'some more text',
-                   urls: [{ label: 'Twitter', url: 'http://twitter.com/example' }],
-                   tags: %w[astro gastro],
-                   configuration: {
+                    description: 'A new Zoo for you!',
+                    primary_language: 'en',
+                    workflow_description: 'some more text',
+                    urls: [{ label: 'Twitter', url: 'http://twitter.com/example' }],
+                    tags: %w[astro gastro],
+                    configuration: {
                                    an_option: 'a setting'
                                   },
-                   beta_requested: true,
-                   private: true } }
+                    beta_requested: true,
+                    private: true } }
     end
 
     let (:create_params) do
@@ -408,7 +408,7 @@ describe Api::V1::ProjectsController, type: :controller do
 
       context 'without commas in the display name' do
         it 'should return the correct resource in the response' do
-          expect(json_response['projects']).to_not be_empty
+          expect(json_response['projects']).not_to be_empty
         end
       end
 
@@ -416,13 +416,13 @@ describe Api::V1::ProjectsController, type: :controller do
         let!(:display_name) { 'My parents, Steve McQueen, and God' }
 
         it 'should return a created response' do
-          expect(json_response['projects']).to_not be_empty
+          expect(json_response['projects']).not_to be_empty
         end
       end
 
       describe 'owner links' do
         it 'should include the link' do
-          expect(json_response['linked']['owners']).to_not be_nil
+          expect(json_response['linked']['owners']).not_to be_nil
         end
       end
 
@@ -475,7 +475,7 @@ describe Api::V1::ProjectsController, type: :controller do
       end
     end
 
-    context 'created with user as owner' do
+    context 'when created with user as owner' do
       it_behaves_like 'is creatable'
 
       context 'with invalid create params' do
@@ -488,8 +488,8 @@ describe Api::V1::ProjectsController, type: :controller do
       end
     end
 
-    context 'created with specified user as owner' do
-      context 'user is the current user' do
+    context 'when created with specified user as owner' do
+      context 'when user is the current user' do
         let(:owner_params) do
           {
            id: authorized_user.id.to_s,
@@ -500,7 +500,7 @@ describe Api::V1::ProjectsController, type: :controller do
         it_behaves_like 'is creatable'
       end
 
-      context 'user is not the current user' do
+      context 'when user is not the current user' do
         let(:req) do
           default_request scopes: scopes, user_id: authorized_user.id
           post :create, params: create_params
@@ -511,28 +511,29 @@ describe Api::V1::ProjectsController, type: :controller do
           user = create(:user)
           {
             id: user.id.to_s,
-              type: 'users'
+            type: 'users'
           }
         end
 
-        it 'should not create a new project' do
-          expect { req }.to_not change(Project, :count)
+        it 'does not create a new project' do
+          expect { req }.not_to change(Project, :count)
         end
 
-        it 'should return 422' do
+        it 'returns 422' do
           req
           expect(response).to have_http_status(:unprocessable_entity)
         end
       end
     end
 
-    context 'create with user_group as owner' do
+    context 'when creating with user_group as owner' do
       let(:owner) { create(:user_group) }
       let!(:membership) { create(:membership,
                                  state: :active,
                                  user: user,
                                  user_group: owner,
-                                 roles: ['group_admin']) }
+                                 roles: ['group_admin'])
+}      
 
       let(:owner_params) do
         {
@@ -702,7 +703,7 @@ describe Api::V1::ProjectsController, type: :controller do
 
         it 'has a different id to the original workflow' do
           put :update, params: params
-          expect(resource.workflows.first.id).to_not eq(workflow.id)
+          expect(resource.workflows.first.id).not_to eq(workflow.id)
         end
       end
 
@@ -716,7 +717,7 @@ describe Api::V1::ProjectsController, type: :controller do
         end
 
         it 'should have a different id' do
-          expect(resource.subject_sets.first.id).to_not eq(subject_set.id)
+          expect(resource.subject_sets.first.id).not_to eq(subject_set.id)
         end
       end
     end

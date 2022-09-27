@@ -10,8 +10,8 @@ RSpec.describe 'when an empty array is in a param', type: :request do
   let(:url) { "/api/workflows/#{workflow.id}" }
   let!(:etag) do
     get url,
-      headers: { 'HTTP_ACCEPT' => 'application/vnd.api+json; version=1',
-                 'HTTP_AUTHORIZATION' => "Bearer #{access_token.token}" }
+        headers: { 'HTTP_ACCEPT' => 'application/vnd.api+json; version=1',
+                   'HTTP_AUTHORIZATION' => "Bearer #{access_token.token}" }
     response.headers['ETag']
   end
 
