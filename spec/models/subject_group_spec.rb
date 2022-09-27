@@ -30,12 +30,6 @@ describe SubjectGroup, type: :model do
   end
 
   describe '#subjects' do
-    before do
-      # force the through assocation to be loaded
-      subject_group.save
-      subject_group.subjects(true)
-    end
-
     it 'has many subjects' do
       expect(subject_group.subjects).to all(be_a(Subject))
     end
@@ -51,8 +45,7 @@ describe SubjectGroup, type: :model do
     end
 
     it 'is leaves the subjects intact' do
-      # use true to force the assocation load
-      test_subjects = subject_group.subjects(true)
+      test_subjects = subject_group.subjects
       subject_group.destroy
       expect(test_subjects.map(&:destroyed?)).to all(be false)
     end
