@@ -67,7 +67,7 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
           before(:each) do
             non_filter_translation
             default_request scopes: scopes, user_id: authorized_user.id
-            get :index, filter_params
+            get :index, params: filter_params
           end
 
           describe "filtering on translation resources" do
@@ -129,7 +129,7 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
         let(:language) { translated_resource.primary_language }
         let(:run_request) do
           default_request scopes: scopes, user_id: authorized_user.id
-          post :create, create_params
+          post :create, params: create_params
         end
       end
     end
@@ -149,7 +149,7 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
 
         context "when the user has no roles" do
           before do
-            get :show, show_params.merge(id: resource.id)
+            get :show, params: show_params.merge(id: resource.id)
           end
 
           it 'should return 404' do
@@ -165,7 +165,7 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
         context "when the user has a translator role" do
           it 'should return 200' do
             user_translator_role
-            get :show, show_params.merge(id: resource.id)
+            get :show, params: show_params.merge(id: resource.id)
             expect(response.status).to eq 200
           end
         end
@@ -205,7 +205,7 @@ RSpec.describe Api::V1::TranslationsController, type: :controller do
         let(:run_request) do
           default_request scopes: scopes, user_id: authorized_user.id
           params = update_params.merge(id: resource.id)
-          put :update, params
+          put :update, params: params
         end
       end
     end

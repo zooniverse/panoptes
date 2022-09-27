@@ -8,12 +8,12 @@ module APIRequestHelpers
     end
 
     def post(path, body, custom_headers = {})
-      spec.post(path, body.to_json, headers_with(custom_headers))
+      spec.post(path, params: body.to_json, headers: headers_with(custom_headers))
     end
 
     def put(path, body, custom_headers = {})
       custom_headers["If-Match"] = get_resource_etag(path)
-      spec.put(path, body.to_json, headers_with(custom_headers))
+      spec.put(path, params: body.to_json, headers: headers_with(custom_headers))
     end
 
     private
