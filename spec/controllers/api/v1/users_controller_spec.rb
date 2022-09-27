@@ -334,6 +334,7 @@ describe Api::V1::UsersController, type: :controller do
     let(:user_response) { created_instance(api_resource_name) }
 
     before(:each) do
+      user.save
       default_request(scopes: scopes, user_id: user.id)
       get :me
     end
@@ -589,7 +590,7 @@ describe Api::V1::UsersController, type: :controller do
       end
 
       it "should return a specific error message in the response body" do
-        error_message = json_error_message("found unpermitted parameter: project_id")
+        error_message = json_error_message("found unpermitted parameter: :project_id")
         expect(response.body).to eq(error_message)
       end
 

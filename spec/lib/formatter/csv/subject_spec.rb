@@ -93,7 +93,7 @@ RSpec.describe Formatter::Csv::Subject do
 
     context "with a subject that has no location metadata" do
       it "should match the db ordered subject_locations array" do
-        allow_any_instance_of(Medium::ActiveRecord_Associations_CollectionProxy)
+        allow_any_instance_of(Medium.const_get('ActiveRecord_Associations_CollectionProxy'))
           .to receive(:loaded?)
           .and_return(true)
         allow_any_instance_of(Medium).to receive(:metadata).and_return(nil)
