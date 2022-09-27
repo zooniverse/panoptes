@@ -6,7 +6,7 @@ module Validators
       if records
         unique_fields_for(record).each do |field|
           if record_exists?(records, record, field)
-            record.errors[field] = "Must be unique for owner"
+            record.errors.add(field, "Must be unique for owner")
           end
         end
       else
