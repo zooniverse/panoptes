@@ -110,7 +110,7 @@ describe RegistrationsController, type: :controller do
         end
 
         it "should increase the count of users" do
-          expect{ post :create, params: { user: user_attributes } }.to change{ User.count }.from(0).to(1)
+          expect { post :create, params: { user: user_attributes } }.to change(User, :count).from(0).to(1)
         end
 
         it "should set the display name" do
@@ -166,7 +166,7 @@ describe RegistrationsController, type: :controller do
           end
 
           it "should increase the count of users" do
-            expect{ post :create, params: { user: user_attributes } }.to change{ User.count }.by(1)
+            expect { post :create, params: { user: user_attributes } }.to change(User, :count).by(1)
           end
 
           it "should persist the user account" do
@@ -195,7 +195,7 @@ describe RegistrationsController, type: :controller do
         end
 
         it "should not increase the count of users" do
-          expect{ post :create, params: { user: user_attributes } }.not_to change{ User.count }
+          expect { post :create, params: { user: user_attributes } }.not_to change(User, :count)
         end
 
         it "should not persist the user account" do
@@ -228,7 +228,7 @@ describe RegistrationsController, type: :controller do
         end
 
         it "should not increase the count of users" do
-          expect{ post :create, params: { user: user_attributes } }.not_to change{ User.count }
+          expect { post :create, params: { user: user_attributes } }.not_to change(User, :count)
         end
 
         it "should provide an error message in the response body" do
@@ -239,7 +239,7 @@ describe RegistrationsController, type: :controller do
 
         it "should not orphan an identity User Group" do
           attrs = user_attributes.merge(login: "test_user", password: '123456')
-          expect{ post :create, params: { user: attrs } }.not_to change{ UserGroup.count }
+          expect { post :create, params: { user: attrs } }.not_to change(UserGroup, :count)
         end
       end
     end
@@ -266,7 +266,7 @@ describe RegistrationsController, type: :controller do
         end
 
         it "should increase the count of users" do
-          expect{ post :create, params: { user: user_attributes } }.to change{ User.count }.from(0).to(1)
+          expect { post :create, params: { user: user_attributes } }.to change(User, :count).from(0).to(1)
         end
 
         it "should persist the user account" do
@@ -305,7 +305,7 @@ describe RegistrationsController, type: :controller do
         end
 
         it "should not increase the count of users" do
-          expect{ post :create, params: { user: user_attributes } }.not_to change{ User.count }
+          expect { post :create, params: { user: user_attributes } }.not_to change(User, :count)
         end
 
         it "should not persist the user account" do
@@ -329,12 +329,12 @@ describe RegistrationsController, type: :controller do
         end
 
         it "should not increase the count of users" do
-          expect{ post :create, params: { user: user_attributes } }.not_to change{ User.count }
+          expect { post :create, params: { user: user_attributes } }.not_to change(User, :count)
         end
 
         it "should not orphan an identity User Group" do
           attrs = user_attributes.merge(login: "test_user", password: '123456')
-          expect{ post :create, params: { user: attrs } }.not_to change{ UserGroup.count }
+          expect { post :create, params: { user: attrs } }.not_to change(UserGroup, :count)
         end
       end
     end
@@ -352,30 +352,30 @@ describe RegistrationsController, type: :controller do
 
       context 'with correct password' do
         it 'redirects to root' do
-          delete :destroy, params: { user: {current_password: password} }
+          delete :destroy, params: { user: { current_password: password } }
           expect(response).to redirect_to('/')
           expect(flash[:notice]).to be_present
         end
 
         it 'signs out the user' do
           expect(controller).to receive(:sign_out)
-          delete :destroy, params: { user: {current_password: password} }
+          delete :destroy, params: { user: { current_password: password } }
         end
 
         it 'deactivates the user' do
-          delete :destroy, params: { user: {current_password: password} }
+          delete :destroy, params: { user: { current_password: password } }
           expect(user.reload.active?).to be_falsey
         end
 
         it 'scrubs the users information' do
           expect(UserInfoScrubber).to receive(:scrub_personal_info!).with(user)
-          delete :destroy, params: { user: {current_password: password} }
+          delete :destroy, params: { user: { current_password: password } }
         end
       end
 
       context 'with incorrect password' do
         it 'renders error' do
-          delete :destroy, params: { user: {current_password: 'wrong'} }
+          delete :destroy, params: { user: { current_password: 'wrong' } }
           expect(user.reload.active?).to be_truthy
           expect(flash[:delete_alert]).to be_present
         end

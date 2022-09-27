@@ -16,16 +16,16 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
   let(:resource) { upps.first }
   let(:resource_class) { UserProjectPreference }
 
-  describe "#index" do
+  describe '#index' do
     let!(:private_resource) { create(:user_project_preference) }
     let(:n_visible) { 2 }
 
-    it_behaves_like "is indexable"
+    it_behaves_like 'is indexable'
 
-    describe "include projects" do
+    describe 'include projects' do
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
-        get :index, params: { include: "project" }
+        get :index, params: { include: 'project' }
       end
 
       it 'should be able to include linked projects' do
@@ -38,11 +38,11 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
     end
   end
 
-  describe "#show" do
-    it_behaves_like "is showable"
+  describe '#show' do
+    it_behaves_like 'is showable'
   end
 
-  describe "#update" do
+  describe '#update' do
     let(:unauthorized_user) { resource.project.owner }
     let(:test_attr) { :email_communication }
     let(:test_attr_value) { false }
@@ -58,12 +58,12 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
       }
     end
 
-    it_behaves_like "is updatable"
+    it_behaves_like 'is updatable'
   end
 
-  describe "#create" do
+  describe '#create' do
     let(:test_attr) { :preferences }
-    let(:test_attr_value) { { "tutorial" => true } }
+    let(:test_attr_value) { { 'tutorial' => true } }
     let(:create_params) do
       {
         project_preferences: {
@@ -75,10 +75,10 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
       }
     end
 
-    it_behaves_like "is creatable"
+    it_behaves_like 'is creatable'
   end
 
-  describe "#update_settings" do
+  describe '#update_settings' do
     let!(:project) { create(:project, owner: authorized_user) }
     let!(:upp) { create(:user_project_preference, project: project) }
     let(:settings_params) do
@@ -99,12 +99,12 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
       default_request user_id: authorized_user.id, scopes: scopes
     end
 
-    it "responds with a 200" do
+    it 'responds with a 200' do
       run_update
       expect(response.status).to eq(200)
     end
 
-    it "responds with the updated resource" do
+    it 'responds with the updated resource' do
       run_update
       updated_upp = json_response[api_resource_name].first
       expect(updated_upp).not_to be_empty
@@ -113,18 +113,18 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
       expect(response_dt).to be_within(1.second).of(modified_dt)
     end
 
-    it "updates the UPP settings attribute" do
+    it 'updates the UPP settings attribute' do
       run_update
       found = UserProjectPreference.where(project: project, user: upp.user).first
-      expect(found.settings["workflow_id"]).to eq(settings_params[:project_preferences][:settings][:workflow_id].to_s)
+      expect(found.settings['workflow_id']).to eq(settings_params[:project_preferences][:settings][:workflow_id].to_s)
     end
 
-    it "allows collaborators to update UPP" do
+    it 'allows collaborators to update UPP' do
       collab = create(:user)
       create(:access_control_list,
              resource: project,
              user_group: collab.identity_group,
-             roles: ["collaborator"])
+             roles: ['collaborator'])
       default_request user_id: collab.id, scopes: scopes
       run_update
       expect(response.status).to eq(200)
@@ -141,7 +141,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
         }
       end
 
-      it "cannot update preferences" do
+      it 'cannot update preferences' do
         run_update
         expect(response.status).to eq(422)
       end
@@ -162,7 +162,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
         }
       end
 
-      it "only updates settings of owned project" do
+      it 'only updates settings of owned project' do
         run_update
         expect(response.status).to eq(403)
       end
@@ -180,7 +180,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
         }
       end
 
-      it "responds with a 404 if UPP not found" do
+      it 'responds with a 404 if UPP not found' do
         run_update
         expect(response.status).to eq(404)
       end

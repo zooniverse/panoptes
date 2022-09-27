@@ -142,7 +142,7 @@ describe PasswordsController, type: [ :controller, :mailer ] do
 
       context "when not supplying a valid reset token" do
         before do
-          put :update, params: { user: passwords.merge(reset_password_token: "ABCDEFGHIJKLMNOPQRSTUVWXYZ") }
+          put :update, params: { user: passwords.merge(reset_password_token: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ') }
         end
 
         it "should return return 422 and a meaningful error response body" do
@@ -202,7 +202,7 @@ describe PasswordsController, type: [ :controller, :mailer ] do
 
       context "when not supplying a valid reset token" do
         before(:each) do
-          put :update, params: { user: { reset_password_token: "ABCDEFGHIJKLMNOPQRSTUVWXYZ" } }
+          put :update, params: { user: { reset_password_token: 'ABCDEFGHIJKLMNOPQRSTUVWXYZ' } }
         end
 
         it "should return 200" do

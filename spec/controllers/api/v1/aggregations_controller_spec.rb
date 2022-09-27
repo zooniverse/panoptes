@@ -50,7 +50,7 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
         context "when supplying just the non public workflow ids" do
 
           it "should return no results" do
-            get :index, params: { workflow_id: "#{private_resource.workflow_id}" }
+            get :index, params: { workflow_id: private_resource.workflow_id.to_s }
             expect(json_response[api_resource_name].length).to eq(0)
           end
         end
@@ -59,7 +59,7 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
 
           it "should only return the resources for the public workflow" do
             ids = [ workflow.id, private_resource.workflow_id ]
-            get :index, params: { workflow_ids: ids.join(",") }
+            get :index, params: { workflow_ids: ids.join(',') }
             expect(result_workflow_ids).to match_array( [ "#{workflow.id}" ])
           end
         end

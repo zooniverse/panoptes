@@ -1,23 +1,23 @@
 require 'spec_helper'
 
-RSpec.describe "api should only accept certain content types", type: :request do
+RSpec.describe 'api should only accept certain content types', type: :request do
   include APIRequestHelpers
 
   let(:user) { create(:user) }
   let(:project) { create(:project, owner: user) }
   let(:headers) do
-    { "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
-      "CONTENT_TYPE" => "application/json" }
+    { 'HTTP_ACCEPT' => 'application/vnd.api+json; version=1',
+      'CONTENT_TYPE' => 'application/json' }
   end
 
   before(:each) do
-    allow_any_instance_of(Api::ApiController).to receive(:doorkeeper_token).and_return(token(["public", "project"], user.id))
+    allow_any_instance_of(Api::ApiController).to receive(:doorkeeper_token).and_return(token(['public', 'project'], user.id))
   end
 
-  context "valid create params" do
+  context 'valid create params' do
     before(:each) do
-      post "/api/subject_sets",
-           params: { subject_sets: { display_name: "a name", links: { project: project.id.to_s } } }.to_json,
+      post '/api/subject_sets',
+           params: { subject_sets: { display_name: 'a name', links: { project: project.id.to_s } } }.to_json,
            headers: headers
     end
 
@@ -26,10 +26,10 @@ RSpec.describe "api should only accept certain content types", type: :request do
     end
   end
 
-  context "invalid create params" do
+  context 'invalid create params' do
     before(:each) do
-      post "/api/subject_sets",
-           params: { subject_sets: { extra: "bad param", display_name: "a name", links: { project: project.id.to_s } } }.to_json,
+      post '/api/subject_sets',
+           params: { subject_sets: { extra: 'bad param', display_name: 'a name', links: { project: project.id.to_s } } }.to_json,
            headers: headers
     end
 

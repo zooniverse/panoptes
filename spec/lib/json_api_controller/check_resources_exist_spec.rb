@@ -66,7 +66,7 @@ describe JsonApiController::CheckResourcesExist, type: :controller do
 
   describe "user is not enrolled on controlled object" do
     it 'should raise an AccessDenied error' do
-      expect{ put :update, params: { id: controlled.id } }.to raise_error(JsonApiController::AccessDenied)
+      expect { put :update, params: { id: controlled.id } }.to raise_error(JsonApiController::AccessDenied)
     end
   end
 
@@ -82,7 +82,7 @@ describe JsonApiController::CheckResourcesExist, type: :controller do
       # as this spec won't return resource ids so won't activate the scope
       # lookup in JsonApiController::CheckResourcesExist.resources_exist?
       allow(controller).to receive(:policy_scoped?).and_return(true)
-      expect{
+      expect {
         get :index, params: { id: nil }
       }.not_to raise_error
     end

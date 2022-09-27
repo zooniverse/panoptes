@@ -1,4 +1,4 @@
-require "spec_helper"
+require 'spec_helper'
 
 describe ApplicationsController, type: :controller do
   let(:normal_user) { create(:user) }
@@ -59,14 +59,14 @@ describe ApplicationsController, type: :controller do
     end
   end
 
-  describe "#create" do
+  describe '#create' do
     before do
       sign_in normal_user
     end
 
     it 'should set the owner of the application' do
       post :create, params: {
-        application: { name: "test app", redirect_uri: "https://example.com" }
+        application: { name: 'test app', redirect_uri: 'https://example.com' }
       }
       expect(Doorkeeper::Application.first.owner).to eq(normal_user)
     end
@@ -74,7 +74,7 @@ describe ApplicationsController, type: :controller do
     it 'should allows insecure localhost scheme URIs' do
       expect {
         post :create, params: {
-          application: { name: "test app", redirect_uri: "http://localhost" }
+          application: { name: 'test app', redirect_uri: 'http://localhost' }
         }
       }.to change {
         Doorkeeper::Application.count
@@ -84,7 +84,7 @@ describe ApplicationsController, type: :controller do
     it 'should allows insecure local zooniverse scheme URIs' do
       expect {
         post :create, params: {
-          application: { name: "test app", redirect_uri: "http://local.zooniverse.org" }
+          application: { name: 'test app', redirect_uri: 'http://local.zooniverse.org' }
         }
       }.to change {
         Doorkeeper::Application.count
@@ -95,7 +95,7 @@ describe ApplicationsController, type: :controller do
       sign_in normal_user
       expect {
         post :create, params: {
-          application: { name: "test app", redirect_uri: "http://example.com" }
+          application: { name: 'test app', redirect_uri: 'http://example.com' }
         }
       }.not_to change {
         Doorkeeper::Application.count
@@ -108,26 +108,26 @@ describe ApplicationsController, type: :controller do
 
     it 'updates your own application' do
       sign_in application.owner
-      put :update, params: { id: application.id, application: {name: 'changed'} }
+      put :update, params: { id: application.id, application: { name: 'changed' } }
       expect(application.reload.name).to eq('changed')
     end
 
     it 'does not update other applications' do
       sign_in normal_user
-      put :update, params: { id: application.id, application: {name: 'changed'} }
+      put :update, params: { id: application.id, application: { name: 'changed' } }
       expect(response.status).to eq(404)
       expect(application.reload.name).to eq('test app')
     end
 
     it 'lets admins update all applications' do
       sign_in admin_user
-      put :update, params: { id: application.id, application: {name: 'changed'} }
+      put :update, params: { id: application.id, application: { name: 'changed' } }
       expect(application.reload.name).to eq('changed')
     end
 
     it 'allows insecure localhost scheme URIs' do
       sign_in application.owner
-      redirect_uri = "http://localhost"
+      redirect_uri = 'http://localhost'
       expect {
         put :update, params: { id: application.id, application: {
           redirect_uri: redirect_uri
@@ -139,7 +139,7 @@ describe ApplicationsController, type: :controller do
 
     it 'allows insecure localhost scheme URIs' do
       sign_in application.owner
-      redirect_uri = "http://local.zooniverse.org"
+      redirect_uri = 'http://local.zooniverse.org'
       expect {
         put :update, params: { id: application.id, application: {
           redirect_uri: redirect_uri
@@ -152,7 +152,7 @@ describe ApplicationsController, type: :controller do
     it 'should not allow insecure non-localhost scheme URIs' do
       sign_in application.owner
       original_redirect = application.redirect_uri
-      put :update, params: { id: application.id, application: {redirect_uri: "http://example.com"} }
+      put :update, params: { id: application.id, application: { redirect_uri: 'http://example.com' } }
       expect(application.redirect_uri).to eq(original_redirect)
     end
   end
