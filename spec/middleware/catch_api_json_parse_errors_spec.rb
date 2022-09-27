@@ -46,7 +46,7 @@ describe CatchApiJsonParseErrors do
         # this would really be a specific parser error in reality, e.g. a `JSON::ParserError` error
         raise StandardError
       rescue StandardError
-        return ActionDispatch::ParamsParser::ParseError.new('test', 'test')
+        return ActionDispatch::ParamsParser::ParseError.new
       end
     }
 

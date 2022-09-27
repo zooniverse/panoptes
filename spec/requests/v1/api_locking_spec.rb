@@ -7,11 +7,11 @@ describe "api should allow conditional requests", type: :request do
   let(:project) { create(:project_with_contents, owner: user) }
   let(:url) { "/api/projects/#{project.id}" }
   let(:req) do
-    get url, nil,
-        { "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
+    get url,
+      headers: { "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
           "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}" }
-    put url, { projects: { name: "different_name" } }.to_json,
-        { "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
+    put url, params: { projects: { name: "different_name" } }.to_json,
+        headers: { "HTTP_ACCEPT" => "application/vnd.api+json; version=1",
           "CONTENT_TYPE" => "application/json",
           "HTTP_AUTHORIZATION" => "Bearer #{access_token.token}",
           "If-Match" => response.etag }

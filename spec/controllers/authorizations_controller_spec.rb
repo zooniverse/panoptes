@@ -43,21 +43,21 @@ describe AuthorizationsController, type: :controller do
     let!(:app) { create(:first_party_app, owner: owner) }
 
     it 'should skip authorization and redirect' do
-      get :new, token_params
+      get :new, params: token_params
       expect(response).to redirect_to(/\A#{params[:redirect_uri]}?access_token/)
     end
   end
 
   context 'with an insecure application using an implicit grant' do
     let!(:app) { create(:application, owner: owner) }
-    let(:req) { get :new, token_params }
+    let(:req) { get :new, params: token_params }
 
     it_behaves_like 'restricted scopes'
   end
 
   context "an authorization grant by a secure application" do
     let!(:app) { create(:secure_app, owner: owner) }
-    let(:req) { get :new, code_params }
+    let(:req) { get :new, params: code_params }
 
     it_behaves_like 'restricted scopes'
   end
@@ -66,7 +66,7 @@ describe AuthorizationsController, type: :controller do
     let!(:app) { create(:application, owner: owner) }
 
     it 'should return 422 unprocessable entity' do
-      get :new, code_params
+      get :new, params: code_params
       expect(response.status).to eq(422)
     end
   end
