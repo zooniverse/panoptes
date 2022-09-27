@@ -69,7 +69,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       it 'should return only serialize the specified fields' do
         get :index, params: { fields: 'display_name,subjects_count,does_not_exist' }
         response_keys = json_response['workflows'].map(&:keys).uniq.flatten
-        expect(response_keys).to match_array ['id', 'links', 'display_name', 'subjects_count']
+        expect(response_keys).to match_array %w[id links display_name subjects_count]
       end
     end
 
@@ -545,7 +545,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       it_behaves_like 'is creatable'
     end
 
-    context 'workflow versions' do
+    context 'with workflow versions' do
       before do
         default_request scopes: scopes, user_id: authorized_user.id
       end
@@ -557,7 +557,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       end
     end
 
-    context 'extracts strings from workflow' do
+    context 'when it extracts strings from workflow' do
       it 'should replace "Draw a circle" with 0' do
         default_request scopes: scopes, user_id: authorized_user.id
         post :create, params: create_params
@@ -694,8 +694,9 @@ describe Api::V1::WorkflowsController, type: :controller do
     end
 
     it 'queues a retire subject worker' do
-      expect(RetireSubjectWorker).to receive(:perform_async).with(workflow.id, [subject1.id], nil)
+      allow(RetireSubjectWorker).to receive(:perform_async).with(workflow.id, [subject1.id], nil)
       post :retire_subjects, params: { workflow_id: workflow.id, subject_id: subject1.id }
+      expect(RetireSubjectWorker).to have_received(:perform_async).with(workflow.id, [subject1.id], nil)
     end
 
     it 'throws an unpermitted params error when retired_reason is invalid', :aggregate_failures do
@@ -732,7 +733,7 @@ describe Api::V1::WorkflowsController, type: :controller do
     let(:test_attr) { :type }
     let(:api_resource_name) { 'media' }
     let(:api_resource_attributes) do
-      ['id', 'src', 'created_at', 'content_type', 'media_type', 'href']
+      %w[id src created_at content_type media_type href]
     end
     let(:api_resource_links) { [] }
     let(:resource_class) { Medium }
