@@ -32,15 +32,15 @@ describe JsonApiController::CheckResourcesExist, type: :controller do
     end
 
     def update
-      render nothing: true
+      head :ok
     end
 
     def show
-      render nothing: true
+      head :ok
     end
 
     def index
-      render nothing: true
+      head :ok
     end
   end
 

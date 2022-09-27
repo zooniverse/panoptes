@@ -14,7 +14,7 @@ describe "api should allow conditional requests", type: :request do
   end
 
   let(:etag) do
-    get url, nil, api_default_params
+    get url, headers: api_default_params
     response.headers['ETag']
   end
 
@@ -32,7 +32,7 @@ describe "api should allow conditional requests", type: :request do
 
     context "when the if-match header is not supplied" do
       before(:each) do
-        send method, url, body.to_json, request_params.except("If-Match")
+        send method, url, params: body.to_json, headers: request_params.except("If-Match")
       end
 
       it "should require if-match header" do
@@ -48,25 +48,25 @@ describe "api should allow conditional requests", type: :request do
     it "should fail request if precondition not met" do
       request_params
       modify
-      send method, url, body.to_json, request_params
+      send method, url, params: body.to_json, headers: request_params
       expect(response).to have_http_status(:precondition_failed)
     end
 
     it "should succeed if precondition is met" do
-      send method, url, body.to_json, request_params
+      send method, url, params: body.to_json, headers: request_params
       expect(response).to have_http_status(ok_status)
     end
 
     it "should succeed if correct weak etag precondition is met" do
       weak_etag = "W/#{etag}"
-      send method, url, body.to_json, request_params.merge("If-Match" => weak_etag)
+      send method, url, params: body.to_json, headers: request_params.merge("If-Match" => weak_etag)
       expect(response).to have_http_status(ok_status)
     end
   end
 
   shared_examples "returns etag" do
     before(:each) do
-      send method, url, nil, api_default_params
+      send method, url, headers: api_default_params
     end
 
     it "should return the ETag Header" do
@@ -76,7 +76,7 @@ describe "api should allow conditional requests", type: :request do
 
   shared_examples "304s when not modified" do
     before(:each) do
-      send method, url, nil, api_default_params.merge("If-None-Match" => etag)
+      send method, url, headers: api_default_params.merge("If-None-Match" => etag)
     end
 
     it 'should return not modified' do
@@ -149,7 +149,7 @@ describe "api should allow conditional requests", type: :request do
         it 'should return 200' do
           request_params
           project.destroy!
-          get url, nil, request_params.except("CONTENT_TYPE")
+          get url, headers: request_params.except("CONTENT_TYPE")
           expect(response).to have_http_status(:ok)
         end
       end

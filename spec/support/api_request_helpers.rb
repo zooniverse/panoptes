@@ -28,7 +28,7 @@ module APIRequestHelpers
     end
 
     def get_resource_etag(path)
-      spec.get(path, {}, headers_with({}))
+      spec.get(path, headers: headers_with({}))
       spec.response.headers["ETag"]
     end
   end
