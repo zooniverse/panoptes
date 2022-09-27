@@ -41,7 +41,7 @@ describe Api::V1::UserGroupsController, type: :controller do
                user: user,
                user_group: user_groups[1])
 
-        get :index, name: user_groups[1].name
+        get :index, params: { name: user_groups[1].name }
 
         expect(json_response["user_groups"]).to all( include("name" => user_groups[1].name) )
       end
@@ -74,7 +74,7 @@ describe Api::V1::UserGroupsController, type: :controller do
 
     context "includes customized urls" do
       before(:each) do
-        get :show, id: resource.id
+        get :show, params: { id: resource.id }
       end
 
       it 'should include a url for projects' do
@@ -102,7 +102,7 @@ describe Api::V1::UserGroupsController, type: :controller do
       let(:group_id) { created_instance_id('user_groups') }
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
-        post :create, create_params
+        post :create, params: create_params
       end
 
       it "should make a the creating user a member" do
@@ -121,7 +121,7 @@ describe Api::V1::UserGroupsController, type: :controller do
     describe "when only a name is provided" do
       it "should set the display name" do
         default_request scopes: scopes, user_id: authorized_user.id
-        post :create, { user_groups: { name: "GalaxyZoo" }}
+        post :create, params: { user_groups: { name: "GalaxyZoo" }}
 
         group = UserGroup.find(created_instance_id("user_groups"))
         expect(group.display_name).to eq("GalaxyZoo")
@@ -152,7 +152,7 @@ describe Api::V1::UserGroupsController, type: :controller do
     context "created membership" do
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
-        post :update_links, user_group_id: resource.id, users: [ new_user.id.to_s ], link_relation: "users"
+        post :update_links, params: { user_group_id: resource.id, users: [ new_user.id.to_s ], link_relation: "users" }
       end
 
       it 'should give the user a group_member role' do
@@ -172,7 +172,7 @@ describe Api::V1::UserGroupsController, type: :controller do
     context "setting membership to inactive" do
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
-        delete :destroy_links, user_group_id: resource.id, link_ids: test_relation_ids.join(','), link_relation: "users"
+        delete :destroy_links, params:  { user_group_id: resource.id, link_ids: test_relation_ids.join(','), link_relation: "users" }
       end
 
       it 'should give the delete user membership to inactive' do
