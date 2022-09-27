@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Api::V1::ProjectsController, type: :controller do
@@ -10,24 +12,24 @@ describe Api::V1::ProjectsController, type: :controller do
   let(:api_resource_name) { 'projects' }
   let(:api_resource_attributes) do
     %w[id display_name classifications_count subjects_count
-     updated_at created_at available_languages title
-     description introduction migrated private live
-     retired_subjects_count urls classifiers_count redirect
-     workflow_description tags experimental_tools
-     completeness activity state mobile_friendly]
+       updated_at created_at available_languages title
+       description introduction migrated private live
+       retired_subjects_count urls classifiers_count redirect
+       workflow_description tags experimental_tools
+       completeness activity state mobile_friendly]
   end
   let(:api_resource_links) do
-    [ 'projects.workflows',
-      'projects.subject_sets',
-      'projects.project_roles',
-      'projects.avatar',
-      'projects.background',
-      'projects.classifications_export',
-      'projects.subjects_export',
-      'projects.attached_images' ]
+    ['projects.workflows',
+     'projects.subject_sets',
+     'projects.project_roles',
+     'projects.avatar',
+     'projects.background',
+     'projects.classifications_export',
+     'projects.subjects_export',
+     'projects.attached_images']
   end
 
-  let(:scopes) { %w(public project) }
+  let(:scopes) { %w[public project] }
   let(:authorized_user) { user }
   let(:resource_class) { Project }
   let(:private_resource) { create(:project, private: true) }
@@ -36,7 +38,7 @@ describe Api::V1::ProjectsController, type: :controller do
   let(:deactivated_resource) { create(:project, activated_state: :inactive) }
 
   describe '#index' do
-    context 'not logged in' do
+    context 'when not logged in' do
       let(:authorized_user) { nil }
       let(:n_visible) { 2 }
 
@@ -50,9 +52,9 @@ describe Api::V1::ProjectsController, type: :controller do
       it_behaves_like 'it only lists active resources'
     end
 
-    context 'logged in ' do
+    context 'when logged in' do
       describe 'custom owner links' do
-        before(:each) do
+        before do
           projects
           get :index
         end
@@ -71,7 +73,7 @@ describe Api::V1::ProjectsController, type: :controller do
           get :index, params: index_options
         end
 
-        before(:each) do
+        before do
           projects
         end
 
@@ -91,7 +93,7 @@ describe Api::V1::ProjectsController, type: :controller do
         describe 'cards only' do
           let(:index_options) { { cards: true } }
           let(:card_attrs) do
-            %w(id display_name description slug redirect avatar_src links updated_at classifications_count launch_approved state completeness)
+            %w[id display_name description slug redirect avatar_src links updated_at classifications_count launch_approved state completeness]
           end
 
           it 'returns only serialise the card data' do
@@ -107,7 +109,7 @@ describe Api::V1::ProjectsController, type: :controller do
         end
 
         describe 'filtering' do
-          let(:owner_resources) { [ resource ] }
+          let(:owner_resources) { [resource] }
           let(:collab_resource) { beta_resource }
           let(:viewer_resource) { private_resource }
           let(:authorized_user) { owner }
@@ -121,7 +123,7 @@ describe Api::V1::ProjectsController, type: :controller do
             end
 
             describe 'beta' do
-              context 'for beta projects' do
+              context 'with beta projects' do
                 let(:index_options) do
                   beta_resource
                   { beta_approved: 'true' }
@@ -137,7 +139,7 @@ describe Api::V1::ProjectsController, type: :controller do
                 end
               end
 
-              context 'for non-beta projects' do
+              context 'with non-beta projects' do
                 let(:index_options) { { beta_approved: 'false' } }
 
                 it 'does not have beta projects' do
@@ -148,7 +150,7 @@ describe Api::V1::ProjectsController, type: :controller do
             end
 
             describe 'approved' do
-              context 'for unapproved projects' do
+              context 'with unapproved projects' do
                 let(:index_options) do
                   unapproved_resource
                   { launch_approved: 'false' }
@@ -159,8 +161,9 @@ describe Api::V1::ProjectsController, type: :controller do
                 end
               end
 
-              context 'for approved projects' do
+              context 'with approved projects' do
                 let(:index_options) { { launch_approved: 'true' } }
+
                 it 'does not have unapproved projects' do
                   expect(Project.find(ids)).not_to include(unapproved_resource)
                 end
@@ -255,12 +258,12 @@ describe Api::V1::ProjectsController, type: :controller do
 
           it 'includes avatar' do
             expect(json_response['linked']['avatars'].map { |r| r['id'] })
-            .to include(project.avatar.id.to_s)
+              .to include(project.avatar.id.to_s)
           end
 
           it 'includes background' do
             expect(json_response['linked']['backgrounds'].map { |r| r['id'] })
-            .to include(project.background.id.to_s)
+              .to include(project.background.id.to_s)
           end
         end
 
@@ -274,7 +277,7 @@ describe Api::V1::ProjectsController, type: :controller do
 
         context 'when the serializer models are known' do
           let(:included_models) do
-            %w(workflows subject_sets project_roles)
+            %w[workflows subject_sets project_roles]
           end
           let(:includes) { included_models.join(',') }
 
@@ -330,16 +333,16 @@ describe Api::V1::ProjectsController, type: :controller do
                     urls: [{ label: 'Twitter', url: 'http://twitter.com/example' }],
                     tags: %w[astro gastro],
                     configuration: {
-                                   an_option: 'a setting'
-                                  },
+                      an_option: 'a setting'
+                    },
                     beta_requested: true,
                     private: true } }
     end
 
-    let (:create_params) do
+    let(:create_params) do
       ps = default_create_params
       if owner_params
-        ps[:projects][:links] ||= Hash.new
+        ps[:projects][:links] ||= {}
         ps[:projects][:links][:owner] = owner_params
       end
       ps
@@ -392,7 +395,7 @@ describe Api::V1::ProjectsController, type: :controller do
     end
 
     describe 'correct serializer configuration' do
-      before(:each) do
+      before do
         default_request scopes: scopes, user_id: authorized_user.id
         post :create, params: create_params
       end
@@ -470,7 +473,6 @@ describe Api::V1::ProjectsController, type: :controller do
       it_behaves_like 'is creatable'
 
       context 'with invalid create params' do
-
         it 'does not orphan an ACL instance when the model is invalid' do
           default_request scopes: scopes, user_id: authorized_user.id
           create_params[:projects] = create_params[:projects].except(:primary_language)
@@ -483,8 +485,8 @@ describe Api::V1::ProjectsController, type: :controller do
       context 'when user is the current user' do
         let(:owner_params) do
           {
-           id: authorized_user.id.to_s,
-           type: 'users'
+            id: authorized_user.id.to_s,
+            type: 'users'
           }
         end
 
@@ -496,7 +498,6 @@ describe Api::V1::ProjectsController, type: :controller do
           default_request scopes: scopes, user_id: authorized_user.id
           post :create, params: create_params
         end
-
 
         let(:owner_params) do
           user = create(:user)
@@ -519,17 +520,18 @@ describe Api::V1::ProjectsController, type: :controller do
 
     context 'when creating with user_group as owner' do
       let(:owner) { create(:user_group) }
-      let!(:membership) { create(:membership,
-                                 state: :active,
-                                 user: user,
-                                 user_group: owner,
-                                 roles: ['group_admin'])
+      let!(:membership) {
+        create(:membership,
+               state: :active,
+               user: user,
+               user_group: owner,
+               roles: ['group_admin'])
       }
 
       let(:owner_params) do
         {
-         id: owner.id.to_s,
-         type: 'user_groups'
+          id: owner.id.to_s,
+          type: 'user_groups'
         }
       end
 
@@ -599,7 +601,7 @@ describe Api::V1::ProjectsController, type: :controller do
         ps
       end
 
-      before(:each) do
+      before do
         default_request scopes: scopes, user_id: authorized_user.id
       end
 
@@ -627,6 +629,7 @@ describe Api::V1::ProjectsController, type: :controller do
 
       context 'when the user is not an admin' do
         let(:authorized_user) { create(:user) }
+
         it 'does not update the project' do
           put :update, params: ps.merge(id: resource.id)
           expect(response).to have_http_status(:unprocessable_entity)
@@ -641,7 +644,7 @@ describe Api::V1::ProjectsController, type: :controller do
 
       let(:project) { resource }
 
-      before(:each) do
+      before do
         default_request scopes: scopes, user_id: authorized_user.id
       end
 
@@ -678,14 +681,14 @@ describe Api::V1::ProjectsController, type: :controller do
       end
     end
 
-    context 'update_links' do
+    context 'with update_links' do
       let(:params) { update_params.merge(id: resource.id) }
 
       before do
         default_request scopes: scopes, user_id: authorized_user.id
       end
 
-      context 'copy linked workflow' do
+      context 'when copying linked workflow' do
         it 'copies the workflow using the WorkflowCopier' do
           allow(WorkflowCopier).to receive(:copy).and_call_original
           put :update, params: params
@@ -698,7 +701,7 @@ describe Api::V1::ProjectsController, type: :controller do
         end
       end
 
-      context 'copy linked subject_set' do
+      context 'when copying linked subject_set' do
         before do
           put :update, params: params
         end
@@ -718,7 +721,7 @@ describe Api::V1::ProjectsController, type: :controller do
     let(:resource) { create(:project_with_contents, owner: authorized_user) }
     let(:resource_id) { :project_id }
     let(:test_attr) { :display_name }
-    let(:test_relation_ids) { [ linked_resource.id.to_s ] }
+    let(:test_relation_ids) { [linked_resource.id.to_s] }
     let(:copied_resource) { resource.reload.send(test_relation).first }
 
     describe 'linking a workflow' do
@@ -732,7 +735,6 @@ describe Api::V1::ProjectsController, type: :controller do
         let!(:linked_resource) { create(:workflow) }
 
         it_behaves_like 'supports update_links via a copy of the original' do
-
           it 'has a copy suffix added to the name' do
             update_via_links
             expect(copied_resource.display_name).to include("#{linked_resource.display_name} (copy:")
@@ -757,7 +759,6 @@ describe Api::V1::ProjectsController, type: :controller do
         let!(:linked_resource) { create(:subject_set_with_subjects) }
 
         it_behaves_like 'supports update_links via a copy of the original' do
-
           it 'has the same name' do
             update_via_links
             expect(copied_resource.display_name).to eq(linked_resource.display_name)
@@ -789,7 +790,7 @@ describe Api::V1::ProjectsController, type: :controller do
     let(:content_type) { 'text/csv' }
 
     let(:create_params) do
-      params = {
+      {
         project_id: project.id,
         media: {
           content_type: content_type,
@@ -799,21 +800,21 @@ describe Api::V1::ProjectsController, type: :controller do
     end
 
     describe '#create_classifications_export' do
-      let(:resource_url) { /http:\/\/test.host\/api\/projects\/#{project.id}\/classifications_export/ }
+      let(:resource_url) { %r{http://test.host/api/projects/#{project.id}/classifications_export} }
       let(:test_attr_value) { 'project_classifications_export' }
 
       it_behaves_like 'is creatable', :create_classifications_export
     end
 
     describe '#create_subjects_export' do
-      let(:resource_url) { /http:\/\/test.host\/api\/projects\/#{project.id}\/subjects_export/ }
+      let(:resource_url) { %r{http://test.host/api/projects/#{project.id}/subjects_export} }
       let(:test_attr_value) { 'project_subjects_export' }
 
       it_behaves_like 'is creatable', :create_subjects_export
     end
 
     describe '#create_workflows_export' do
-      let(:resource_url) { /http:\/\/test.host\/api\/projects\/#{project.id}\/workflows_export/ }
+      let(:resource_url) { %r{http://test.host/api/projects/#{project.id}/workflows_export} }
       let(:test_attr_value) { 'project_workflows_export' }
 
       it_behaves_like 'is creatable', :create_workflows_export
