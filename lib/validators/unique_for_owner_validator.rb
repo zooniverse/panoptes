@@ -10,7 +10,7 @@ module Validators
           end
         end
       else
-        record.errors[:owner] = "Must not be nil"
+        record.errors.add(:owner, "Must not be nil")
       end
     end
 
