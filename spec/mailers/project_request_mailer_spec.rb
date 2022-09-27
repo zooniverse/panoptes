@@ -3,7 +3,7 @@ require "spec_helper"
 RSpec.describe ProjectRequestMailer, type: :mailer do
   let(:project) { create(:project) }
   let(:mail) do
-    described_class.project_request("beta", project)
+    described_class.project_request("beta", project.id)
   end
   let(:emails) do
     [project.owner.email].concat(Panoptes.project_request.recipients)
