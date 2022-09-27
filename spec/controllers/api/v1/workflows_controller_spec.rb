@@ -171,7 +171,7 @@ describe Api::V1::WorkflowsController, type: :controller do
           }
         end
 
-        it 'should touch the workflow resource' do
+        it 'touches the workflow resource' do
           expect {
             put :update, params: task_only_update_params
           }.to change {
@@ -349,7 +349,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
         case link_to_test
         when :subject_sets
-          it 'should call post link subject set workers', :aggregate_failures do
+          it 'calls post link subject set workers', :aggregate_failures do
             test_relation_ids.each do |set_id|
               expect(SubjectSetStatusesCreateWorker)
               .to receive(:perform_async)
@@ -383,7 +383,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       it_behaves_like 'supports update_links'
       it_behaves_like 'reloads the non logged in queues', :subject_sets
 
-      it 'should call SubjectSetStatusesCreateWorker' do
+      it 'calls SubjectSetStatusesCreateWorker' do
         expect(SubjectSetStatusesCreateWorker)
         .to receive(:perform_async)
         .with(subject_set_id, resource.id)
@@ -397,7 +397,7 @@ describe Api::V1::WorkflowsController, type: :controller do
         post :update_links, params: params
       end
 
-      it 'should handle non-array link formats' do
+      it 'handles non-array link formats' do
         default_request scopes: scopes, user_id: authorized_user.id
         params = {
           link_relation: test_relation.to_s,
