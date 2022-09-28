@@ -559,7 +559,7 @@ describe Api::V1::SubjectsController, type: :controller do
       end
 
       it 'has a useful error message' do
-        expect(response.body).to include('found unpermitted parameter: num_rows')
+        expect(response.body).to include('found unpermitted parameter:', 'num_rows')
       end
     end
 

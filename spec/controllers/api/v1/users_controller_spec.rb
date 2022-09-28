@@ -590,8 +590,7 @@ describe Api::V1::UsersController, type: :controller do
       end
 
       it "should return a specific error message in the response body" do
-        error_message = json_error_message("found unpermitted parameter: :project_id")
-        expect(response.body).to eq(error_message)
+        expect(response.body).to include('errors', 'found unpermitted parameter:', 'project_id')
       end
 
       it "should not updated the resource attribute" do
