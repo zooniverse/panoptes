@@ -13,16 +13,16 @@ shared_context 'a valid login' do
 end
 
 describe TokensController, type: :controller do
-  let(:owner) { create(:user)}
+  let(:owner) { create(:user) }
 
   describe 'resource owner password credentials flow' do
     let(:token_response_keys) { %w[access_token token_type expires_in refresh_token scope] }
-    let(:params) { 
+    let(:params) {
       { 'grant_type' => 'password',
-                     'client_id' => app.uid,
-                     'scope' => 'public project classification',
-                     'client_secret' => app.secret }
-}    
+        'client_id' => app.uid,
+        'scope' => 'public project classification',
+        'client_secret' => app.secret }
+    }
 
     context 'a first party application' do
       let!(:app) { create(:first_party_app, owner: owner) }
@@ -35,7 +35,6 @@ describe TokensController, type: :controller do
       end
 
       context 'when supplying missing and blank application client_id' do
-
         it 'responds with 422' do
           post :create, params: params.merge!('client_id' => '')
           expect(response).to have_http_status(:unprocessable_entity)
@@ -119,11 +118,11 @@ describe TokensController, type: :controller do
 
   describe 'client crendentials workflow' do
     let(:token_response_keys) { %w[access_token token_type expires_in scope] }
-    let(:params) { 
+    let(:params) {
       { 'grant_type' => 'client_credentials',
-                     'client_id' => app.uid,
-                     'client_secret' => app.secret }
-}    
+        'client_id' => app.uid,
+        'client_secret' => app.secret }
+    }
 
     let(:token_response) { json_response['access_token'] }
     let(:token) { Doorkeeper::AccessToken.find_by(token: token_response) }
