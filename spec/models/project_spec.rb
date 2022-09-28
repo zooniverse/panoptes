@@ -337,14 +337,14 @@ describe Project, type: :model do
   end
 
   describe "#retired_subjects_count" do
-    it "should use the association values when loaded" do
+    it "uses the association values when loaded" do
       full_project.active_workflows.update_all(retired_set_member_subjects_count: 1)
-      # i had to call inspect to actually get the association to stay loaded..wtf?!
-      full_project.active_workflows.inspect
+      #update_all sends an update directly to the database - it won't update the report models you have in memory, so we need to reload models
+      full_project.active_workflows.map(&:reload)
       expect(full_project.active_workflows)
-        .to receive(:inject)
-        .and_call_original
-
+      .to receive(:inject)
+      .and_call_original
+      
       expect(full_project.retired_subjects_count).to eq(1)
     end
 
