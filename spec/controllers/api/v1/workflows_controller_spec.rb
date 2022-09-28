@@ -49,12 +49,12 @@ describe Api::V1::WorkflowsController, type: :controller do
         let!(:inactive_workflow) { create(:workflow, active: false) }
         let(:filter_opts) { { active: true } }
 
-        it 'should only return activated workflows', :aggregate_failures do
+        it 'only returns activated workflows', :aggregate_failures do
           expect(json_response[api_resource_name].length).to eq(2)
           expect(json_response[api_resource_name].map{ |w| w['active'] }).to all( be true )
         end
 
-        it 'should not include in active workflows' do
+        it 'does not include in active workflows' do
           expect(json_response[api_resource_name].map{ |w| w['id'] }).to_not include(inactive_workflow.id)
         end
       end
@@ -66,7 +66,7 @@ describe Api::V1::WorkflowsController, type: :controller do
         default_request user_id: user.id, scopes: scopes
       end
 
-      it 'should return only serialize the specified fields' do
+      it 'returns only serialize the specified fields' do
         get :index, params: { fields: 'display_name,subjects_count,does_not_exist' }
         response_keys = json_response['workflows'].map(&:keys).uniq.flatten
         expect(response_keys).to match_array %w[id links display_name subjects_count]
@@ -74,7 +74,7 @@ describe Api::V1::WorkflowsController, type: :controller do
     end
 
     describe 'requesting published versions' do
-      it 'should return the published version of records' do
+      it 'returns the published version of records' do
         filterable_resources[0].publish!
         filterable_resources[0].update! tasks: {}, strings: {}
         get :index, params: { published: true }
@@ -155,7 +155,7 @@ describe Api::V1::WorkflowsController, type: :controller do
         update_params[:id] = resource.id
       end
 
-      it 'should replace "Draw a circle" with Contemplate', :aggregate_failures do
+      it 'replaces "Draw a circle" with Contemplate', :aggregate_failures do
         put :update, params: update_params
         instance = Workflow.find(created_instance_id(api_resource_name))
         expect(instance.tasks['interest']['question']).to eq('interest.question')
@@ -179,7 +179,7 @@ describe Api::V1::WorkflowsController, type: :controller do
           }
         end
 
-        it 'should update the strings' do
+        it 'updates the strings' do
           put :update, params: task_only_update_params
           instance = Workflow.find(created_instance_id(api_resource_name))
           expect(instance.strings['interest.question']).to eq(new_question)
@@ -194,7 +194,7 @@ describe Api::V1::WorkflowsController, type: :controller do
           }
         end
 
-        it 'should update the workflow active state' do
+        it 'updates the workflow active state' do
           expect {
             put :update, params: no_task_update_params
           }.to change {
@@ -202,7 +202,7 @@ describe Api::V1::WorkflowsController, type: :controller do
           }.to(true)
         end
 
-        it 'should not update the workflow tasks' do
+        it 'does not update the workflow tasks' do
           expect {
             put :update, params: no_task_update_params
           }.not_to change {
@@ -210,7 +210,7 @@ describe Api::V1::WorkflowsController, type: :controller do
           }
         end
 
-        it 'should not update the strings' do
+        it 'does not update the strings' do
           expect {
             put :update, params: no_task_update_params
           }.not_to change {
@@ -248,7 +248,7 @@ describe Api::V1::WorkflowsController, type: :controller do
           }
         end
 
-        it 'should return 403' do
+        it 'returns 403' do
           expect(response).to have_http_status(:forbidden)
         end
       end
@@ -256,7 +256,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       context 'when the update requests grouped to change' do
         let(:update_params) { { grouped: !resource.grouped } }
 
-        it 'should return 403' do
+        it 'returns 403' do
           expect(response).to have_http_status(:forbidden)
         end
       end
@@ -264,7 +264,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       context 'when the update requests pairwise to change' do
         let(:update_params) { { pairwise: !resource.pairwise } }
 
-        it 'should return 403' do
+        it 'returns 403' do
           expect(response).to have_http_status(:forbidden)
         end
       end
@@ -272,7 +272,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       context 'when the update requests prioritizied to change' do
         let(:update_params) { { prioritized: !resource.prioritized } }
 
-        it 'should return 403' do
+        it 'returns 403' do
           expect(response).to have_http_status(:forbidden)
         end
       end
@@ -280,7 +280,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       context 'when the update requests first_task to change' do
         let(:update_params) { { first_task: 'last_task' } }
 
-        it 'should return 403' do
+        it 'returns 403' do
           expect(response).to have_http_status(:forbidden)
         end
       end
@@ -292,11 +292,11 @@ describe Api::V1::WorkflowsController, type: :controller do
           { tasks: tasks }
         end
 
-        it 'should return 200' do
+        it 'returns 200' do
           expect(response).to have_http_status(:ok)
         end
 
-        it 'should update the content model' do
+        it 'updates the content model' do
           expect{ resource.reload }.to change{ resource.strings }
         end
       end
@@ -312,13 +312,13 @@ describe Api::V1::WorkflowsController, type: :controller do
         default_request scopes: scopes, user_id: authorized_user.id
       end
 
-      it 'should update the primary content task strings' do
+      it 'updates the primary content task strings' do
         put :update, params: params
         response_tasks = json_response['workflows'][0]['tasks']
         expect(response_tasks).to eq(tasks.deep_stringify_keys)
       end
 
-      it 'should touch the workflow resource to modify the cache_key / etag' do
+      it 'touches the workflow resource to modify the cache_key / etag' do
         expect {
           put :update, params: params
         }.to change { resource.reload.updated_at }
@@ -342,7 +342,7 @@ describe Api::V1::WorkflowsController, type: :controller do
           post :update_links, params: update_link_params
         end
 
-        it 'should run refresh workflow status worker' do
+        it 'runs refresh workflow status worker' do
           expect(RefreshWorkflowStatusWorker)
             .to receive(:perform_async)
         end
@@ -360,7 +360,7 @@ describe Api::V1::WorkflowsController, type: :controller do
               .with(resource.id)
           end
         when :retired_subjects
-          it 'should notify the subject selector that subjects were retired' do
+          it 'notifies the subject selector that subjects were retired' do
             expect(NotifySubjectSelectorOfRetirementWorker).to receive(:perform_async)
               .with(linked_resource.id.to_s, workflow.id)
           end
@@ -416,17 +416,17 @@ describe Api::V1::WorkflowsController, type: :controller do
 
         it_behaves_like 'supports update_links via a copy of the original' do
 
-          it 'should have the same name' do
+          it 'has the same name' do
             update_via_links
             expect(copied_resource.display_name).to eq(linked_resource.display_name)
           end
 
-          it 'should belong to the correct project' do
+          it 'belongs to the correct project' do
             update_via_links
             expect(copied_resource.project_id).to eq(resource.project_id)
           end
 
-          it 'should create copies of every subject via set_member_subjects' do
+          it 'creates copies of every subject via set_member_subjects' do
             expect{ update_via_links }.to change { SetMemberSubject.count }.by(expected_copies_count)
           end
         end
@@ -558,7 +558,7 @@ describe Api::V1::WorkflowsController, type: :controller do
     end
 
     context 'when it extracts strings from workflow' do
-      it 'should replace "Draw a circle" with 0' do
+      it 'replaces "Draw a circle" with 0' do
         default_request scopes: scopes, user_id: authorized_user.id
         post :create, params: create_params
         instance = Workflow.find(created_instance_id(api_resource_name))
