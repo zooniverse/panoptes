@@ -90,7 +90,6 @@ RSpec.describe UserSerializer do
         private_attrs.each do |me_only_attr|
           private_user_data = user.send(me_only_attr)
           serialized_result = result[me_only_attr.to_sym]
-          # binding.pry
           expect(serialized_result).to eq(private_user_data)
         end
       end
