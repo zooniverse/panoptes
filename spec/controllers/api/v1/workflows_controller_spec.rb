@@ -45,7 +45,7 @@ describe Api::V1::WorkflowsController, type: :controller do
         get :index, params: filter_opts
       end
 
-      context 'filter by activated' do
+      context 'when filter by activated' do
         let!(:inactive_workflow) { create(:workflow, active: false) }
         let(:filter_opts) { { active: true } }
 
@@ -302,7 +302,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       end
     end
 
-    context 'workflow_contents task strings' do
+    context 'with workflow_contents task strings' do
       let(:tasks) { update_params.dig(:workflows, :tasks) }
       let(:params) do
         { workflows: { tasks: tasks }, id: resource.id }
@@ -368,7 +368,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       end
     end
 
-    context 'linking a subject set' do
+    context 'when linking a subject set' do
       let(:subject_set_project) { project }
       let(:linked_resource) { create(:subject_set_with_subjects, project: subject_set_project) }
       let(:subject_set_id) { linked_resource.id.to_s }
@@ -433,7 +433,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       end
     end
 
-    context 'linking a tutorial' do
+    context 'when linking a tutorial' do
 
       let(:tutorial_project) { project }
       let(:linked_resource) { create(:tutorial, project: tutorial_project) }
@@ -450,7 +450,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       end
     end
 
-    context 'retiring subjects via links' do
+    context 'when retiring subjects via links' do
       let(:subject_set_project) { project }
       let(:subject_set) { create(:subject_set, project: project, workflows: [project.workflows.first]) }
       let(:subject_set_id) { subject_set.id }
