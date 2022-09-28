@@ -37,10 +37,17 @@ class CalculateProjectCompletenessWorker
   end
 
   def project_completeness
-    return 0.0 if no_active_workflows?
+    return 0.0 if no_active_workflows? || no_linked_subjects?
 
-    completenesses = project.active_workflows.pluck(:completeness)
-    completenesses.sum / completenesses.size.to_f
+    # return the sum of the proportional completeness metrics
+    project.active_workflows.sum(0.0) do |active_workflow|
+      # as each workflow has a proportion of the total subjects
+      # we can weight each workflow's completeness metric to the total for the project
+      subject_proportion = active_workflow.subjects_count.to_d / project_subjects_count
+
+      # the summated proportion metrics will be clamped to the 0.0..1.0 range by subjects / total subjects fraction
+      active_workflow.completeness * subject_proportion
+    end
   end
 
   def workflow_completeness(workflow)
@@ -50,7 +57,7 @@ class CalculateProjectCompletenessWorker
 
     retired_subjects = workflow.retired_subjects_count
     total_subjects = workflow_subjects_count
-    (0.0..1.0).clamp(retired_subjects / total_subjects.to_f)
+    (0.0..1.0).clamp(retired_subjects / total_subjects.to_d)
   end
 
   def project_columns_to_update
@@ -70,10 +77,14 @@ class CalculateProjectCompletenessWorker
   end
 
   def no_active_workflows?
-    project.active_workflows.empty?
+    @no_active_workflows ||= project.active_workflows.empty?
+  end
+
+  def project_subjects_count
+    @project_subjects_count ||= project.active_workflows.sum(&:subjects_count)
   end
 
   def no_linked_subjects?
-    project.active_workflows.all? { |workflow| workflow.subjects_count.zero? }
+    @no_linked_subjects ||= project_subjects_count.zero?
   end
 end
