@@ -81,7 +81,7 @@ describe CalculateProjectCompletenessWorker do
       it 'returns the proportional scaled completeness metric' do
         # 0.5 * (100 / 1000) + 0.9 * (900 / 1000)
         # 0.05 + 0.81
-        expect(worker.project_completeness).to eq(0.86)
+        expect(worker.project_completeness.to_d).to eq(0.86)
       end
     end
   end
