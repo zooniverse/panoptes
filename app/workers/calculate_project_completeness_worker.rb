@@ -61,7 +61,7 @@ class CalculateProjectCompletenessWorker
   end
 
   def project_columns_to_update
-    completeness = project_completeness
+    completeness = project_completeness.to_d
     columns_to_update = { completeness: completeness }
 
     # avoid the overriden project.finished? method
