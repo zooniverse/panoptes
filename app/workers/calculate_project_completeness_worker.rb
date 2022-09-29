@@ -43,7 +43,7 @@ class CalculateProjectCompletenessWorker
     project.active_workflows.sum(0.0) do |active_workflow|
       # as each workflow has a proportion of the total subjects
       # we can weight each workflow's completeness metric to the total for the project
-      subject_proportion = active_workflow.subjects_count.to_d / project_subjects_count
+      subject_proportion = active_workflow.subjects_count.to_f / project_subjects_count
 
       # the summated proportion metrics will be clamped to the 0.0..1.0 range by subjects / total subjects fraction
       active_workflow.completeness * subject_proportion
@@ -57,7 +57,7 @@ class CalculateProjectCompletenessWorker
 
     retired_subjects = workflow.retired_subjects_count
     total_subjects = workflow_subjects_count
-    (0.0..1.0).clamp(retired_subjects / total_subjects.to_d)
+    (0.0..1.0).clamp(retired_subjects / total_subjects.to_f)
   end
 
   def project_columns_to_update
