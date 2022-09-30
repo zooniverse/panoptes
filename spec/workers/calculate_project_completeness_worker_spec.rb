@@ -79,9 +79,38 @@ describe CalculateProjectCompletenessWorker do
       end
 
       it 'returns the proportional scaled completeness metric' do
+        # small error with extra precision due to floating point math
         # 0.5 * (100 / 1000) + 0.9 * (900 / 1000)
         # 0.05 + 0.81
-        expect(worker.project_completeness.to_d).to eq(0.86)
+        expect(worker.project_completeness).to eq(0.86)
+      end
+    end
+
+    context 'when a project has recurring proportional completeness (1/6)' do
+      let(:workflows_relation_double) do
+        Array.new(6) do |_|
+          build_stubbed(:workflow, completeness: 1.0, real_set_member_subjects_count: 1, retired_set_member_subjects_count: 1)
+        end
+      end
+
+      it 'returns the correct value without precision rounding errors' do
+        # frogsong - recurring small values issue with this one
+        # 6(1.0 * (1 / 6)) == 6(1/6) == 1.0
+        expect(worker.project_completeness).to eq(1.0)
+      end
+    end
+
+    context 'when a project has varying workflow completeness proportions of small' do
+      # nest quest go sparrows - to_d rounding issue with this one
+      # total_subjects = 128610
+      let(:workflows_relation_double) do
+        [12860, 12860, 12863, 12863, 12860, 12860, 12860, 12860, 12863, 10094, 2767].map do |retired_subjects|
+          build_stubbed(:workflow, completeness: 1.0, real_set_member_subjects_count: retired_subjects, retired_set_member_subjects_count: retired_subjects)
+        end
+      end
+
+      it 'returns the correct value without precision rounding errors' do
+        expect(worker.project_completeness).to eq(1.0)
       end
     end
   end
