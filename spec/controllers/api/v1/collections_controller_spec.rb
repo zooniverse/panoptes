@@ -74,7 +74,7 @@ describe Api::V1::CollectionsController, type: :controller do
       describe 'by favorite' do
         let!(:favorite_col) { create(:collection, favorite: true) }
 
-        it 'onlies return the favorite collection' do
+        it 'only returns the favorite collection' do
           get :index, params: { favorite: true }
           expect(json_response[api_resource_name].map { |r| r['id'] }).to match_array([favorite_col.id.to_s])
         end
