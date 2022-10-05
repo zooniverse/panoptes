@@ -344,7 +344,6 @@ describe Project, type: :model do
       expect(full_project.active_workflows)
       .to receive(:inject)
       .and_call_original
-      
       expect(full_project.retired_subjects_count).to eq(1)
     end
 
