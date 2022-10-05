@@ -25,7 +25,7 @@ jobs:
       matrix:
         gemfile:
           - Gemfile
-          - Gemfile.next
+          # - Gemfile.next
         ruby:
           - 2.6
         spec-commands:

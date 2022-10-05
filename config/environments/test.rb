@@ -54,6 +54,6 @@ Rails.application.configure do
     puts 'Logs are being suppressed to speed up the test suite. ' \
          'Remove DISABLE_TEST_LOGGING env var to add logging back.'
     # rubocop:enable Rails/Output
-    config.log_level = :warn
+    config.log_level = :fatal
   end
 end

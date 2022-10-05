@@ -22,17 +22,17 @@ module RateLimitDumpWorker
   module ClassMethods
     def congestion_enabled?(requester_id)
       # if the user is missing, should only happen via the rails console
-      return false if requester_id.blank?
+      # false if the user is a special skip rate limit user
+      return false if requester_id.blank? || Panoptes::RateLimitDumpWorker.skip_rate_limit_user_ids.include?(requester_id)
 
-      skip_user_ids = Panoptes::RateLimitDumpWorker.skip_rate_limit_user_ids
-
-      if skip_user_ids.include?(requester_id)
-        # false if the user is a special skip rate limit user
-        false
-      else
-        # false if user is admin, true if not admin
-        !User.find(requester_id).is_admin?
-      end
+      user = User.find(requester_id)
+      # false - disable congestion if user is admin
+      # true - enable congestion if they are a normal user
+      user.is_admin? ? false : true
+    rescue ActiveRecord::RecordNotFound
+      # if the user ID can't then enable congestion rate limiting
+      # this may be the special case of a 'fake' internal user, e.g. -1
+      true
     end
   end
 end

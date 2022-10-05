@@ -1,10 +1,7 @@
 class RequeueClassificationsWorker
   include Sidekiq::Worker
-  include Sidetiq::Schedulable
 
   sidekiq_options queue: :data_medium, lock: :until_executed
-
-  recurrence { hourly.minute_of_hour(0, 15, 30, 45)}
 
   def perform
     unless Panoptes.disable_lifecycle_worker
