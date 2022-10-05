@@ -10,8 +10,7 @@ RSpec.describe Api::V1::MediaController, type: :controller do
 
   RSpec.shared_examples "has_many media" do |parent_name, media_type, actions, content_type|
     let!(:resources) do
-      create_list :medium, 2, linked: parent, content_type: content_type,
-                              type: "#{parent_name}_#{media_type.to_s.singularize}"
+      create_list :medium, 2, linked: parent, content_type: content_type, type: "#{parent_name}_#{media_type.to_s.singularize}"
     end
 
     if actions.include? :index

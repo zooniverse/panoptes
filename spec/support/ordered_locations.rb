@@ -7,7 +7,7 @@ RSpec.shared_examples 'it has ordered locations' do
 
   it "should sort the non-loaded locations by db index" do
     lone_resource = klass.find(resource.id)
-    expect_any_instance_of(Medium.const_get('ActiveRecord_Associations_CollectionProxy'))
+    expect_any_instance_of(Medium::CollectionProxy)
       .to receive(:order)
       .with("\"media\".\"metadata\"->'index' ASC")
       .and_call_original
