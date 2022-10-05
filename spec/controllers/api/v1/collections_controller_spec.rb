@@ -198,7 +198,7 @@ describe Api::V1::CollectionsController, type: :controller do
       it 'returns created', :aggregate_failures do
         expect(response).to have_http_status(:created)
         created_links = created_instance(api_resource_name)['links']
-        expect(created_links).to be_key('projects')
+        expect(created_links).to have_key('projects')
       end
 
       context 'when passing inconsistent project links' do
