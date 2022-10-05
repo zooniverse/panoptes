@@ -17,12 +17,13 @@ describe TokensController, type: :controller do
 
   describe 'resource owner password credentials flow' do
     let(:token_response_keys) { %w[access_token token_type expires_in refresh_token scope] }
-    let(:params) {
+    let(:params) do 
       { 'grant_type' => 'password',
         'client_id' => app.uid,
         'scope' => 'public project classification',
-        'client_secret' => app.secret }
-    }
+        'client_secret' => app.secret 
+      }
+    end
 
     context 'a first party application' do
       let!(:app) { create(:first_party_app, owner: owner) }
@@ -118,11 +119,12 @@ describe TokensController, type: :controller do
 
   describe 'client crendentials workflow' do
     let(:token_response_keys) { %w[access_token token_type expires_in scope] }
-    let(:params) {
+    let(:params) do
       { 'grant_type' => 'client_credentials',
         'client_id' => app.uid,
-        'client_secret' => app.secret }
-    }
+        'client_secret' => app.secret 
+      }
+    end
 
     let(:token_response) { json_response['access_token'] }
     let(:token) { Doorkeeper::AccessToken.find_by(token: token_response) }
