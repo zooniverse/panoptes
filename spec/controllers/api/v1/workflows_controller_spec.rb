@@ -113,15 +113,27 @@ describe Api::V1::WorkflowsController, type: :controller do
              ]
            }
            },
-           steps: [],
+           steps: [['S0', { 'taskKeys' => ['T0', 'T1'] }]],
            display_order_position: 1,
            links: {
             subject_sets: [subject_set.id.to_s],
             tutorials: [tutorial.id.to_s]
           }
-
         }
       }
+    end
+
+    describe 'steps attribute with nested array objects' do
+      before do
+        default_request scopes: scopes, user_id: authorized_user.id
+        update_params[:id] = resource.id
+      end
+
+      it 'correctly handles steps attributes nested array objects' do
+        put :update, update_params
+        updated_resource = json_response['workflows'][0]
+        expect(updated_resource['steps']).to match(update_params.dig(:workflows, :steps))
+      end
     end
 
     it_behaves_like "is updatable"
