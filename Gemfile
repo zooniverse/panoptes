@@ -8,8 +8,8 @@ source 'https://rubygems.org'
 
 gem 'active_interaction', '~> 3.8.3'
 gem 'active_model_serializers' # Event stream
-gem 'activerecord-import', '~> 1.4'
 gem 'active_record_extended'
+gem 'activerecord-import', '~> 1.4'
 gem 'aws-sdk', '~> 2.10'
 gem 'azure-storage'
 gem 'azure-storage-blob'
