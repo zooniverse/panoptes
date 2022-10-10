@@ -3,7 +3,7 @@ require "spec_helper"
 RSpec.describe UserSerializer do
   let(:sign_in) { 1 }
   let(:migrated) { false }
-  let(:user) { create(:user, migrated: migrated, sign_in_count: sign_in) }
+  let(:user) { create(:user, migrated: migrated, sign_in_count: sign_in, zooniverse_id: "zoo-id-#{SecureRandom.random_number(100)}") }
   let(:context) { {} }
 
   let(:serializer) do
@@ -73,8 +73,6 @@ RSpec.describe UserSerializer do
 
   describe "private user attributes" do
     let(:result) do
-      # save user so that User.where/User.find can find zooniverse id
-      user.save
       UserSerializer.single({}, User.where(id: user.id), context)
     end
     let(:private_attrs) do
