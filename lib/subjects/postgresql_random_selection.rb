@@ -36,7 +36,11 @@ module Subjects
     # to resolve the ordering to be applied to the joined result set
     # otherwise it attemps to sort the whole available query scope which can be large
     def focus_window_random_sample
-      SetMemberSubject.with(available_ids: available).joins('INNER JOIN available_ids ON available_ids.id = set_member_subjects.id').order(random: %i[asc desc].sample).limit(focus_set_window_size)
+      SetMemberSubject
+        .with(available_ids: available)
+        .joins('INNER JOIN available_ids ON available_ids.id = set_member_subjects.id')
+        .order(random: %i[asc desc].sample)
+        .limit(focus_set_window_size)
     end
 
     def focus_set_window_size
