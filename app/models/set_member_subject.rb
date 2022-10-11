@@ -51,24 +51,24 @@ class SetMemberSubject < ActiveRecord::Base
     by_workflow(workflow_id).where(subject_id: retired_subject_ids)
   end
 
-  # Be careful using this query as it's not selective on a large table
-  # and the LEFT OUTER JOIN can take a long time to resolve
+  # Be careful using this query directly in the console
+  # as it's not super selective on a large data set
+  # and the LEFT JOIN can take a long time to resolve
   def self.unseen_for_user_by_workflow(user_id, workflow_id)
-    all_sms = all_sms_for_user_by_workflow(user_id, workflow_id)
-    unseen_smses = all_sms.where("seen_subject_ids.subject_id IS NULL")
-
-    by_workflow(workflow_id).merge(unseen_smses)
-  end
-
-  def self.all_sms_for_user_by_workflow(user_id, workflow_id)
     uss = UserSeenSubject.arel_table
     seens = uss.project('UNNEST(subject_ids) as subject_id')
-    seens.where(uss[:user_id].eq(user_id).and(uss[:workflow_id].eq(workflow_id)))
-    seens_subquery = seens.as(Arel.sql('as seen_subject_ids'))
-    joins(
-      "LEFT OUTER JOIN #{seens_subquery.to_sql} " \
-      "ON set_member_subjects.subject_id = seen_subject_ids.subject_id"
-    )
+    user_seen_subject_ids = seens.where(uss[:user_id].eq(user_id).and(uss[:workflow_id].eq(workflow_id)))
+    # use a CTE to unnest the seen subject ids for use in the join below
+    # join the seen subject ids to the set member subjects
+    # but only take the rows where the seen_for_user cte subject id is null
+    # i.e. the one's we haven't seen yet
+    # https://github.com/georgekaraszi/ActiveRecordExtended#common-table-expressions-cte
+    unseen_smses =
+      with(seen_for_user: user_seen_subject_ids)
+      .joins('LEFT JOIN seen_for_user ON seen_for_user.subject_id = set_member_subjects.subject_id')
+      .where(seen_for_user: { subject_id: nil })
+
+    by_workflow(workflow_id).merge(unseen_smses)
   end
 
   def retired_workflow_ids

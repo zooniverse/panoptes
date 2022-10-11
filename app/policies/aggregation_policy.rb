@@ -5,9 +5,8 @@ class AggregationPolicy < ApplicationPolicy
       updatable_parents = policy_for(Workflow).scope_for(:update)
       updatable_scope = scope.joins(:workflow).merge(updatable_parents)
 
-      scope.joins(:workflow)
-        .where("workflows.aggregation ->> 'public' = 'true'")
-        .union(updatable_scope)
+      public_aggregations = scope.joins(:workflow).where("workflows.aggregation ->> 'public' = 'true'")
+      Aggregation.union(updatable_scope, public_aggregations)
     end
   end
 
