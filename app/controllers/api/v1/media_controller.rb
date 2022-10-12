@@ -17,7 +17,8 @@ class Api::V1::MediaController < Api::ApiController
     classifications_export: :classifications_export,
     subjects_export: :subjects_export,
     workflows_export: :workflows_export,
-    workflow_contents_export: :workflow_contents_export
+    workflow_contents_export: :workflow_contents_export,
+    profile_header: :profile_header
   }.freeze
 
   def schema_class(action)
