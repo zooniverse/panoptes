@@ -27,7 +27,6 @@ module JsonApiController
     def update_links
       check_relation
       resource = controlled_resources.first
-
       resource_class.transaction(requires_new: true) do
         add_relation(resource, relation, params[relation])
         if resource.changed?
