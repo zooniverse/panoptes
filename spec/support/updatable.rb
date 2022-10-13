@@ -140,7 +140,7 @@ RSpec.shared_examples "supports update_links via a copy of the original" do
   end
 
   it 'updates the cache key on the original resource' do
-    # this is so the serializer resonse cache is busted and the links includes the newly added resource
+    # this is so the serializer response cache is busted and the links includes the newly added resource
     expect { update_via_links }.to change { resource.reload.cache_key }
   end
 end
