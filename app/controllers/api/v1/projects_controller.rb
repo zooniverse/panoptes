@@ -102,6 +102,17 @@ class Api::V1::ProjectsController < Api::ApiController
     created_resource_response(copied_project)
   end
 
+  # ensure we avoid clobbering the workflow relations on a project via the
+  # relation manager when the workflow id is not in the array form, i.e. is singular
+  def update_links
+    # using an array form param ensures we use the concat form of relation adding vs overwriting the relation
+    # this is important for the project -> workflow relation
+    # as we never want to unlink a workflow when handling project links
+    # instead force the clients to explicitly delete workflows from the project
+    params[:workflows] = Array.wrap(params[:workflows])
+    super
+  end
+
   private
 
   def create_response(project_scope)
