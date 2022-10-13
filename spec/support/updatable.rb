@@ -81,24 +81,32 @@ RSpec.shared_examples "supports update_links" do
   let(:updated_resource) { resource.reload }
   let(:stringified_test_relation_ids) { Array.wrap(test_relation_ids).map(&:to_s) }
   let(:linked_resources) { updated_resource.send(test_relation) }
-
-  before(:each) do
-    default_request scopes: scopes, user_id: authorized_user.id
-    params = {
+  let(:params) do
+    {
       link_relation: test_relation.to_s,
       test_relation => test_relation_ids,
       resource_id => resource.id
     }
-    post :update_links, params
   end
 
-  it 'should update any included links' do
+  before do
+    default_request scopes: scopes, user_id: authorized_user.id
+  end
+
+  it 'updates any included links' do
+    post :update_links, params
     updated_relation_ids = UpdatableResource.extract_linked_resource_ids(linked_resources)
     expect(updated_relation_ids).to include(*stringified_test_relation_ids)
   end
 
-  it 'should retain pre-existing links' do
+  it 'retains pre-existing links' do
+    post :update_links, params
     expect(linked_resources.map(&:id)).to include(*old_ids)
+  end
+
+  it 'updates the cache key on the resource' do
+    # this is so the serializer resonse cache is busted and the links includes the newly added resource
+    expect { post :update_links, params }.to change { resource.reload.cache_key }
   end
 end
 
@@ -117,18 +125,22 @@ RSpec.shared_examples "supports update_links via a copy of the original" do
     post :update_links, params
   end
 
-  it 'should have resources to copy' do
+  it 'has resources to copy' do
     update_via_links
-    expect(expected_copies_count).to_not eq(0)
+    expect(expected_copies_count).not_to eq(0)
   end
 
-  it 'should be successful' do
+  it 'is successful' do
     update_via_links
     expect(response).to have_http_status(:ok)
   end
 
-  it "should create a new linked_resource" do
-    linked_resource
+  it 'creates a new linked_resource' do
     expect{ update_via_links }.to change { linked_resource.class.count }.by(1)
+  end
+
+  it 'updates the cache key on the original resource' do
+    # this is so the serializer resonse cache is busted and the links includes the newly added resource
+    expect { update_via_links }.to change { resource.reload.cache_key }
   end
 end
