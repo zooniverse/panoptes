@@ -446,7 +446,6 @@ describe Api::V1::WorkflowsController, type: :controller do
     end
 
     context 'linking a tutorial' do
-
       let(:tutorial_project) { project }
       let(:linked_resource) { create(:tutorial, project: tutorial_project) }
       let(:resource) { workflow }
@@ -456,9 +455,9 @@ describe Api::V1::WorkflowsController, type: :controller do
 
       it_behaves_like "supports update_links" do
         it 'links the tutorial to the workflow' do
-          expect(updated_resource.tutorials.pluck(:id).map(&:to_s)).to eq(test_relation_ids)
+          post :update_links, params
+          expect(updated_resource.tutorial_ids.map(&:to_s)).to eq(test_relation_ids)
         end
-
       end
     end
 
@@ -479,7 +478,8 @@ describe Api::V1::WorkflowsController, type: :controller do
 
       it_behaves_like "supports update_links" do
         it 'marks the subject as retired' do
-          expect(linked_resource.retired_for_workflow?(resource)).to be_truthy
+          post :update_links, params
+          expect(linked_resource.retired_for_workflow?(resource)).to be(true)
         end
       end
 
