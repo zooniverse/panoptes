@@ -752,6 +752,26 @@ describe Api::V1::ProjectsController, type: :controller do
           end
         end
       end
+
+      context 'with linkable workflow id not in array form' do
+        let(:params) do
+          {
+            link_relation: test_relation.to_s,
+            workflows: linked_resource.id.to_s,
+            project_id: resource.id
+          }
+        end
+
+        before do
+          default_request scopes: scopes, user_id: authorized_user.id
+        end
+
+        it "does not clobber the project's existing workflow links" do
+          post :update_links, params
+          response_wf_ids = json_response['projects'][0]['links']['workflows']
+          expect(response_wf_ids).to include(linked_resource.id.to_s)
+        end
+      end
     end
 
     describe "linking a subject_set" do
