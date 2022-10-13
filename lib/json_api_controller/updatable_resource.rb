@@ -29,7 +29,11 @@ module JsonApiController
       resource = controlled_resources.first
       resource_class.transaction(requires_new: true) do
         add_relation(resource, relation, params[relation])
-        resource.save!
+        if resource.changed?
+          resource.save!
+        else
+          resource.touch
+        end
       end
 
       yield resource if block_given?
