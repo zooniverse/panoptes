@@ -109,21 +109,33 @@ module Serialization
     end
 
     def include_assoc?(assoc)
-      return false unless @options[:include]
-      check_assoc("#{assoc}$")
+      return false unless @options.key?(:include)
+
+      check_assoc(assoc)
     end
 
     def include_nested_assoc?(assoc)
-      return false unless @options[:include]
-      check_assoc("#{assoc}.")
+      return false unless @options.key?(:include)
+
+      check_nested_assoc(assoc)
     end
 
     def check_assoc(assoc)
       include_opt = @options[:include]
       include_opt = include_opt.split(',') if include_opt.is_a?(String)
-      include_opt.any? do |s|
-        s.match(/^#{assoc.gsub('.', '\.')}/)
-      end
+
+      # check if any of the included associations match the current association
+      include_opt.any?(assoc)
+    end
+
+    def check_nested_assoc(assoc)
+      include_opt = @options[:include]
+      include_opt = include_opt.split(',') if include_opt.is_a?(String)
+
+      # check if any of the included associations match the prefix path of the association
+      # i.e. ${association}.path
+      nested_assoc_pattern = "#{assoc}."
+      include_opt.any? { |included_assoc| included_assoc.starts_with?(nested_assoc_pattern) }
     end
 
     def add_resource_links(attrs, serializer, options = {})
