@@ -105,7 +105,7 @@ RSpec.shared_examples "supports update_links" do
   end
 
   it 'updates the cache key on the resource' do
-    # this is so the serializer resonse cache is busted and the links includes the newly added resource
+    # this is so the serializer response cache is busted and the links includes the newly added resource
     expect { post :update_links, params }.to change { resource.reload.cache_key }
   end
 end
