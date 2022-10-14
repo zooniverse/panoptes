@@ -24,6 +24,10 @@ describe Organization, type: :model do
     expect(build(:organization, primary_language: nil)).to_not be_valid
   end
 
+  it 'allows a primary language field with a lang code subtags' do
+    expect(build(:organization, primary_language: 'en-GB')).to be_valid
+  end
+
   it_behaves_like "has slugged name"
 
   it_behaves_like "a versioned model"
