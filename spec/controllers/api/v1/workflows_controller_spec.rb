@@ -130,7 +130,7 @@ describe Api::V1::WorkflowsController, type: :controller do
       end
 
       it 'correctly handles steps attributes nested array objects' do
-        put :update, update_params
+        put :update, params: update_params
         updated_resource = json_response['workflows'][0]
         expect(updated_resource['steps']).to match(update_params.dig(:workflows, :steps))
       end
@@ -456,7 +456,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
       it_behaves_like 'supports update_links' do
         it 'links the tutorial to the workflow' do
-          post :update_links, params
+          post :update_links, params: params
           expect(updated_resource.tutorial_ids.map(&:to_s)).to eq(test_relation_ids)
         end
       end
@@ -479,7 +479,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
       it_behaves_like 'supports update_links' do
         it 'marks the subject as retired' do
-          post :update_links, params
+          post :update_links, params: params
           expect(linked_resource.retired_for_workflow?(resource)).to be(true)
         end
       end
