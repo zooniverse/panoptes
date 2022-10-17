@@ -6,8 +6,8 @@ class Subject < ActiveRecord::Base
   belongs_to :uploader, class_name: "User", foreign_key: "upload_user_id"
   has_many :collections_subjects, dependent: :restrict_with_exception
   has_many :collections, through: :collections_subjects
-  has_many :subject_sets, through: :set_member_subjects
   has_many :set_member_subjects, dependent: :destroy
+  has_many :subject_sets, through: :set_member_subjects
   has_many :workflows, through: :set_member_subjects
   has_many :subject_workflow_statuses, dependent: :restrict_with_exception
   has_many :locations,

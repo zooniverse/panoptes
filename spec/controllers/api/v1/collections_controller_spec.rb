@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Api::V1::CollectionsController, type: :controller do
@@ -14,7 +16,7 @@ describe Api::V1::CollectionsController, type: :controller do
   let(:authorized_user) { owner }
   let(:resource_class) { Collection }
 
-  before(:each) do
+  before do
     default_request scopes: scopes
   end
 
@@ -72,8 +74,8 @@ describe Api::V1::CollectionsController, type: :controller do
       describe 'by favorite' do
         let!(:favorite_col) { create(:collection, favorite: true) }
 
-        it 'should only return the favorite collection' do
-          get :index, favorite: true
+        it 'only returns the favorite collection' do
+          get :index, params: { favorite: true }
           expect(json_response[api_resource_name].map { |r| r['id'] }).to match_array([favorite_col.id.to_s])
         end
       end
@@ -121,12 +123,12 @@ describe Api::V1::CollectionsController, type: :controller do
         }
       end
 
-      before(:each) do
+      before do
         default_request scopes: scopes, user_id: authorized_user.id
       end
 
-      it 'should return a useful error message' do
-        post :update_links, params
+      it 'returns a useful error message' do
+        post :update_links, params: params
         aggregate_failures 'dup link ids' do
           expect(response).to have_http_status(:bad_request)
           error_body = 'Validation failed: Subject is already in the collection'
@@ -134,11 +136,11 @@ describe Api::V1::CollectionsController, type: :controller do
         end
       end
 
-      it 'should handle duplicate index violations gracefully' do
+      it 'handles duplicate index violations gracefully' do
         msg = 'ERROR: duplicate key value violates unique constraint'
-        error = ActiveRecord::RecordNotUnique.new(msg, PG::UniqueViolation)
+        error = ActiveRecord::RecordNotUnique.new(msg)
         allow(subject).to receive(:add_relation).and_raise(error)
-        post :update_links, params
+        post :update_links, params: params
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
@@ -161,7 +163,7 @@ describe Api::V1::CollectionsController, type: :controller do
       end
 
       it 'allows another subject to be added' do
-        post :update_links, params
+        post :update_links, params: params
         expect(response).to have_http_status(:ok)
       end
     end
@@ -188,21 +190,21 @@ describe Api::V1::CollectionsController, type: :controller do
     context 'with singular project link object' do
       let(:create_links) { { project: project.id } }
 
-      before(:each) do
+      before do
         default_request scopes: scopes, user_id: authorized_user.id
-        post :create, create_params
+        post :create, params: create_params
       end
 
-      it 'should return created', :aggregate_failures do
+      it 'returns created', :aggregate_failures do
         expect(response).to have_http_status(:created)
         created_links = created_instance(api_resource_name)['links']
-        expect(created_links.key?('projects')).to be_truthy
+        expect(created_links).to have_key('projects')
       end
 
       context 'when passing inconsistent project links' do
         let(:create_links) { { project: project.id, projects: [1, 2] } }
 
-        it 'should return an error' do
+        it 'returns an error' do
           msg = 'Error: project_ids and project link keys must not be set together'
           expect(response.body).to eq(json_error_message(msg))
         end
@@ -229,7 +231,7 @@ describe Api::V1::CollectionsController, type: :controller do
 
       context 'when favorite collection does not exist for given user/project' do
         it 'successfully creates a favorite collection' do
-          post :create, favorite_params
+          post :create, params: favorite_params
           expect(response).to have_http_status(:created)
         end
       end
@@ -238,7 +240,7 @@ describe Api::V1::CollectionsController, type: :controller do
         before { create(:collection, favorite: true, project_ids: [project.id], owner: owner) }
 
         it 'returns a bad request error trying to create a favorite collection' do
-          post :create, favorite_params
+          post :create, params: favorite_params
           expect(response).to have_http_status(:bad_request)
         end
       end
@@ -247,7 +249,7 @@ describe Api::V1::CollectionsController, type: :controller do
         before { create(:collection, favorite: false, project_ids: [project.id], owner: owner) }
 
         it 'successfully creates a favorite collection' do
-          post :create, favorite_params
+          post :create, params: favorite_params
           expect(response).to have_http_status(:created)
         end
       end
@@ -256,7 +258,7 @@ describe Api::V1::CollectionsController, type: :controller do
         before { create(:collection, favorite: true, project_ids: [project.id + 1], owner: owner) }
 
         it 'successfully creates a favorite collection' do
-          post :create, favorite_params
+          post :create, params: favorite_params
           expect(response).to have_http_status(:created)
         end
       end
@@ -275,12 +277,14 @@ describe Api::V1::CollectionsController, type: :controller do
 
       def delete_default(ids)
         delete :destroy_links,
-               collection_id: collection.id,
-               link_relation: :subjects,
-               link_ids: ids
+               params: {
+                 collection_id: collection.id,
+                 link_relation: :subjects,
+                 link_ids: ids
+               }
       end
 
-      before(:each) do
+      before do
         default_request scopes: scopes, user_id: authorized_user.id
         collection.update(default_subject: default_subject)
       end

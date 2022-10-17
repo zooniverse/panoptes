@@ -58,7 +58,7 @@ RSpec.describe Api::V1::SetMemberSubjectsController, type: :controller do
     it 'should call the set count worker after action' do
       default_request user_id: authorized_user.id, scopes: scopes
       expect(SubjectSetSubjectCounterWorker).to receive(:perform_async).once
-      post :create, create_params
+      post :create, params: create_params
     end
 
     it 'should call the sws status create worker' do
@@ -69,7 +69,7 @@ RSpec.describe Api::V1::SetMemberSubjectsController, type: :controller do
         .with(kind_of(Numeric), linked_subject.id, workflow_id)
       end
       default_request user_id: authorized_user.id, scopes: scopes
-      post :create, create_params
+      post :create, params: create_params
     end
   end
 
@@ -85,14 +85,14 @@ RSpec.describe Api::V1::SetMemberSubjectsController, type: :controller do
         expect(SubjectSetSubjectCounterWorker)
           .to receive(:perform_async)
           .with(resource.subject_set_id)
-        delete :destroy, id: resource.id
+        delete :destroy, params: { id: resource.id }
       end
 
       it 'should call the subject removal worker' do
         expect(SubjectRemovalWorker)
           .to receive(:perform_async)
           .with(resource.subject_id)
-        delete :destroy, id: resource.id
+        delete :destroy, params: { id: resource.id }
       end
     end
   end

@@ -25,7 +25,7 @@ describe "user sign in sessions", type: :request do
       end
     end
 
-    let(:get_sign_in) { get new_user_session_path, nil, json_defaults }
+    let(:get_sign_in) { get new_user_session_path, headers: json_defaults }
     let(:json_defaults) do
       {
         "HTTP_ACCEPT" => "application/json",

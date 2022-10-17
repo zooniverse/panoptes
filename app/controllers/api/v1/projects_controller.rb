@@ -96,7 +96,7 @@ class Api::V1::ProjectsController < Api::ApiController
       )
     end
 
-    operations_params = params.slice(:create_subject_set).merge(project: project)
+    operations_params = params.to_unsafe_h.slice(:create_subject_set).merge(project: project)
     copied_project = Projects::Copy.with(api_user: api_user).run!(operations_params)
 
     created_resource_response(copied_project)

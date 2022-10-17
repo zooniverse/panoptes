@@ -39,7 +39,7 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
 
         before(:each) do
           default_request scopes: scopes, user_id: authorized_user.id if authorized_user
-          get :index, index_options
+          get :index, params: index_options
         end
 
         describe "filter by project_id" do
@@ -86,14 +86,14 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
       it "calls the mailer if user added to project" do
         params = update_params.merge(id: user.user_groups.first.access_control_lists.first)
         expect(UserAddedToProjectMailerWorker).to receive(:perform_async).with(user.id, project.id, ["collaborator"]).once
-        put :update, params
+        put :update, params: params
       end
 
       it "does not call the mailer not appropriate" do
         new_roles = { project_roles: { roles: ["tester"] } }
         params = new_roles.merge(id: user.user_groups.first.access_control_lists.first)
         expect(UserAddedToProjectMailerWorker).to_not receive(:perform_async)
-        put :update, params
+        put :update, params: params
       end
     end
   end
@@ -128,7 +128,7 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
 
       before(:each) do
         default_request user_id: authorized_user.id, scopes: scopes
-        post :create, create_params
+        post :create, params: create_params
       end
 
       it 'should return 400' do
@@ -144,7 +144,7 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
     shared_examples "no user" do
       before(:each) do
         default_request user_id: authorized_user.id, scopes: scopes
-        post :create, create_params
+        post :create, params: create_params
       end
 
       it 'should return 422' do
@@ -183,13 +183,13 @@ RSpec.describe Api::V1::ProjectRolesController, type: :controller do
       end
 
       it 'calls the mailer if user added to project as a collaborator' do
-        post :create, create_params
+        post :create, params: create_params
         expect(UserAddedToProjectMailerWorker).to have_received(:perform_async).with(user.to_i, project.id.to_i, ['collaborator']).once
       end
 
       it 'does not call the mailer if no relevant project role changes' do
         create_params[:project_roles][:roles] = ['tester']
-        post :create, create_params
+        post :create, params: create_params
         expect(UserAddedToProjectMailerWorker).not_to have_received(:perform_async)
       end
     end
