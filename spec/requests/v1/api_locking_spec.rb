@@ -19,17 +19,6 @@ describe 'api should allow conditional requests', type: :request do
                         'If-Match' => response.etag }
   end
 
-  context 'when a record is locked' do
-    before do
-      allow_any_instance_of(Project).to receive(:lock_version).and_return(-1)
-      req
-    end
-
-    it 'returns conflict' do
-      expect(response).to have_http_status(:conflict)
-    end
-  end
-
   context 'when a record is not locked' do
     before do
       req
