@@ -96,10 +96,21 @@ class Api::V1::ProjectsController < Api::ApiController
       )
     end
 
-    operations_params = params.slice(:create_subject_set).merge(project: project)
+    operations_params = params.to_unsafe_h.slice(:create_subject_set).merge(project: project)
     copied_project = Projects::Copy.with(api_user: api_user).run!(operations_params)
 
     created_resource_response(copied_project)
+  end
+
+  # ensure we avoid clobbering the workflow relations on a project via the
+  # relation manager when the workflow id is not in the array form, i.e. is singular
+  def update_links
+    # using an array form param ensures we use the concat form of relation adding vs overwriting the relation
+    # this is important for the project -> workflow relation
+    # as we never want to unlink a workflow when handling project links
+    # instead force the clients to explicitly delete workflows from the project
+    params[:workflows] = Array.wrap(params[:workflows])
+    super
   end
 
   private

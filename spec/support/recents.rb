@@ -13,7 +13,7 @@ RSpec.shared_examples "has recents" do
 
   context "with the controller action run" do
     before do
-      get :recents, filter_params.merge(resource_key_id => resource.id)
+      get :recents, params: filter_params.merge(resource_key_id => resource.id)
     end
 
     context "no filters" do

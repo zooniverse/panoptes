@@ -36,7 +36,7 @@ describe Api::V1::OrganizationPagesController, type: :controller do
         index_params.merge!(filter_opts)
         default_request scopes: scopes, user_id: authorized_user.id
         request.env.merge!(headers)
-        get :index, index_params
+        get :index, params: index_params
       end
 
       describe "filter by url_key" do
@@ -77,7 +77,7 @@ describe Api::V1::OrganizationPagesController, type: :controller do
     describe "paging" do
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
-        get :index, index_params
+        get :index, params: index_params
       end
 
       it 'should use correct paging links' do
@@ -120,7 +120,7 @@ describe Api::V1::OrganizationPagesController, type: :controller do
 
     it 'should set organization from the organization_id param' do
       default_request scopes: scopes, user_id: authorized_user.id
-      post :create, create_params
+      post :create, params: create_params
       expect(json_response[api_resource_name][0]["links"]["organization"]).to eq(organization.id.to_s)
     end
   end

@@ -10,7 +10,7 @@ module JsonApiController
 
     def update
       @updated_resources = resource_class.transaction(requires_new: true) do
-        resources_with_updates = controlled_resources.zip(Array.wrap(update_params))
+        resources_with_updates = controlled_resources.zip(Array.wrap(update_params.to_h))
         resources_with_updates.map do |resource, update_hash|
           resource.assign_attributes(build_update_hash(update_hash, resource))
 
@@ -29,7 +29,11 @@ module JsonApiController
       resource = controlled_resources.first
       resource_class.transaction(requires_new: true) do
         add_relation(resource, relation, params[relation])
-        resource.save!
+        if resource.changed?
+          resource.save!
+        else
+          resource.touch
+        end
       end
 
       yield resource if block_given?
