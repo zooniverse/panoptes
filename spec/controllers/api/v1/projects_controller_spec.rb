@@ -761,7 +761,7 @@ describe Api::V1::ProjectsController, type: :controller do
         end
 
         it "does not clobber the project's existing workflow links" do
-          post :update_links, params
+          post :update_links, params: params
           response_wf_ids = json_response['projects'][0]['links']['workflows']
           expect(response_wf_ids).to include(linked_resource.id.to_s)
         end
