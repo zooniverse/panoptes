@@ -94,19 +94,19 @@ RSpec.shared_examples "supports update_links" do
   end
 
   it 'updates any included links' do
-    post :update_links, params
+    post :update_links, params: params
     updated_relation_ids = UpdatableResource.extract_linked_resource_ids(linked_resources)
     expect(updated_relation_ids).to include(*stringified_test_relation_ids)
   end
 
   it 'retains pre-existing links' do
-    post :update_links, params
+    post :update_links, params: params
     expect(linked_resources.map(&:id)).to include(*old_ids)
   end
 
   it 'updates the cache key on the resource' do
     # this is so the serializer response cache is busted and the links includes the newly added resource
-    expect { post :update_links, params }.to change { resource.reload.cache_key }
+    expect { post :update_links, params: params }.to change { resource.reload.cache_key }
   end
 end
 
