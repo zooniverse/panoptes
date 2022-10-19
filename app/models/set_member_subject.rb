@@ -1,4 +1,4 @@
-require 'subjects/set_member_subject_selector'
+# frozen_string_literal: true
 
 class SetMemberSubject < ApplicationRecord
 

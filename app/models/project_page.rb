@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class ProjectPage < ApplicationRecord
   include Translatable
   include LanguageValidation

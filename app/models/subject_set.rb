@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class SubjectSet < ApplicationRecord
 
   belongs_to :project

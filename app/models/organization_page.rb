@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class OrganizationPage < ApplicationRecord
   include Translatable
   include LanguageValidation

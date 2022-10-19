@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CodeExperimentConfig < ApplicationRecord
   include Scientist::Experiment
   CACHE_TIME = 5.minutes

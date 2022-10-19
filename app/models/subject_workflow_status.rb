@@ -1,6 +1,7 @@
+# frozen_string_literal: true
+
 class SubjectWorkflowStatus < ApplicationRecord
   self.table_name = 'subject_workflow_counts'
-
 
   belongs_to :subject
   belongs_to :workflow

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class WorkflowVersion < ApplicationRecord
   belongs_to :workflow
 

@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Tag < ApplicationRecord
   include PgSearch::Model
   has_many :tagged_resources

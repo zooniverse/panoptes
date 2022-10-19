@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class Classification < ApplicationRecord
   belongs_to :project
   belongs_to :user
