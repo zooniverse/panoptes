@@ -1950,7 +1950,7 @@ CREATE TABLE public.workflows (
     grouped boolean DEFAULT false NOT NULL,
     prioritized boolean DEFAULT false NOT NULL,
     primary_language character varying,
-    first_task character varying,
+    first_task character varying DEFAULT ''::character varying,
     tutorial_subject_id integer,
     lock_version integer DEFAULT 0,
     retired_set_member_subjects_count integer DEFAULT 0,
@@ -4580,6 +4580,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20210729152047'),
 ('20211007125705'),
 ('20211124175756'),
-('20211201164326');
+('20211201164326'),
+('20221018032140');
 
 
