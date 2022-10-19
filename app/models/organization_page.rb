@@ -1,4 +1,4 @@
-class OrganizationPage < ActiveRecord::Base
+class OrganizationPage < ApplicationRecord
   include Translatable
   include LanguageValidation
   include Versioning

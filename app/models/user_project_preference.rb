@@ -1,4 +1,4 @@
-class UserProjectPreference < ActiveRecord::Base
+class UserProjectPreference < ApplicationRecord
   include Preferences
 
   preferences_for :project

@@ -1,4 +1,4 @@
-class SubjectSetsWorkflow < ActiveRecord::Base
+class SubjectSetsWorkflow < ApplicationRecord
   belongs_to :workflow
   belongs_to :subject_set
 

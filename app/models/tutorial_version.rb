@@ -1,3 +1,3 @@
-class TutorialVersion < ActiveRecord::Base
+class TutorialVersion < ApplicationRecord
   belongs_to :tutorial
 end

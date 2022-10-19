@@ -1,4 +1,4 @@
-class Collection < ActiveRecord::Base
+class Collection < ApplicationRecord
   include RoleControl::Owned
   include Activatable
   include PgSearch::Model

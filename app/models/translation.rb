@@ -1,4 +1,4 @@
-class Translation < ActiveRecord::Base
+class Translation < ApplicationRecord
   include Versioning
 
   belongs_to :translated, polymorphic: true, required: true

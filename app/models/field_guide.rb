@@ -1,4 +1,4 @@
-class FieldGuide < ActiveRecord::Base
+class FieldGuide < ApplicationRecord
   include Translatable
   include LanguageValidation
   include Versioning

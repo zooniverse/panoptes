@@ -1,4 +1,4 @@
-class UserGroup < ActiveRecord::Base
+class UserGroup < ApplicationRecord
   include Activatable
   include PgSearch::Model
 

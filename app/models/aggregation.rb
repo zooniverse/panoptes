@@ -1,4 +1,4 @@
-class Aggregation < ActiveRecord::Base
+class Aggregation < ApplicationRecord
 
   belongs_to :workflow
   belongs_to :subject

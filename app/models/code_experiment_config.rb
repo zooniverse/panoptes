@@ -1,4 +1,4 @@
-class CodeExperimentConfig < ActiveRecord::Base
+class CodeExperimentConfig < ApplicationRecord
   include Scientist::Experiment
   CACHE_TIME = 5.minutes
 

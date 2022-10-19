@@ -1,4 +1,4 @@
-class Recent < ActiveRecord::Base
+class Recent < ApplicationRecord
   include OrderedLocations
 
   belongs_to :classification

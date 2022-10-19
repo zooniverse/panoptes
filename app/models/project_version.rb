@@ -1,3 +1,3 @@
-class ProjectVersion < ActiveRecord::Base
+class ProjectVersion < ApplicationRecord
   belongs_to :project
 end

@@ -1,4 +1,4 @@
-class Classification < ActiveRecord::Base
+class Classification < ApplicationRecord
   belongs_to :project
   belongs_to :user
   belongs_to :workflow

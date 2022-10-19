@@ -1,3 +1,3 @@
-class TranslationVersion < ActiveRecord::Base
+class TranslationVersion < ApplicationRecord
   belongs_to :translation
 end

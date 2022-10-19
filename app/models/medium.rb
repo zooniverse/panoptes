@@ -1,4 +1,4 @@
-class Medium < ActiveRecord::Base
+class Medium < ApplicationRecord
   class MissingPutFilePath < StandardError; end
 
   belongs_to :linked, polymorphic: true

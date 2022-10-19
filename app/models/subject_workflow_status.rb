@@ -1,4 +1,4 @@
-class SubjectWorkflowStatus < ActiveRecord::Base
+class SubjectWorkflowStatus < ApplicationRecord
   self.table_name = 'subject_workflow_counts'
 
 

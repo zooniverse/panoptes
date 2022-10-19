@@ -9,7 +9,7 @@
 #
 # Long term this can probably go, but please check that the projects have
 # been retired and don't need this data for the feedback mechanism.
-class GoldStandardAnnotation < ActiveRecord::Base
+class GoldStandardAnnotation < ApplicationRecord
   belongs_to :workflow
   belongs_to :subject
   belongs_to :project

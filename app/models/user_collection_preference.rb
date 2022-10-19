@@ -1,4 +1,4 @@
-class UserCollectionPreference < ActiveRecord::Base
+class UserCollectionPreference < ApplicationRecord
   include Preferences
 
   preferences_for :collection

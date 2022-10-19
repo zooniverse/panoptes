@@ -9,7 +9,7 @@
 # classifications, recents, seens data etc
 #
 # This class is not associated with the 'SubjectSet' class (a way to association subjects with a workflow)
-class SubjectGroup < ActiveRecord::Base
+class SubjectGroup < ApplicationRecord
   belongs_to :project
   has_many :subject_group_members, dependent: :destroy
   has_many :subjects, through: :subject_group_members

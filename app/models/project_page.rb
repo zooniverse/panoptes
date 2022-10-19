@@ -1,4 +1,4 @@
-class ProjectPage < ActiveRecord::Base
+class ProjectPage < ApplicationRecord
   include Translatable
   include LanguageValidation
   include Versioning

@@ -1,4 +1,4 @@
-class UserSeenSubject < ActiveRecord::Base
+class UserSeenSubject < ApplicationRecord
   belongs_to :user
   belongs_to :workflow
 

@@ -1,4 +1,4 @@
-class SubjectSet < ActiveRecord::Base
+class SubjectSet < ApplicationRecord
 
   belongs_to :project
   has_many :subject_sets_workflows, dependent: :destroy

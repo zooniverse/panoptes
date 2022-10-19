@@ -1,4 +1,4 @@
-class AccessControlList < ActiveRecord::Base
+class AccessControlList < ApplicationRecord
   belongs_to :user_group
   belongs_to :resource, polymorphic: true
 

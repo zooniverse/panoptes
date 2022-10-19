@@ -1,4 +1,4 @@
-class Authorization < ActiveRecord::Base
+class Authorization < ApplicationRecord
   belongs_to :user
 
   validates_presence_of :provider, :uid, :token

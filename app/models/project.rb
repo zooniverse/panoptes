@@ -1,4 +1,4 @@
-class Project < ActiveRecord::Base
+class Project < ApplicationRecord
   include RoleControl::Owned
   include Activatable
   include ExtendedCacheKey

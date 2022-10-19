@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class SubjectGroupMember < ActiveRecord::Base
+class SubjectGroupMember < ApplicationRecord
   belongs_to :subject
   belongs_to :subject_group
   has_one :project, through: :subject_group

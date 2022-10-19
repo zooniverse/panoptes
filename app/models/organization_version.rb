@@ -1,3 +1,3 @@
-class OrganizationVersion < ActiveRecord::Base
+class OrganizationVersion < ApplicationRecord
   belongs_to :organization
 end

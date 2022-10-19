@@ -1,4 +1,4 @@
-class Tag < ActiveRecord::Base
+class Tag < ApplicationRecord
   include PgSearch::Model
   has_many :tagged_resources
   has_many :projects, through: :tagged_resources, source: :resource, source_type: "Project"

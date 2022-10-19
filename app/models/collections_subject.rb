@@ -1,4 +1,4 @@
-class CollectionsSubject < ActiveRecord::Base
+class CollectionsSubject < ApplicationRecord
   belongs_to :collection
   belongs_to :subject
 
