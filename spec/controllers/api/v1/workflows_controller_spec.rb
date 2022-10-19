@@ -616,6 +616,14 @@ describe Api::V1::WorkflowsController, type: :controller do
       it_behaves_like 'is creatable'
     end
 
+    context 'with a missing task attribute' do
+      it 'saves without setting tasks to nil and failing the non-null constraint in linked workflow_versions' do
+        default_request scopes: scopes, user_id: authorized_user.id
+        non_task_params = default_create_params[:workflows].except(*:tasks)
+        expect { post :create, params: { workflows: non_task_params } }.not_to raise_error
+      end
+    end
+
     context 'with an serialize_with_project attribute' do
       let(:create_params) do
         default_create_params.merge(serialize_with_project: false)
