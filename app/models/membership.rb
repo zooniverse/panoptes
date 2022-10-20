@@ -1,4 +1,6 @@
-class Membership < ActiveRecord::Base
+# frozen_string_literal: true
+
+class Membership < ApplicationRecord
   belongs_to :user_group
   belongs_to :user
   enum state: [:active, :invited, :inactive]

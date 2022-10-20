@@ -1,4 +1,6 @@
-class UserSeenSubject < ActiveRecord::Base
+# frozen_string_literal: true
+
+class UserSeenSubject < ApplicationRecord
   belongs_to :user
   belongs_to :workflow
 

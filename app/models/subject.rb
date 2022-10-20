@@ -1,4 +1,6 @@
-class Subject < ActiveRecord::Base
+# frozen_string_literal: true
+
+class Subject < ApplicationRecord
   include Activatable
   include OrderedLocations
 

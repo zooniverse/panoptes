@@ -1,3 +1,5 @@
-class TranslationVersion < ActiveRecord::Base
+# frozen_string_literal: true
+
+class TranslationVersion < ApplicationRecord
   belongs_to :translation
 end

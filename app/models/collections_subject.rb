@@ -1,4 +1,6 @@
-class CollectionsSubject < ActiveRecord::Base
+# frozen_string_literal: true
+
+class CollectionsSubject < ApplicationRecord
   belongs_to :collection
   belongs_to :subject
 

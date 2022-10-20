@@ -1,6 +1,6 @@
-require "user_unsubscribe_message_verifier"
+# frozen_string_literal: true
 
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   include Activatable
   include PgSearch::Model
   include ExtendedCacheKey

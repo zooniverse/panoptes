@@ -1,4 +1,6 @@
-class WorkflowVersion < ActiveRecord::Base
+# frozen_string_literal: true
+
+class WorkflowVersion < ApplicationRecord
   belongs_to :workflow
 
   # These two aliases are used by Versioning because it doesn't support aliasing directly

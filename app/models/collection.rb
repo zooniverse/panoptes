@@ -1,4 +1,6 @@
-class Collection < ActiveRecord::Base
+# frozen_string_literal: true
+
+class Collection < ApplicationRecord
   include RoleControl::Owned
   include Activatable
   include PgSearch::Model

@@ -1,4 +1,6 @@
-class Aggregation < ActiveRecord::Base
+# frozen_string_literal: true
+
+class Aggregation < ApplicationRecord
 
   belongs_to :workflow
   belongs_to :subject

@@ -1,4 +1,6 @@
-class Workflow < ActiveRecord::Base
+# frozen_string_literal: true
+
+class Workflow < ApplicationRecord
   include Activatable
   include ExtendedCacheKey
   include RankedModel

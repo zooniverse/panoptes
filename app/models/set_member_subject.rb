@@ -1,6 +1,6 @@
-require 'subjects/set_member_subject_selector'
+# frozen_string_literal: true
 
-class SetMemberSubject < ActiveRecord::Base
+class SetMemberSubject < ApplicationRecord
 
   belongs_to :subject_set
   belongs_to :subject
