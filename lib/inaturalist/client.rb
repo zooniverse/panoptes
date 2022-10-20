@@ -1,8 +1,9 @@
 module Inaturalist
   class Client
-    attr_reader :url, :headers, :default_params
+    attr_reader :url, :request_url, :headers, :default_params
     def initialize
-      @url ||= 'https://api.inaturalist.org/v1/observations'
+      @url = 'https://api.inaturalist.org/v1/observations'
+      @request_url = nil
       @headers = {'User-Agent' => 'zooniverse-testing'}
       @default_params = {
         verifiable: true,
@@ -13,7 +14,6 @@ module Inaturalist
     end
 
     def get(params)
-
       request_params = @default_params.merge(params)
       conn = Faraday.new(
         url: @url,
@@ -28,6 +28,8 @@ module Inaturalist
       end;
 
       begin
+        response = conn.get
+        @request_url = response.env.url.to_s
         conn.get.body
       rescue Faraday::ClientError => e
         raise e
