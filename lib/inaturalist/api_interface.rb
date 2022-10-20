@@ -4,8 +4,9 @@ module Inaturalist
     require 'faraday_middleware'
     require 'json'
 
+    # Set maximum imported subjects, or no limit with -1
     MAX_OBSERVATIONS = -1
-    attr_reader :taxon_id, :observation_cache, :params
+    attr_reader :taxon_id, :total_results, :observation_cache, :params
 
     def initialize(taxon_id: , updated_since: nil, max_observations: -1)
       @taxon_id = taxon_id
@@ -15,6 +16,7 @@ module Inaturalist
       @params = {taxon_id: @taxon_id}
       @params[:updated_since] = updated_since unless updated_since.nil?
       @done = false
+      @total_results = nil
     end
 
     def observations
@@ -32,6 +34,7 @@ module Inaturalist
     def fetch_next_page
       page_params = @params.merge(id_above: @id_above)
       response = client.get(page_params)
+      @total_results ||= response['total_results']
       results = response['results']
       # Stop if a) there are no more results
       #         b) the total number of desired subjects is hit
