@@ -1,5 +1,7 @@
 module Inaturalist
   class SubjectImporter
+    attr_reader :subject_set_import
+
     class FailedImport < StandardError; end
 
     def initialize(user_id, subject_set_id)
@@ -32,6 +34,10 @@ module Inaturalist
       # So like SubjectSetImports, this scope is limited to the subject set and constrained by SetMemberSubjects
       # @combined_set_subject_scope.where(external_id: external_id).first_or_initialize
       @subject_set.subjects.where(external_id: external_id).first_or_initialize
+    end
+
+    def subject_set_import
+      @subject_set_import ||= SubjectSetImport.new(user_id: user_id, subject_set_id: subject_set_id)
     end
   end
 end
