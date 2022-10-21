@@ -14,7 +14,7 @@ describe Inaturalist::Observation do
       num_identification_disagreements: 0,
       location: "11.111,-11.111",
       geoprivacy: nil,
-      scientific_name: "Squirrelius Maxiumus"
+      scientific_name: "Sciurus carolinensis"
     }
   }
   let(:obs_locations) {
