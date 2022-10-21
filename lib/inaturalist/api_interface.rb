@@ -7,7 +7,6 @@ module Inaturalist
     require 'json'
 
     # Set maximum imported subjects, or no limit with -1
-    MAX_OBSERVATIONS = -1
     attr_reader :taxon_id, :total_results, :observation_cache, :params
 
     def initialize(taxon_id: , updated_since: nil, max_observations: -1)
