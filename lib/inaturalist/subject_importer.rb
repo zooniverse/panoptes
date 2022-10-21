@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Inaturalist
   class SubjectImporter
     attr_reader :subject_set_import

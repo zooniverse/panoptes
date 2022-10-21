@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module Inaturalist
   class Client
     attr_reader :url, :request_url, :headers, :default_params
