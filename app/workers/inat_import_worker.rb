@@ -8,7 +8,7 @@ class InatImportWorker
     inat = Inaturalist::ApiInterface.new(taxon_id: taxon_id, updated_since: updated_since)
     importer = Inaturalist::SubjectImporter.new(user_id, subject_set_id)
 
-    # Use an SSImport instance to track progress & store data
+    # Use a SubjectSetImport instance to track progress & store data
     ss_import = importer.subject_set_import
 
     failed_imports = []
@@ -34,14 +34,9 @@ class InatImportWorker
 
     # notify the user about the import success / failure
     InatImportCompletedMailerWorker.perform_async(ss_import.id)
-
   end
-
 
   def update_progress_every_rows(total_results)
     update_progress_every_rows ||= SubjectSetImport::ProgressUpdateCadence.calculate(total_results)
   end
-
-
-
 end
