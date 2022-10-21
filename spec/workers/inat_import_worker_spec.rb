@@ -35,7 +35,6 @@ RSpec.describe InatImportWorker do
       expect(importer_double).to have_received(:import).with(obs_array[1])
     end
 
-
     it 'calls the subject set import mailer worker' do
       described_class.new.perform(1, 1, 1)
       expect(InatImportCompletedMailerWorker).to have_received(:perform_async).with(ss_import.id)
