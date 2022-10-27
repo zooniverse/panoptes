@@ -39,7 +39,7 @@ module Inaturalist
     end
 
     def subject_set_import
-      @subject_set_import ||= SubjectSetImport.new(user_id: user_id, subject_set_id: subject_set_id)
+      @subject_set_import ||= SubjectSetImport.new(user_id: @uploader.id, subject_set_id: @subject_set.id)
     end
   end
 end
