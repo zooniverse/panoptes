@@ -19,14 +19,14 @@ class InatImportWorker
       begin
         importer.import(obs)
       rescue SubjectSetImport::Processor::FailedImport
-        ss_import.update_columns( failed_count: failed_count + 1, failed_uuids: failed_uuids | [external_id])
+        ss_import.update_columns(failed_count: failed_count + 1, failed_uuids: failed_uuids | [external_id])
       end
 
       imported_row_count += 1
 
       # update the imported_count as we progress through the import so we can use
       # this as a progress metric on API resource polling (see SubjectSetWorker)
-      save_imported_row_count(imported_row_count) if (imported_row_count % update_progress_every_rows(inat.total_results)).zero?
+      ss_import.save_imported_row_count(imported_row_count) if (imported_row_count % update_progress_every_rows(inat.total_results)).zero?
     end
 
     ss_import.save_imported_row_count(imported_row_count)
