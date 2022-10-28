@@ -21,28 +21,57 @@ RSpec.describe InatImportWorker do
       instance_double(SubjectSetSubjectCounterWorker, perform: true)
     end
 
-    before do
-      allow(Inaturalist::SubjectImporter).to receive(:new).and_return(importer_double)
-      allow(Inaturalist::ApiInterface).to receive(:new).and_return(api_double)
-      allow(SubjectSetImport).to receive(:new).and_return(ss_import)
-      allow(SubjectSetSubjectCounterWorker).to receive(:new).and_return(count_worker_double)
-      allow(InatImportCompletedMailerWorker).to receive(:perform_async)
+    context 'when the import is successful' do
+      before do
+        allow(Inaturalist::SubjectImporter).to receive(:new).and_return(importer_double)
+        allow(Inaturalist::ApiInterface).to receive(:new).and_return(api_double)
+        allow(SubjectSetImport).to receive(:new).and_return(ss_import)
+        allow(SubjectSetSubjectCounterWorker).to receive(:new).and_return(count_worker_double)
+        allow(InatImportCompletedMailerWorker).to receive(:perform_async)
+      end
+
+      it 'runs SubjectImporter#import on each observation in an enumerable' do
+        described_class.new.perform(1, 1, 1)
+        expect(importer_double).to have_received(:import).with(obs_array[0])
+        expect(importer_double).to have_received(:import).with(obs_array[1])
+      end
+
+      it 'calls the subject set import mailer worker' do
+        described_class.new.perform(1, 1, 1)
+        expect(InatImportCompletedMailerWorker).to have_received(:perform_async).with(ss_import.id)
+      end
+
+      it 'calls the subject set counter worker inline' do
+        described_class.new.perform(1, 1, 1)
+        expect(count_worker_double).to have_received(:perform).with(1)
+      end
     end
 
-    it 'runs SubjectImporter#import on each observation in an enumerable' do
-      described_class.new.perform(1, 1, 1)
-      expect(importer_double).to have_received(:import).with(obs_array[0])
-      expect(importer_double).to have_received(:import).with(obs_array[1])
-    end
+    context 'when a subject fails to import' do
+      let(:taxon_id) { 12345 }
+      let(:user) { create(:user) }
+      let(:subject_set) { create(:subject_set) }
 
-    it 'calls the subject set import mailer worker' do
-      described_class.new.perform(1, 1, 1)
-      expect(InatImportCompletedMailerWorker).to have_received(:perform_async).with(ss_import.id)
-    end
+      before do
+        allow(Inaturalist::ApiInterface).to receive(:new).and_return(api_double)
+        allow_any_instance_of(Inaturalist::SubjectImporter).to receive(:import).and_raise(Inaturalist::SubjectImporter::FailedImport)
+        allow(obs_array[0]).to receive(:external_id).and_return('123asdf')
+        allow(obs_array[1]).to receive(:external_id).and_return('456ghj')
+      end
 
-    it 'calls the subject set counter worker inline' do
-      described_class.new.perform(1, 1, 1)
-      expect(count_worker_double).to have_received(:perform).with(1)
+      it 'continues processing' do
+        expect { described_class.new.perform(user.id, taxon_id, subject_set.id) }.not_to raise_error
+      end
+
+      it 'stores the failed count' do
+       described_class.new.perform(user.id, taxon_id, subject_set.id)
+       expect(SubjectSetImport.where(user_id: user.id, subject_set_id: subject_set.id).first.failed_count).to eq(2)
+      end
+
+      it 'stores the failed UUIDs' do
+        described_class.new.perform(user.id, taxon_id, subject_set.id)
+        expect(SubjectSetImport.where(user_id: user.id, subject_set_id: subject_set.id).first.failed_uuids).to match_array(['123asdf', '456ghj'])
+      end
     end
   end
 end
