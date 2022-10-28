@@ -1,20 +1,24 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Inaturalist::ApiInterface do
-
   let(:response) { JSON.parse(file_fixture('inat_observations.json').read) }
   let(:client) { instance_double(Inaturalist::Client) }
   let(:interface) { described_class.new(taxon_id: 46017) }
 
-  context 'enumeration' do
+  describe 'enumeration' do
     before do
       allow(Inaturalist::Client).to receive(:new).and_return(client)
       allow(client).to receive(:get).and_return(response)
       allow(interface).to receive(:client).and_return(client)
     end
 
-    it 'behaves like an enumerator' do
+    it 'is an enumerator' do
       expect(interface.observations).to be_a(Enumerator)
+    end
+
+    it 'responsds to #each' do
       expect(interface.observations.respond_to?(:each)).to be true
     end
 
@@ -32,7 +36,7 @@ describe Inaturalist::ApiInterface do
     end
   end
 
-  context 'pagination' do
+  describe 'pagination' do
     let(:page_one) {
       {
         "total_results": 3,
