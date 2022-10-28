@@ -2,8 +2,6 @@
 
 module Inaturalist
   class SubjectImporter
-    attr_reader :subject_set_import
-
     class FailedImport < StandardError; end
 
     def initialize(user_id, subject_set_id)
