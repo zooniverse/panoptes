@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Inaturalist::Client do
@@ -6,7 +8,7 @@ describe Inaturalist::Client do
   let(:parsed_body) { JSON.parse(response_body) }
   let(:url) { 'https://api.inaturalist.org/v1/observations' }
 
-  describe "#get" do
+  describe '#get' do
     it 'sends a default request to the iNat API for observations' do
       client = described_class.new
       stub_request(:get, url)

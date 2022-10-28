@@ -126,7 +126,6 @@ Rails.application.routes.draw do
 
       json_api_resources :subject_set_imports, links: [:subject_sets, :users], only: [:index, :show, :create]
 
-
       post '/inaturalist/import', to: 'inaturalist#import', format: false
 
       json_api_resources :collections, links: [:subjects, :default_subject]

@@ -11,7 +11,7 @@ RSpec.describe InatImportWorker do
 
   describe '#perform' do
     # An enumerable proxy for the importer's #observations method
-    let(:obs_array) { [ double('observation'), double('observation') ] }
+    let(:obs_array) { [instance_double('observation'), instance_double('observation')] }
     let(:api_double) { instance_double(Inaturalist::ApiInterface, observations: obs_array, total_results: 123) }
     let(:ss_import) { instance_double(SubjectSetImport, id: 1, update_columns: true, save_imported_row_count: true) }
     let(:importer_double) do
@@ -64,13 +64,13 @@ RSpec.describe InatImportWorker do
       end
 
       it 'stores the failed count' do
-       described_class.new.perform(user.id, taxon_id, subject_set.id)
-       expect(SubjectSetImport.where(user_id: user.id, subject_set_id: subject_set.id).first.failed_count).to eq(2)
+        described_class.new.perform(user.id, taxon_id, subject_set.id)
+        expect(SubjectSetImport.where(user_id: user.id, subject_set_id: subject_set.id).first.failed_count).to eq(2)
       end
 
       it 'stores the failed UUIDs' do
         described_class.new.perform(user.id, taxon_id, subject_set.id)
-        expect(SubjectSetImport.where(user_id: user.id, subject_set_id: subject_set.id).first.failed_uuids).to match_array(['123asdf', '456ghj'])
+        expect(SubjectSetImport.where(user_id: user.id, subject_set_id: subject_set.id).first.failed_uuids).to match_array(%w[123asdf 456ghj])
       end
     end
   end

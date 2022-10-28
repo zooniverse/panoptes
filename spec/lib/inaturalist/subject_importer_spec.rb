@@ -1,7 +1,8 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Inaturalist::SubjectImporter do
-
   describe '#import' do
     let(:response) { JSON.parse(file_fixture('inat_observations.json').read) }
     let(:obs) { Inaturalist::Observation.new(response['results'][0]) }
@@ -9,8 +10,8 @@ describe Inaturalist::SubjectImporter do
     let(:importer) { described_class.new(subject_set.project.owner.id, subject_set.id) }
     let(:locations) {
       [
-        { "image/jpeg" => "https://static.inaturalist.org/photos/12345/original.JPG" },
-        { "image/jpeg" => "https://static.inaturalist.org/photos/45678/original.JPG" }
+        { 'image/jpeg' => 'https://static.inaturalist.org/photos/12345/original.JPG' },
+        { 'image/jpeg' => 'https://static.inaturalist.org/photos/45678/original.JPG' }
       ]
     }
 
@@ -28,11 +29,11 @@ describe Inaturalist::SubjectImporter do
       let(:imported_locations) { subject_set.subjects.first.locations.order(:id) }
 
       it 'sets external_link correctly' do
-        expect(imported_locations.map {|l| l.external_link }).to match_array([true, true])
+        expect(imported_locations.map(&:external_link)).to match_array([true, true])
       end
 
       it 'sets content_type correctly' do
-        expect(imported_locations.map {|l| l.content_type }).to match_array(['image/jpeg', 'image/jpeg'])
+        expect(imported_locations.map(&:content_type)).to match_array(['image/jpeg', 'image/jpeg'])
       end
 
       it 'sets src correctly' do
@@ -56,11 +57,11 @@ describe Inaturalist::SubjectImporter do
 
     context 'when a required record does not exist' do
       it 'requires a valid user id' do
-        expect{ described_class.new(1234, subject_set.id) }.to raise_error(ActiveRecord::RecordNotFound)
+        expect { described_class.new(1234, subject_set.id) }.to raise_error(ActiveRecord::RecordNotFound)
       end
 
       it 'requires a valid subject_set id' do
-        expect{ described_class.new(subject_set.project.owner.id, 999999) }.to raise_error(ActiveRecord::RecordNotFound)
+        expect { described_class.new(subject_set.project.owner.id, 999999) }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
   end

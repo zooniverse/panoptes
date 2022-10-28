@@ -3,7 +3,7 @@
 require "spec_helper"
 
 describe Api::V1::InaturalistController, type: :controller do
-  describe "import" do
+  describe 'import' do
     let(:project) { create(:project) }
     let(:subject_set) { create :subject_set, project: project }
     let(:authorized_user) { project.owner }
