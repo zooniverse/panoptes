@@ -1,5 +1,4 @@
 require 'spec_helper'
-RSpec::Matchers.define_negated_matcher :not_change, :change
 
 RSpec.describe InatImportCompletedMailerWorker do
   let(:ss_import) { create(:subject_set_import) }
