@@ -90,5 +90,5 @@ group :test do
   gem 'rspec-its'
   gem 'rspec-rails'
   gem 'spring-commands-rspec'
-  gem "webmock"
+  gem 'webmock'
 end

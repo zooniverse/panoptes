@@ -13,7 +13,6 @@ class InatImportWorker
     # Use a SubjectSetImport instance to track progress & store data
     ss_import = importer.subject_set_import
 
-    failed_imports = []
     imported_row_count = 0
     inat.observations.each do |obs|
       begin

@@ -3,10 +3,11 @@
 module Inaturalist
   class Client
     attr_reader :url, :request_url, :headers, :default_params
+
     def initialize
       @url = 'https://api.inaturalist.org/v1/observations'
       @request_url = nil
-      @headers = {'User-Agent' => 'zooniverse-testing'}
+      @headers = { 'User-Agent' => 'zooniverse-import' }
       @default_params = {
         verifiable: true,
         order: 'asc',
@@ -27,7 +28,7 @@ module Inaturalist
         f.response :raise_error
         f.response :json
         f.adapter Faraday.default_adapter
-      end;
+      end
 
       begin
         response = conn.get
@@ -37,6 +38,5 @@ module Inaturalist
         raise e
       end
     end
-
   end
 end

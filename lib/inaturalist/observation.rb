@@ -35,7 +35,7 @@ module Inaturalist
 
     def extract_locations(obs)
       locations = []
-      @obs['photos'].each do |p|
+      obs['photos'].each do |p|
         url = p['url'].sub('square', 'original')
         mimetype = mime_type_from_file_extension(url)
         locations << { mimetype => url }
@@ -44,12 +44,11 @@ module Inaturalist
     end
 
     def all_rights_reserved?
-      @obs['license_code'] == nil
+      @obs['license_code'].nil?
     end
 
     def mime_type_from_file_extension(url)
       MiniMime.lookup_by_filename(url).content_type
     end
-
   end
 end
