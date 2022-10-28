@@ -17,8 +17,11 @@ class InatImportWorker
     inat.observations.each do |obs|
       begin
         importer.import(obs)
-      rescue SubjectSetImport::Processor::FailedImport
-        ss_import.update_columns(failed_count: failed_count + 1, failed_uuids: failed_uuids | [external_id])
+      rescue Inaturalist::SubjectImporter::FailedImport
+        ss_import.update_columns(
+          failed_count: ss_import.failed_count + 1,
+          failed_uuids: ss_import.failed_uuids | [obs.external_id]
+        )
       end
 
       imported_row_count += 1
@@ -38,6 +41,6 @@ class InatImportWorker
   end
 
   def update_progress_every_rows(total_results)
-    update_progress_every_rows ||= SubjectSetImport::ProgressUpdateCadence.calculate(total_results)
+    SubjectSetImport::ProgressUpdateCadence.calculate(total_results)
   end
 end
