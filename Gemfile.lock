@@ -35,8 +35,9 @@ GEM
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.0, >= 1.0.3)
-    active_interaction (3.8.3)
-      activemodel (>= 4, < 7)
+    active_interaction (4.1.0)
+      activemodel (>= 5, < 8)
+      activesupport (>= 5, < 8)
     active_model_serializers (0.10.13)
       actionpack (>= 4.1, < 7.1)
       activemodel (>= 4.1, < 7.1)
@@ -480,7 +481,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  active_interaction (~> 3.8.3)
+  active_interaction (~> 4.1.0)
   active_model_serializers
   active_record_extended
   activerecord-import (~> 1.4)

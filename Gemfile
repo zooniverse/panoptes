@@ -6,7 +6,7 @@ end
 
 source 'https://rubygems.org'
 
-gem 'active_interaction', '~> 3.8.3'
+gem 'active_interaction', '~> 4.1.0'
 gem 'active_model_serializers' # Event stream
 gem 'active_record_extended'
 gem 'activerecord-import', '~> 1.4'
