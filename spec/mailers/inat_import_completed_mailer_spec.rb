@@ -19,7 +19,7 @@ RSpec.describe InatImportCompletedMailer, type: :mailer do
     end
 
     it 'includes the subject set name' do
-      expect(mail.body.encoded).to include("subjects were imported into subject set '#{ subject_set.display_name }'")
+      expect(mail.body.encoded).to include("subjects were imported into subject set '#{subject_set.display_name}'")
     end
 
     it 'includes the subject sets lab link' do

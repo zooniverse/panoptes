@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 RSpec.describe InatImportCompletedMailerWorker do
   let(:ss_import) { create(:subject_set_import) }
 
-  it 'should deliver the mail' do
+  it 'delivers the mail' do
     expect{ subject.perform(ss_import) }.to change{ ActionMailer::Base.deliveries.count }.by(1)
   end
 

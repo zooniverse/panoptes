@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-require "spec_helper"
+require 'spec_helper'
 
 describe Api::V1::InaturalistController, type: :controller do
   describe 'import' do
@@ -10,7 +10,7 @@ describe Api::V1::InaturalistController, type: :controller do
     let(:unauthorized_user) { create(:user) }
     let(:import_params) { { taxon_id: 12345, subject_set_id: subject_set.id } }
 
-    context 'a project owner' do
+    context 'with a project owner' do
       before { default_request user_id: authorized_user.id }
 
       it 'enqueues a worker' do
@@ -20,17 +20,17 @@ describe Api::V1::InaturalistController, type: :controller do
 
       it 'returns a successful status code' do
         response = post :import, import_params
-        expect(response).to have_http_status(200)
+        expect(response).to have_http_status(:ok)
       end
 
       it 'returns an error if the subject set is missing' do
         import_params[:subject_set_id] = 99999
         response = post :import, import_params
-        expect(response).to have_http_status(404)
+        expect(response).to have_http_status(:not_found)
       end
     end
 
-    context 'an unauthorized user' do
+    context 'with an unauthorized user' do
       before { default_request user_id: unauthorized_user.id }
 
       it 'fails if the user is unauthorized' do
@@ -39,7 +39,7 @@ describe Api::V1::InaturalistController, type: :controller do
 
       it 'raises an error' do
         response = post :import, import_params
-        expect(response).to have_http_status(403)
+        expect(response).to have_http_status(:forbidden)
       end
     end
   end
