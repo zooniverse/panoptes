@@ -23,16 +23,18 @@ describe Inaturalist::ApiInterface do
     end
 
     it 'transforms iNat API response into Observation instances' do
-      expect(interface.observations.each.to_a).to match_array([
-        have_attributes(
-          class: Inaturalist::Observation,
-          external_id: 123456789
-        ),
-        have_attributes(
-          class: Inaturalist::Observation,
-          external_id: 987654321
-        )
-      ])
+      expect(interface.observations.each.to_a).to match_array(
+        [
+          have_attributes(
+            class: Inaturalist::Observation,
+            external_id: 123456789
+          ),
+          have_attributes(
+            class: Inaturalist::Observation,
+            external_id: 987654321
+          )
+        ]
+      )
     end
   end
 
@@ -62,7 +64,7 @@ describe Inaturalist::ApiInterface do
       }
     }
 
-    before(:each) do
+    before do
       allow(Inaturalist::Client).to receive(:new).and_return(client)
       allow(interface).to receive(:client).and_return(client)
       allow(client).to receive(:get).and_return(
