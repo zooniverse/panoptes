@@ -12,8 +12,7 @@ jobs:
     uses: zooniverse/ci-cd/.github/workflows/build_and_push_image.yaml@main
     with:
       repo_name: panoptes
-      commit_id: ${{ github.sha }}-next
-      file: Dockerfile.rails-next
+      commit_id: ${{ github.sha }}
       latest: true
 
   db_migration_staging:
@@ -23,7 +22,7 @@ jobs:
     with:
       app_name: panoptes
       environment: staging
-      commit_id: ${{ github.sha }}-next
+      commit_id: ${{ github.sha }}
     secrets:
       creds: ${{ secrets.AZURE_AKS }}
 
@@ -34,7 +33,7 @@ jobs:
     with:
       app_name: panoptes
       repo_name: panoptes
-      commit_id: ${{ github.sha }}-next
+      commit_id: ${{ github.sha }}
       environment: staging
     secrets:
       creds: ${{ secrets.AZURE_AKS }}
