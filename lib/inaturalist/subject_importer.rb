@@ -16,7 +16,8 @@ module Inaturalist
         subject.project_id = @subject_set.project_id
         subject.uploader = @uploader
         subject.metadata = obs.metadata
-        subject.subject_sets << @subject_set
+        # Don't add the set if it exists on an upsert, or SetMemberSubjects insert won't validate
+        subject.subject_sets << @subject_set unless subject.subject_sets.include?(@subject_set)
 
         Subject.location_attributes_from_params(obs.locations).each do |location_attributes|
           subject.locations.build(location_attributes)
