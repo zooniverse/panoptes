@@ -69,7 +69,7 @@ describe Inaturalist::SubjectImporter do
     context 'when an upsert is required' do
       before do
         # First import is in before block, override with new metadata
-        allow(obs).to receive(:metadata).and_return({'completely' => 'different'})
+        allow(obs).to receive(:metadata).and_return({ 'completely' => 'different' })
         # Reimport with new metadata
         @same_subject = importer.import(obs)
       end
