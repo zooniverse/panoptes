@@ -38,7 +38,7 @@ describe Api::V1::InaturalistController, type: :controller do
       end
 
       it 'raises an error' do
-        response = post :import, params:  import_params
+        response = post :import, params: import_params
         expect(response).to have_http_status(:forbidden)
       end
     end
