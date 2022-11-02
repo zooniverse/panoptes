@@ -14,18 +14,18 @@ describe Api::V1::InaturalistController, type: :controller do
       before { default_request user_id: authorized_user.id }
 
       it 'enqueues a worker' do
-        expect { post :import, import_params }
+        expect { post :import, params: import_params }
           .to change(InatImportWorker.jobs, :size).by(1)
       end
 
       it 'returns a successful status code' do
-        response = post :import, import_params
+        response = post :import, params: import_params
         expect(response).to have_http_status(:ok)
       end
 
       it 'returns an error if the subject set is missing' do
         import_params[:subject_set_id] = 99999
-        response = post :import, import_params
+        response = post :import, params: import_params
         expect(response).to have_http_status(:not_found)
       end
     end
@@ -34,11 +34,11 @@ describe Api::V1::InaturalistController, type: :controller do
       before { default_request user_id: unauthorized_user.id }
 
       it 'fails if the user is unauthorized' do
-        expect { post :import, import_params }.to not_change(InatImportWorker.jobs, :size)
+        expect { post :import, params: import_params }.to not_change(InatImportWorker.jobs, :size)
       end
 
       it 'raises an error' do
-        response = post :import, import_params
+        response = post :import, params:  import_params
         expect(response).to have_http_status(:forbidden)
       end
     end

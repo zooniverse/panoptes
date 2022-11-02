@@ -6,7 +6,7 @@ RSpec.describe InatImportCompletedMailerWorker do
   let(:ss_import) { create(:subject_set_import) }
 
   it 'delivers the mail' do
-    expect { described_class.new.perform(ss_import) }.to change{ ActionMailer::Base.deliveries.count }.by(1)
+    expect { described_class.new.perform(ss_import.id) }.to change{ ActionMailer::Base.deliveries.count }.by(1)
   end
 
   context 'with missing attributes' do
