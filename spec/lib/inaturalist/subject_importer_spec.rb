@@ -81,6 +81,10 @@ describe Inaturalist::SubjectImporter do
       it 'updates the metadata' do
         expect(@same_subject.metadata).to eq({ 'completely' => 'different' })
       end
+
+      it 'does not duplicate existing locations' do
+        expect(@same_subject.locations.count).to eq(2)
+      end
     end
   end
 end

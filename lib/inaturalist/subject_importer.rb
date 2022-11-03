@@ -20,9 +20,9 @@ module Inaturalist
         subject.subject_sets << @subject_set unless subject.subject_sets.include?(@subject_set)
 
         Subject.location_attributes_from_params(obs.locations).each do |location_attributes|
-          subject.locations.build(location_attributes)
+          # Don't insert a new location if an existing location shares the same src & content_type
+          subject.locations.build(location_attributes) unless location_exists?(location_attributes, subject.locations)
         end
-
         subject.save!
       end
       subject
@@ -39,6 +39,15 @@ module Inaturalist
 
     def subject_set_import
       @subject_set_import ||= SubjectSetImport.create(user_id: @uploader.id, subject_set_id: @subject_set.id)
+    end
+
+    def location_exists?(location_attrs, locations)
+      # If the incoming src, content_type, & metadata match a single location, it already exists
+      locations.map do |l|
+        l.src == location_attrs[:src] &&
+        l.content_type == location_attrs[:content_type] &&
+        l.metadata.with_indifferent_access == location_attrs[:metadata].with_indifferent_access
+      end.include?(true)
     end
   end
 end
