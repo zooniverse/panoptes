@@ -53,7 +53,7 @@ module Inaturalist
     def max_cache_hit?
       # Short circuit to turn off limit
       return false if @max_observations == -1
-      return true if @observation_cache.size >= @max_observations
+      @observation_cache.size >= @max_observations
     end
 
     def client
