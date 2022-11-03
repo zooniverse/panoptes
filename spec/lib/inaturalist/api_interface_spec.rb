@@ -75,7 +75,7 @@ describe Inaturalist::ApiInterface do
       )
     end
 
-    it 'paginates and then stops when results are empty' do
+    it 'fetches exactly three pages' do
       interface.observations.count
       expect(interface).to have_received(:fetch_next_page).exactly(3).times
     end

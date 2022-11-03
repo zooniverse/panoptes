@@ -45,8 +45,8 @@ module Inaturalist
       # If the incoming src, content_type, & metadata match a single location, it already exists
       locations.map do |l|
         l.src == location_attrs[:src] &&
-        l.content_type == location_attrs[:content_type] &&
-        l.metadata.with_indifferent_access == location_attrs[:metadata].with_indifferent_access
+          l.content_type == location_attrs[:content_type] &&
+          l.metadata.with_indifferent_access == location_attrs[:metadata].with_indifferent_access
       end.include?(true)
     end
   end
