@@ -67,11 +67,17 @@ describe Inaturalist::ApiInterface do
     before do
       allow(Inaturalist::Client).to receive(:new).and_return(client)
       allow(interface).to receive(:client).and_return(client)
+      allow(interface).to receive(:fetch_next_page).and_call_original
       allow(client).to receive(:get).and_return(
         page_one.with_indifferent_access,
         page_two.with_indifferent_access,
         last_page.with_indifferent_access
       )
+    end
+
+    it 'paginates and then stops when results are empty' do
+      interface.observations.count
+      expect(interface).to have_received(:fetch_next_page).exactly(3).times
     end
 
     it 'paginates and then stops when results are empty' do
