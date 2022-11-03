@@ -18,7 +18,7 @@ describe Inaturalist::ApiInterface do
       expect(interface.observations).to be_a(Enumerator)
     end
 
-    it 'responsds to #each' do
+    it 'responds to #each' do
       expect(interface.observations.respond_to?(:each)).to be true
     end
 
