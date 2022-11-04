@@ -37,8 +37,6 @@ class SubjectSetImport < ApplicationRecord
     end
   end
 
-  private
-
   def save_imported_row_count(imported_row_count)
     self.imported_count = imported_row_count
     save! # ensure we touch updated_at for busting any serializer cache
