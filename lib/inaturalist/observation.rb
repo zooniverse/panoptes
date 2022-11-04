@@ -2,6 +2,8 @@
 
 module Inaturalist
   class Observation
+    require 'mini_mime'
+
     def initialize(obs)
       @obs = obs
     end
