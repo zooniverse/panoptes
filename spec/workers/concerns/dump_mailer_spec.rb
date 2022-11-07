@@ -3,7 +3,7 @@ require 'spec_helper'
 describe DumpMailer do
   let(:users) { create_list(:user, 2) }
   let(:owner) { users.sample }
-  let(:resource) { Project.new(id: 1, owner: owner) }
+  let(:resource) { create(:project, owner: owner) }
   let(:metadata) { {"recipients" => users.map(&:id) } }
   let(:medium) { instance_double("Medium", id: 2, metadata: metadata) }
   let(:dump_mailer) { described_class.new(resource, medium, "classifications") }
