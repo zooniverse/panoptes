@@ -29,7 +29,7 @@ module JsonApiController
       resource = controlled_resources.first
       resource_class.transaction(requires_new: true) do
         add_relation(resource, relation, params[relation])
-        if resource.changed?
+        if resource.saved_changes?
           resource.save!
         else
           resource.touch
