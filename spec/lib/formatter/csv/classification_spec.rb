@@ -7,7 +7,7 @@ RSpec.describe Formatter::Csv::Classification do
   end
   let(:subject) { build_stubbed(:subject) }
   let(:subject_data) do
-    { "#{subject.id}" => {retired: false}.merge(subject.metadata) }
+    { "#{subject.id}" => subject.metadata.merge({retired: false}) }
   end
   let(:subject_json_data) { subject_data.to_json }
   let(:subject_ids) { subject.id.to_s }
