@@ -32,7 +32,7 @@ module ExtendedCacheKey
     cache_key = super
     associations_cache_key = compound_association_cache_keys.join("+")
     methods_cache_key = compound_method_cache_keys.join("")
-    create_append_cache_key(cache_key, methods_cache_key, associations_cache_key)
+    create_append_cache_key(+cache_key, methods_cache_key, associations_cache_key)
   end
 
   private
