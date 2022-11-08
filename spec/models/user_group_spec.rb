@@ -5,7 +5,7 @@ describe UserGroup, :type => :model do
   let(:named) { user_group }
   let(:activatable) { user_group }
   let(:owner) { user_group }
-  let(:owned) { build(:project, owner: owner) }
+  let(:owned) { create(:project, owner: owner) }
   let(:locked_factory) { :user_group }
   let(:locked_update) { {display_name: "A-different_name"} }
 
