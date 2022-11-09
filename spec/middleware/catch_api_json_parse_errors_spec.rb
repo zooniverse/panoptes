@@ -41,12 +41,12 @@ describe CatchApiJsonParseErrors do
       # raise an error here to simulate the HTTP request data parsers blowing up
       # https://github.com/rails/rails/commit/b3d41eae4b138d6c9d38bd9c1cbe033802c0e21d
       # to match the deprecated params parsing error behaviour
-      # via last know error $! (https://til.hashrocket.com/posts/da62981e47-ruby-)
+      # via last known error $! (https://til.hashrocket.com/posts/da62981e47-ruby-)
       begin
         # this would really be a specific parser error in reality, e.g. a `JSON::ParserError` error
         raise StandardError
       rescue StandardError
-        return ActionDispatch::ParamsParser::ParseError.new
+        return ActionDispatch::Http::Parameters::ParseError.new
       end
     }
 
@@ -56,7 +56,7 @@ describe CatchApiJsonParseErrors do
 
     context 'when the call is not JSON' do
       it 'reraises the error' do
-        expect { middle.call(bad_env) }.to raise_error(ActionDispatch::ParamsParser::ParseError)
+        expect { middle.call(bad_env) }.to raise_error(ActionDispatch::Http::Parameters::ParseError)
       end
     end
 
