@@ -35,7 +35,10 @@ module Inaturalist
 
     def fetch_next_page
       page_params = @params.merge(id_above: @id_above)
-      response = client.get(page_params)
+
+      # Faraday's built-in parsing blocks GC, so parse manually
+      raw_response = client.get(page_params)
+      response = JSON.parse(raw_response)
       @total_results ||= response['total_results']
       results = response['results']
       # Stop if a) there are no more results
@@ -47,6 +50,11 @@ module Inaturalist
       @observation_count += 1
       @id_above = results.last['id']
       @params['id_above'] = @id_above
+
+      # Try to ensure as few objects are kept in memory as possible
+      raw_response = nil
+      response = nil
+      GC.start
       results
     end
 
