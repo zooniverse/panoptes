@@ -38,6 +38,13 @@ describe Inaturalist::Observation do
     expect(obs.locations).to eq(obs_locations)
   end
 
+  context 'the url is invalid' do
+    it 'fills with the default' do
+      bad_url = "https://inaturalist-open-data.s3.amazonaws.com/photos/12345/square."
+      expect(obs.mime_type_from_file_extension(bad_url)).to eq('invalid-filetype')
+    end
+  end
+
   describe '#all rights reserved?' do
     let(:obs2) { described_class.new(response['results'][1]) }
 
