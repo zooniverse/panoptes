@@ -50,11 +50,9 @@ module Inaturalist
     end
 
     def mime_type_from_file_extension(url)
-      begin
-        MiniMime.lookup_by_filename(url).content_type || ""
-      rescue NoMethodError => e
-        'invalid-filetype'
-      end
+      MiniMime.lookup_by_filename(url).content_type
+    rescue NoMethodError
+      'invalid-filetype'
     end
   end
 end
