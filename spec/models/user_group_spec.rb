@@ -5,14 +5,16 @@ describe UserGroup, :type => :model do
   let(:named) { user_group }
   let(:activatable) { user_group }
   let(:owner) { user_group }
-  let(:owned) { create(:project, owner: owner) }
+  let(:owned) { build(:project, owner: owner) }
   let(:locked_factory) { :user_group }
   let(:locked_update) { {display_name: "A-different_name"} }
 
   it_behaves_like "optimistically locked"
 
   it_behaves_like "activatable"
-  it_behaves_like "is an owner"
+  it_behaves_like "is an owner" do
+    before { owned.save }
+  end
 
   it "should have a valid factory" do
     expect(build(:user_group)).to be_valid
