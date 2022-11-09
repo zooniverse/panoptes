@@ -12,7 +12,9 @@ describe UserGroup, :type => :model do
   it_behaves_like "optimistically locked"
 
   it_behaves_like "activatable"
-  it_behaves_like "is an owner"
+  it_behaves_like 'is an owner' do
+    before { owned.save }
+  end
 
   it "should have a valid factory" do
     expect(build(:user_group)).to be_valid
