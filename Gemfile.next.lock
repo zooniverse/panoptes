@@ -525,7 +525,7 @@ DEPENDENCIES
   listen (~> 3.7)
   lograge
   mime-types
-  mini_racer (~> 0.4.0)
+  mini_racer
   mock_redis
   newrelic_rpm
   omniauth (~> 1.9)
