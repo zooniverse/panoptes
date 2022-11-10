@@ -236,7 +236,7 @@ class User < ApplicationRecord
   def active_for_authentication?
     return false if disabled?
     update_ouroboros_created
-    ok_for_auth = changed? ? save : true
+    ok_for_auth = saved_changes? ? save : true
     ok_for_auth && super
   end
 
@@ -308,7 +308,7 @@ class User < ApplicationRecord
 
   def set_zooniverse_id
     self.zooniverse_id ||= panoptes_zoo_id
-    if zooniverse_id_changed?
+    if saved_change_to_zooniverse_id?
       self.update_column(:zooniverse_id, self.zooniverse_id)
     end
   end

@@ -10,7 +10,7 @@ module UserProjectPreferences
         upp.email_communication = user.project_email_communication
       end
 
-      if upp.new_record? || upp.changed?
+      if upp.new_record? || upp.saved_changes?
         upp.save!
         ProjectClassifiersCountWorker.perform_async(upp.project_id)
       else
