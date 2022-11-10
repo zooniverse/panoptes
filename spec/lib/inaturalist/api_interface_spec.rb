@@ -10,7 +10,7 @@ describe Inaturalist::ApiInterface do
   describe 'enumeration' do
     before do
       allow(Inaturalist::Client).to receive(:new).and_return(client)
-      allow(client).to receive(:get).and_return(response)
+      allow(client).to receive(:get).and_return(response.to_json)
       allow(interface).to receive(:client).and_return(client)
     end
 
@@ -69,9 +69,9 @@ describe Inaturalist::ApiInterface do
       allow(interface).to receive(:client).and_return(client)
       allow(interface).to receive(:fetch_next_page).and_call_original
       allow(client).to receive(:get).and_return(
-        page_one.with_indifferent_access,
-        page_two.with_indifferent_access,
-        last_page.with_indifferent_access
+        page_one.to_json,
+        page_two.to_json,
+        last_page.to_json
       )
     end
 
