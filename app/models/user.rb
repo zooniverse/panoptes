@@ -308,9 +308,7 @@ class User < ApplicationRecord
 
   def set_zooniverse_id
     self.zooniverse_id ||= panoptes_zoo_id
-    if saved_change_to_zooniverse_id?
-      self.update_column(:zooniverse_id, self.zooniverse_id)
-    end
+    self.update_column(:zooniverse_id, self.zooniverse_id) if saved_change_to_zooniverse_id?
   end
 
   def setup_unsubscribe_token
