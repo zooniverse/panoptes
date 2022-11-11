@@ -11,6 +11,11 @@ describe UserProjectPreferences::FindOrCreate do
       result = operation.run
       expect(result.result).to eq(user_project_preference)
     end
+
+    it 'sets the email_communication attribute when it is missing' do
+      user_project_preference = create :user_project_preference, user: user, project: project, email_communication: nil
+      expect { operation.run }.to change(user_project_preference, :email_communication).from(nil).to(true)
+    end
   end
 
   context 'when UPP does not exist' do
