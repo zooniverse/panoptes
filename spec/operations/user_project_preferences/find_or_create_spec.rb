@@ -14,7 +14,9 @@ describe UserProjectPreferences::FindOrCreate do
 
     it 'sets the email_communication attribute when it is missing' do
       user_project_preference = create :user_project_preference, user: user, project: project, email_communication: nil
-      expect { operation.run }.to change(user_project_preference, :email_communication).from(nil).to(true)
+      operation.run
+      user_project_preference.reload
+      expect(user_project_preference.email_communication).to be(true)
     end
   end
 
