@@ -6,9 +6,7 @@ module UserProjectPreferences
     def execute
       upp = UserProjectPreference.find_or_initialize_by(project_id: project.id, user_id: user.id)
 
-      if upp.email_communication.nil?
-        upp.email_communication = user.project_email_communication
-      end
+      upp.email_communication ||= user.project_email_communication
 
       if upp.new_record? || upp.has_changes_to_save?
         upp.save!
