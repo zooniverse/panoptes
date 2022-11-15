@@ -16,6 +16,15 @@ module Panoptes
     )
   end
 
+  # setup CORS allow and block lists at boot time as they don't change
+  # https://github.com/cyu/rack-cors#rack-configuration
+  #
+  # block list is a list of domain hosts to reject
+  # NOTE: do not use strip! here as it returns nil if no changes and test this manually if you change the setup
+  CORS_ORIGIN_HOST_REJECTIONS = ENV.fetch('CORS_ORIGINS_REJECT_HOSTS', '').split(',').map(&:strip).freeze
+  # allow list is a regex to match against the origin host
+  CORS_ORIGIN_REGEX = /#{ENV.fetch('CORS_ORIGINS_REGEX', '^https?:\/\/(127\.0\.0\.1|localhost|[a-z0-9-]+\.local)(:\d+)?$')}/.freeze
+
   # return a proc that can be used to configure the cors middleware
   def self.cors_origin_allowed
     proc do |source, _env|
@@ -23,8 +32,7 @@ module Panoptes
       allowed_origin = false
 
       # allow to reject some domains - allows multiple values via comma delimited string
-      cors_origin_host_rejections = ENV.fetch('CORS_ORIGINS_REJECT_HOSTS', '').split(',')
-      reject_origin = cors_origin_host_rejections.map do |rejection_substring|
+      reject_origin = CORS_ORIGIN_HOST_REJECTIONS.map do |rejection_substring|
         URI.parse(source).host == rejection_substring
       end.any?
 
@@ -33,13 +41,7 @@ module Panoptes
       # so we have to use control flow and boolean logic to determine if this origin is allowed
 
       # test the origin via regex if not rejected
-      unless reject_origin
-        cors_origin_regex = ENV.fetch(
-          'CORS_ORIGINS_REGEX',
-          '^https?:\/\/(127\.0\.0\.1|localhost|[a-z0-9-]+\.local)(:\d+)?$'
-        )
-        allowed_origin = (source =~ /#{cors_origin_regex}/).present?
-      end
+      allowed_origin = (source =~ CORS_ORIGIN_REGEX).present? unless reject_origin
 
       # allow the origin if:
       # 1. it is not explicitly rejected

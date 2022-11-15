@@ -58,23 +58,32 @@ RSpec.describe "api should return CORS headers on all requests", type: :request 
       end
     end
 
+    context 'with multiple domains in the rejected origins blocklist' do
+      let(:source_origin) { 'http://localhost:3000' }
+
+      it 'compares the origin for each block list entry and deals with whitespacing issues' do
+        stub_const('Panoptes::CORS_ORIGIN_HOST_REJECTIONS', %w[panoptes-uploads-staging.zooniverse.org panoptes-uploads.zooniverse.org])
+        allow(URI).to receive(:parse).and_call_original
+        get '/users/sign_in', headers: {
+          'HTTP_ACCEPT' => 'application/json',
+          'HTTP_ORIGIN' => source_origin
+        }
+        expect(URI).to have_received(:parse).with(source_origin).twice
+      end
+    end
+
     context 'with domains match the rejected origins blocklist' do
       before do
         # allow all zooniverse subdomains - test the block list in isolation
-        ENV['CORS_ORIGINS_REGEX'] = '^https?:/\/[a-z0-9-]+\.zooniverse\.org$'
+        stub_const('Panoptes::CORS_ORIGINS_REGEX', %r{https?://[a-z0-9-]+\.zooniverse\.org$})
         # explicitly block the test domain
-        ENV['CORS_ORIGINS_REJECT_HOSTS'] = 'panoptes-uploads.zooniverse.org'
-      end
-
-      after do
-        ENV.delete('CORS_ORIGINS_REGEX')
-        ENV.delete('CORS_ORIGINS_REJECT_HOSTS')
+        stub_const('Panoptes::CORS_ORIGIN_HOST_REJECTIONS', ['panoptes-uploads.zooniverse.org'])
       end
 
       it 'does not have the Access-Control-Allow-Origin response header' do
         get '/users/sign_in', headers: {
           'HTTP_ACCEPT' => 'application/json',
-          'HTTP_ORIGIN' => 'https://panoptes-uploads.zooniverse.org'
+          'HTTP_ORIGIN' => 'https://panoptessdfdsfd-uploads.zooniverse.org'
         }
         expect(response.headers.to_h).not_to include('Access-Control-Expose-Headers')
       end
