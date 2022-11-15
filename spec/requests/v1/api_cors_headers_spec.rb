@@ -37,6 +37,50 @@ RSpec.describe "api should return CORS headers on all requests", type: :request 
     }
   end
 
+  describe 'testing allowed origins on controlled paths' do
+    context 'with domains that match the allow regex' do
+      it 'returns the Access-Control-Allow-Origin response header' do
+        get '/users/sign_in', headers: {
+          'HTTP_ACCEPT' => 'application/json',
+          'HTTP_ORIGIN' => 'http://localhost:3000'
+        }
+        expect(response.headers.to_h).to include('Access-Control-Expose-Headers')
+      end
+    end
+
+    context 'with domains that do not match the allow regex' do
+      it 'does not return the Access-Control-Allow-Origin response header' do
+        get '/users/sign_in', headers: {
+          'HTTP_ACCEPT' => 'application/json',
+          'HTTP_ORIGIN' => 'http://example.com'
+        }
+        expect(response.headers.to_h).not_to include('Access-Control-Expose-Headers')
+      end
+    end
+
+    context 'with domains match the rejected origins blocklist' do
+      before do
+        # allow all zooniverse subdomains - test the block list in isolation
+        ENV['CORS_ORIGINS_REGEX'] = '^https?:/\/[a-z0-9-]+\.zooniverse\.org$'
+        # explicitly block the test domain
+        ENV['CORS_ORIGINS_REJECT_HOSTS'] = 'panoptes-uploads.zooniverse.org'
+      end
+
+      after do
+        ENV.delete('CORS_ORIGINS_REGEX')
+        ENV.delete('CORS_ORIGINS_REJECT_HOSTS')
+      end
+
+      it 'does not have the Access-Control-Allow-Origin response header' do
+        get '/users/sign_in', headers: {
+          'HTTP_ACCEPT' => 'application/json',
+          'HTTP_ORIGIN' => 'https://panoptes-uploads.zooniverse.org'
+        }
+        expect(response.headers.to_h).not_to include('Access-Control-Expose-Headers')
+      end
+    end
+  end
+
   describe "non-error requests" do
     before(:each) do
       allow_any_instance_of(Api::ApiController).to receive(:doorkeeper_token).and_return(token(["public", "user"], user.id))
