@@ -50,8 +50,7 @@ module Inaturalist
         f.request :url_encoded
         f.request :retry
         f.response :raise_error
-        f.adapter :net_http_persistent
-        # f.adapter Faraday.default_adapter
+        f.adapter Faraday.default_adapter
       end
 
       begin
