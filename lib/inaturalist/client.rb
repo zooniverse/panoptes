@@ -35,13 +35,13 @@ module Inaturalist
         verifiable: true,
         order: 'asc',
         order_by: 'id',
-        per_page: 200
+        per_page: 200,
+        fields: RISON_FIELDS
       }
     end
 
     def get(params)
       request_params = @default_params.merge(params)
-      request_params['fields'] = RISON_FIELDS
       conn = Faraday.new(
         url: @url,
         headers: @headers,
