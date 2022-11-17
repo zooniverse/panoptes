@@ -53,13 +53,9 @@ module Inaturalist
         f.adapter Faraday.default_adapter
       end
 
-      begin
-        response = conn.get
-        @request_url = response.env.url.to_s
-        conn.get.body
-      rescue Faraday::ClientError => e
-        raise e
-      end
+      response = conn.get
+      @request_url = response.env.url.to_s
+      conn.get.body
     end
   end
 end
