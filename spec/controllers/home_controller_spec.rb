@@ -12,7 +12,7 @@ describe HomeController, type: :controller do
       end
 
       it "should be successful" do
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it "should default to html" do
@@ -26,7 +26,7 @@ describe HomeController, type: :controller do
       end
 
       it "returns success" do
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it "returns the expected json header" do
