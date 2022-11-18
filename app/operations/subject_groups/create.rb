@@ -92,7 +92,7 @@ module SubjectGroups
         .active
         .where(id: subject_ids)
         .order(
-          "idx(array[#{subject_ids.join(',')}], id)"
+          Arel.sql("idx(array[#{subject_ids.join(',')}], id)")
         )
         .load
     end
