@@ -19,7 +19,7 @@ RSpec.describe Medium, :type => :model do
       expect(m).to_not be_valid
     end
 
-    context 'non-export medium types' do
+    context 'when non-export medium types' do
       it 'should be valid with all content_types' do
         aggregate_failures 'content types' do
           limited_list_of_allowed_mime_types = %w(
