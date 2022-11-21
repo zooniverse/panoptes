@@ -34,7 +34,7 @@ class Api::V1::SubjectsController < Api::ApiController
       .active
       .where(id: selected_subject_ids)
       .order(
-        "idx(array[#{selected_subject_ids.join(',')}], id)"
+        Arel.sql("idx(array[#{selected_subject_ids.join(',')}], id)")
       )
     end
 
@@ -73,7 +73,7 @@ class Api::V1::SubjectsController < Api::ApiController
       if selected_subject_ids.empty?
         Subject.none
       else
-        Subject.active.where(id: selected_subject_ids).order("idx(array[#{selected_subject_ids.join(',')}], id)") # guardrails-disable-line
+        Subject.active.where(id: selected_subject_ids).order(Arel.sql("idx(array[#{selected_subject_ids.join(',')}], id)")) # guardrails-disable-line
       end
 
     # create a special 'fake' selector for the serializer
@@ -119,7 +119,7 @@ class Api::V1::SubjectsController < Api::ApiController
     selected_subject_scope =
       Subject
       .where(id: group_subject_ids)
-      .order("idx(array[#{group_subject_ids.join(',')}], id)") # guardrails-disable-line
+      .order(Arel.sql("idx(array[#{group_subject_ids.join(',')}], id)")) # guardrails-disable-line
 
     selection_context = Subjects::SelectorContext.new(
       group_selection_result.subject_selector,
