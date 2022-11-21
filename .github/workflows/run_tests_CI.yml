@@ -61,3 +61,4 @@ jobs:
         env:
            RAILS_ENV: test
            DISABLE_TEST_LOGGING: 1
+           DEPRECATION_WARNINGS_SILENCED: 1
