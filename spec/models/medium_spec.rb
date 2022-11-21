@@ -19,9 +19,9 @@ RSpec.describe Medium, :type => :model do
       expect(m).to_not be_valid
     end
 
-    context "non-export medium types" do
+    context 'non-export medium types' do
       it 'should be valid with all content_types' do
-        aggregate_failures "content types" do
+        aggregate_failures 'content types' do
           limited_list_of_allowed_mime_types = %w(
             image/jpeg
             image/png
@@ -32,12 +32,27 @@ RSpec.describe Medium, :type => :model do
             audio/mp4
             audio/x-m4a
             text/plain
-            text/html
+            text/csv
             video/mp4
+            application/pdf
           )
           limited_list_of_allowed_mime_types.each do |content_type|
             m = build(:medium, content_type: content_type)
             expect(m).to be_valid
+          end
+        end
+      end
+
+      it 'should not be valid for non-whitelisted content_types' do
+        aggregate_failures 'content types' do
+          limited_list_of_unallowed_mime_types = %w(
+            text/html
+            text/css
+            application/javascript
+          )
+          limited_list_of_unallowed_mime_types.each do |content_type|
+            m = build(:medium, content_type: content_type)
+            expect(m).not_to be_valid
           end
         end
       end

@@ -12,6 +12,7 @@ class Medium < ApplicationRecord
   before_destroy :queue_medium_removal, unless: :external_link
 
   ALLOWED_EXPORT_CONTENT_TYPES = %w(text/csv).freeze
+  ALLOWED_CONTENT_TYPES = %r{jp(e)?g|gif|png|ico|txt|mp(3|4)|webm|og(a|g|m|v|x)|spx|opus|pdf|ttf|tar|gz|tgz|bz2|tbz2|zip|csv|mp(e)?g|svg|plain|m4(a|b)}
   EXPORT_MEDIUM_TYPE_REGEX = /\A(project|workflow)_[a-z_]+_export\z/i
 
   validate do |medium|
@@ -20,6 +21,8 @@ class Medium < ApplicationRecord
       medium.errors.add(:content_type, "Content-Type must be one of #{ALLOWED_EXPORT_CONTENT_TYPES.join(", ")}")
     end
   end
+
+  validate :validate_content_type
 
   def self.inheritance_column
     nil
@@ -100,6 +103,12 @@ class Medium < ApplicationRecord
     # ensure we raise unexpected errors once we've exhausted
     # the number of retries to continute to surface these errors
     raise e
+  end
+
+  def validate_content_type
+    if !ALLOWED_CONTENT_TYPES.match?(content_type)
+      errors.add(:content_type, 'Invalid file type')
+    end
   end
 
   private
