@@ -44,13 +44,13 @@ RSpec.describe Medium, :type => :model do
         end
       end
 
-      it 'should not be valid for non-whitelisted content_types' do
+      it 'does not allow invalid non-whitelisted content_types' do
         aggregate_failures 'content types' do
-          limited_list_of_unallowed_mime_types = %w(
+          limited_list_of_unallowed_mime_types = %w[
             text/html
             text/css
             application/javascript
-          )
+        ]
           limited_list_of_unallowed_mime_types.each do |content_type|
             m = build(:medium, content_type: content_type)
             expect(m).not_to be_valid
