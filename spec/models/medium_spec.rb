@@ -35,6 +35,7 @@ RSpec.describe Medium, :type => :model do
             text/csv
             video/mp4
             application/pdf
+            application/json
           )
           limited_list_of_allowed_mime_types.each do |content_type|
             m = build(:medium, content_type: content_type)
