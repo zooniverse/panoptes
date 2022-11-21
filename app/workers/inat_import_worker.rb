@@ -4,7 +4,7 @@ class InatImportWorker
   include Sidekiq::Worker
 
   # skip retries for this job to avoid re-running imports with errors
-  sidekiq_options retry: 0, queue: :data_medium
+  sidekiq_options retry: 0, queue: :dumpworker
   sidekiq_options lock: :until_and_while_executing
 
   def perform(user_id, taxon_id, subject_set_id, updated_since=nil)
