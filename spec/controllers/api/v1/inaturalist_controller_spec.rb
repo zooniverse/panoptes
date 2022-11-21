@@ -28,6 +28,12 @@ describe Api::V1::InaturalistController, type: :controller do
         response = post :import, params: import_params
         expect(response).to have_http_status(:not_found)
       end
+
+      it 'includes updated_since' do
+        import_params[:updated_since] = '2022-10-31'
+        expect { post :import, params: import_params }
+          .to change(InatImportWorker.jobs, :size).by(1)
+      end
     end
 
     context 'with an unauthorized user' do
