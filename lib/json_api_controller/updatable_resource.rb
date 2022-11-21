@@ -29,11 +29,10 @@ module JsonApiController
       resource = controlled_resources.first
       resource_class.transaction(requires_new: true) do
         add_relation(resource, relation, params[relation])
-        if resource.changed?
-          resource.save!
-        else
-          resource.touch
-        end
+        # as this resource may not have changed but the linked resources may have
+        # ensure we modify the upated_at timestamp to cache bust this resource
+        resource.updated_at = Time.zone.now
+        resource.save!
       end
 
       yield resource if block_given?
