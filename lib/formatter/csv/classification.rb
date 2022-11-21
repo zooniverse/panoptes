@@ -46,7 +46,7 @@ module Formatter
         {}.tap do |subjects_and_metadata|
           classification_subject_ids.map {|id| cache.subject(id) }.each do |subject|
             retired_data = { retired: cache.retired?(subject.id, workflow.id) }
-            subjects_and_metadata[subject.id] = retired_data.reverse_merge!(subject.metadata)
+            subjects_and_metadata[subject.id] = retired_data.merge!(subject.metadata)
           end
         end.to_json
       end

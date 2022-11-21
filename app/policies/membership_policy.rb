@@ -20,7 +20,7 @@ class MembershipPolicy < ApplicationPolicy
       when :show, :index
         public_memberships = scope.where(identity: false, state: Membership.states[:active])
                                .joins(:user_group).merge(UserGroup.where(private: false))
-        query.union_all(public_memberships)
+        Membership.union_all(query, public_memberships)
       else
         query
       end

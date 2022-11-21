@@ -65,12 +65,12 @@ describe EmailsController, type: :controller do
         let(:token) { "blurghkjsh" }
 
         it "should redirect" do
-          get :unsubscribe_via_token, token: token
+          get :unsubscribe_via_token, params: { token: token }
           expect(response.location).to eq("#{base_url}?processed=true")
         end
 
         it "should redirect to the front end unsubscribed page" do
-          get :unsubscribe_via_token, token: token
+          get :unsubscribe_via_token, params: { token: token }
           expect(response.location).to eq("#{base_url}?processed=true")
         end
       end
@@ -78,7 +78,7 @@ describe EmailsController, type: :controller do
       context "when supplying a valid token" do
         let(:token) { user.unsubscribe_token }
         let(:unsubscribe_user) do
-          get :unsubscribe_via_token, token: token
+          get :unsubscribe_via_token, params: { token: token }
         end
 
         it_behaves_like "it removes user email subscriptions"
@@ -111,7 +111,7 @@ describe EmailsController, type: :controller do
       context "when supplying an invalid email" do
         let(:unknown_email) { "not@my.email" }
         let(:unsubscribe) do
-          post :unsubscribe_via_email, email: unknown_email
+          post :unsubscribe_via_email, params: { email: unknown_email }
         end
 
         it "should be successful" do
@@ -122,7 +122,7 @@ describe EmailsController, type: :controller do
 
       context "when supplying a valid email" do
         let(:unsubscribe_user) do
-          post :unsubscribe_via_email, email: user.email
+          post :unsubscribe_via_email, params: { email: user.email }
         end
 
         it_behaves_like "it removes user email subscriptions"

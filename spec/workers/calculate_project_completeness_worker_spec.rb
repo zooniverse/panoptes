@@ -35,7 +35,10 @@ describe CalculateProjectCompletenessWorker do
 
   describe '#project_completeness' do
     let(:workflows_relation_double) do
-      double(pluck: [1, 0], empty?: false)
+      [
+        build_stubbed(:workflow, completeness: 0, real_set_member_subjects_count: 0, retired_set_member_subjects_count: 0),
+        build_stubbed(:workflow, completeness: 1, real_set_member_subjects_count: 10, retired_set_member_subjects_count: 10)
+      ]
     end
     let(:project) do
       instance_double('Project', active_workflows: workflows_relation_double)
@@ -45,8 +48,8 @@ describe CalculateProjectCompletenessWorker do
       allow(worker).to receive(:project).and_return(project)
     end
 
-    it 'returns the average of the workflow completenesses' do
-      expect(worker.project_completeness).to eq(0.5)
+    it 'returns the proportional workflow completenesses metric' do
+      expect(worker.project_completeness).to eq(1.0)
     end
 
     it "should set to 0.0 when a project has no active workflows" do
@@ -54,9 +57,61 @@ describe CalculateProjectCompletenessWorker do
       expect(worker.project_completeness).to eq(0.0)
     end
 
-    it 'returns 0.0 when a project has active workflows with 0 completeness (no linked subjects)' do
-      allow(workflows_relation_double).to receive(:pluck).and_return([0, 0])
-      expect(worker.project_completeness).to eq(0.0)
+    context 'when a project has active workflows with 0 completeness (no linked subjects)' do
+      let(:workflows_relation_double) do
+        [
+          build_stubbed(:workflow, completeness: 0, real_set_member_subjects_count: 0, retired_set_member_subjects_count: 0),
+          build_stubbed(:workflow, completeness: 0, real_set_member_subjects_count: 0, retired_set_member_subjects_count: 0)
+        ]
+      end
+
+      it 'returns 0.0' do
+        expect(worker.project_completeness).to eq(0.0)
+      end
+    end
+
+    context 'when a project has active workflows and varied completeness metrics and subject proportions' do
+      let(:workflows_relation_double) do
+        [
+          build_stubbed(:workflow, completeness: 0.5, real_set_member_subjects_count: 100, retired_set_member_subjects_count: 50),
+          build_stubbed(:workflow, completeness: 0.9, real_set_member_subjects_count: 900, retired_set_member_subjects_count: 810)
+        ]
+      end
+
+      it 'returns the proportional scaled completeness metric' do
+        # small error with extra precision due to floating point math
+        # 0.5 * (100 / 1000) + 0.9 * (900 / 1000)
+        # 0.05 + 0.81
+        expect(worker.project_completeness).to eq(0.86)
+      end
+    end
+
+    context 'when a project has recurring proportional completeness (1/6)' do
+      let(:workflows_relation_double) do
+        Array.new(6) do |_|
+          build_stubbed(:workflow, completeness: 1.0, real_set_member_subjects_count: 1, retired_set_member_subjects_count: 1)
+        end
+      end
+
+      it 'returns the correct value without precision rounding errors' do
+        # frogsong - recurring small values issue with this one
+        # 6(1.0 * (1 / 6)) == 6(1/6) == 1.0
+        expect(worker.project_completeness).to eq(1.0)
+      end
+    end
+
+    context 'when a project has varying workflow completeness proportions of small' do
+      # nest quest go sparrows - to_d rounding issue with this one
+      # total_subjects = 128610
+      let(:workflows_relation_double) do
+        [12860, 12860, 12863, 12863, 12860, 12860, 12860, 12860, 12863, 10094, 2767].map do |retired_subjects|
+          build_stubbed(:workflow, completeness: 1.0, real_set_member_subjects_count: retired_subjects, retired_set_member_subjects_count: retired_subjects)
+        end
+      end
+
+      it 'returns the correct value without precision rounding errors' do
+        expect(worker.project_completeness).to eq(1.0)
+      end
     end
   end
 
@@ -115,7 +170,9 @@ describe CalculateProjectCompletenessWorker do
       before do
         allow(project)
           .to receive(:active_workflows)
-          .and_return(double(pluck: [0.91], empty?: false, all?: false))
+          .and_return(
+            [build_stubbed(:workflow, completeness: 0.91, real_set_member_subjects_count: 100, retired_set_member_subjects_count: 91)]
+          )
       end
 
       it "should not move the project to paused" do
@@ -170,8 +227,8 @@ describe CalculateProjectCompletenessWorker do
     context "when the project is active and complete" do
       before do
         allow(project)
-        .to receive(:active_workflows)
-        .and_return(double(pluck: [1], empty?: false))
+          .to receive(:active_workflows)
+          .and_return([build_stubbed(:workflow, completeness: 1.0, real_set_member_subjects_count: 10, retired_set_member_subjects_count: 10)])
       end
 
       it "should move it to paused" do
@@ -185,7 +242,7 @@ describe CalculateProjectCompletenessWorker do
 
     context 'when the project is active with no workflows' do
       before do
-        allow(project).to receive(:active_workflows).and_return(double(pluck: [], empty?: true))
+        allow(project).to receive(:active_workflows).and_return([])
       end
 
       it 'should move it to paused' do

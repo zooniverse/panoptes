@@ -15,7 +15,7 @@ describe SubjectGroups::Create do
     operation.run!(params)
   end
 
-  it 'creates creates a valid subject_group' do
+  it 'creates a valid subject_group' do
     expect(created_subject_group).to be_valid
   end
 

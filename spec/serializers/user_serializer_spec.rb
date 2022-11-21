@@ -3,7 +3,7 @@ require "spec_helper"
 RSpec.describe UserSerializer do
   let(:sign_in) { 1 }
   let(:migrated) { false }
-  let(:user) { create(:user, migrated: migrated, sign_in_count: sign_in) }
+  let(:user) { create(:user, migrated: migrated, sign_in_count: sign_in, zooniverse_id: "zoo-id-#{SecureRandom.random_number(100)}") }
   let(:context) { {} }
 
   let(:serializer) do

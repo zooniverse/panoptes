@@ -3,7 +3,7 @@ require 'spec_helper'
 describe DumpMailer do
   let(:users) { create_list(:user, 2) }
   let(:owner) { users.sample }
-  let(:resource) { Project.new(id: 1, owner: owner) }
+  let(:resource) { build_stubbed(:project, owner: owner) }
   let(:metadata) { {"recipients" => users.map(&:id) } }
   let(:medium) { instance_double("Medium", id: 2, metadata: metadata) }
   let(:dump_mailer) { described_class.new(resource, medium, "classifications") }
@@ -30,6 +30,7 @@ describe DumpMailer do
       let(:expected_emails) { [ owner.email ] }
 
       it 'queues an email to the owner' do
+        allow(resource).to receive(:communication_emails).and_return(expected_emails)
         dump_mailer.send_email
       end
     end
@@ -39,6 +40,7 @@ describe DumpMailer do
       let(:expected_emails) { [owner.email] }
 
       it 'queues an email to the owner' do
+        allow(resource).to receive(:communication_emails).and_return(expected_emails)
         dump_mailer.send_email
       end
     end

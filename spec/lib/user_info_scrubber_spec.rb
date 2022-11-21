@@ -91,8 +91,9 @@ describe UserInfoScrubber do
       end
 
       it 'should not change the persisted instance' do
+        user.reload
         scrub_user_details(user) rescue nil
-        expect(user.changed?).to eq(false)
+        expect(user.saved_changes?).to eq(false)
       end
     end
   end

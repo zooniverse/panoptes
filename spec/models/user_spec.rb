@@ -569,9 +569,12 @@ describe User, type: :model do
     let(:user) { create(:user) }
 
     it "should call update_ouroboros_created on the model" do
-      expect(user).to receive(:update_ouroboros_created)
-      expect(user).not_to receive(:save)
-      user.active_for_authentication?
+      stubbed_user = build_stubbed(:user)
+      allow(stubbed_user).to receive(:update_ouroboros_created)
+      allow(stubbed_user).to receive(:save)
+      stubbed_user.active_for_authentication?
+      expect(stubbed_user).to have_received(:update_ouroboros_created)
+      expect(stubbed_user).not_to have_received(:save)
     end
 
     it "should return true for an active user" do

@@ -1,6 +1,6 @@
-require "user_unsubscribe_message_verifier"
+# frozen_string_literal: true
 
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   include Activatable
   include PgSearch::Model
   include ExtendedCacheKey
@@ -236,7 +236,7 @@ class User < ActiveRecord::Base
   def active_for_authentication?
     return false if disabled?
     update_ouroboros_created
-    ok_for_auth = changed? ? save : true
+    ok_for_auth = saved_changes? ? save : true
     ok_for_auth && super
   end
 
@@ -308,9 +308,7 @@ class User < ActiveRecord::Base
 
   def set_zooniverse_id
     self.zooniverse_id ||= panoptes_zoo_id
-    if zooniverse_id_changed?
-      self.update_column(:zooniverse_id, self.zooniverse_id)
-    end
+    self.update_column(:zooniverse_id, self.zooniverse_id) if saved_change_to_zooniverse_id?
   end
 
   def setup_unsubscribe_token

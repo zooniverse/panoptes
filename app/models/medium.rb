@@ -1,4 +1,6 @@
-class Medium < ActiveRecord::Base
+# frozen_string_literal: true
+
+class Medium < ApplicationRecord
   class MissingPutFilePath < StandardError; end
 
   belongs_to :linked, polymorphic: true

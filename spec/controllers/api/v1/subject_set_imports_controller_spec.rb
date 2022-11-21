@@ -67,7 +67,7 @@ describe Api::V1::SubjectSetImportsController, type: :controller do
       end
 
       it 'returns a useful error message' do
-        post :create, create_params
+        post :create, params: create_params
         returned_error_message = json_error_message(error_message)
         expect(response.body).to eq(returned_error_message)
       end
@@ -82,12 +82,12 @@ describe Api::V1::SubjectSetImportsController, type: :controller do
       it_behaves_like 'is creatable'
 
       it 'enqueues a worker' do
-        expect { post :create, create_params }
+        expect { post :create, params: create_params }
           .to change(SubjectSetImportWorker.jobs, :size).by(1)
       end
 
       it 'sets the manifest_count attribute' do
-        post :create, create_params
+        post :create, params: create_params
         import = SubjectSetImport.find(created_instance_id('subject_set_imports'))
         expect(import.manifest_count).to eq(data_row_count)
       end
@@ -103,12 +103,12 @@ describe Api::V1::SubjectSetImportsController, type: :controller do
       end
 
       it 'returns a forbidden status code when the manifest is over the limit' do
-        post :create, create_params
+        post :create, params: create_params
         expect(response).to have_http_status(:forbidden)
       end
 
       it 'returns a useful error message when the manifest is over the limit' do
-        post :create, create_params
+        post :create, params: create_params
         returned_error_message = json_error_message(error_message)
         expect(response.body).to eq(returned_error_message)
       end

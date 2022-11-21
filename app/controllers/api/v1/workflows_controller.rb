@@ -50,12 +50,10 @@ class Api::V1::WorkflowsController < Api::ApiController
 
   def retire_subjects
     operation.run!(params)
-    render nothing: true, status: 204
   end
 
   def unretire_subjects
     operation.run!(params)
-    render nothing: true, status: 204
   end
 
   def create_classifications_export
@@ -121,9 +119,12 @@ class Api::V1::WorkflowsController < Api::ApiController
   end
 
   def build_resource_for_create(create_params)
-    stripped_tasks, strings = extract_strings(create_params[:tasks])
-    create_params[:tasks] = stripped_tasks
-    create_params[:strings] = strings
+    if create_params.key? :tasks
+      stripped_tasks, strings = extract_strings(create_params[:tasks])
+      create_params[:tasks] = stripped_tasks
+      create_params[:strings] = strings
+    end
+
     create_params[:active] = false if project_live?
 
     super(create_params)

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class SubjectSetImport < ActiveRecord::Base
+class SubjectSetImport < ApplicationRecord
   belongs_to :subject_set
   belongs_to :user
 
@@ -36,8 +36,6 @@ class SubjectSetImport < ActiveRecord::Base
       save_imported_row_count(imported_row_count)
     end
   end
-
-  private
 
   def save_imported_row_count(imported_row_count)
     self.imported_count = imported_row_count

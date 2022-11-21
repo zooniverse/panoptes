@@ -6,7 +6,7 @@ RSpec.shared_examples "filters by owner" do
 
   before do
     resource
-    get :index, index_options
+    get :index, params: index_options
   end
 
   it "should respond with the correct number of items" do

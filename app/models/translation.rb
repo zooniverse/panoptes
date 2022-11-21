@@ -1,4 +1,6 @@
-class Translation < ActiveRecord::Base
+# frozen_string_literal: true
+
+class Translation < ApplicationRecord
   include Versioning
 
   belongs_to :translated, polymorphic: true, required: true

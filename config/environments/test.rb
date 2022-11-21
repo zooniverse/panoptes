@@ -1,5 +1,5 @@
 Rails.application.configure do
-  ActiveSupport::Deprecation.silenced = true
+  ActiveSupport::Deprecation.silenced = ENV.fetch('DEPRECATION_WARNINGS_SILENCED', nil).present?
   # Settings specified here will take precedence over those in config/application.rb.
 
   # The test environment is used exclusively to run your application's
@@ -14,7 +14,7 @@ Rails.application.configure do
   config.eager_load = false
 
   # Configure static asset server for tests with Cache-Control for performance.
-  config.serve_static_files  = true
+  config.public_file_server.enabled = true
   config.static_cache_control = 'public, max-age=3600'
 
   # Show full error reports and disable caching.
@@ -42,12 +42,6 @@ Rails.application.configure do
 
   # Raises error for missing translations
   # config.action_view.raise_on_missing_translations = true
-
-  #hack to fix issue with doorkeeper not loading ControllerHelpers in test env
-  # https://github.com/doorkeeper-gem/doorkeeper/issues/375
-  config.to_prepare do
-    Doorkeeper::ApplicationsController.helper Doorkeeper::Helpers::Controller
-  end
 
   if ENV['DISABLE_TEST_LOGGING']
     # rubocop:disable Rails/Output

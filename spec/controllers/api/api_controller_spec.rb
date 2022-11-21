@@ -56,7 +56,7 @@ describe Api::ApiController, type: :controller do
       end
 
       it "should return 401" do
-        get :index, access_token: token.token
+        get :index, params: { access_token: token.token }
         expect(response.status).to eq(401)
       end
     end
@@ -69,7 +69,7 @@ describe Api::ApiController, type: :controller do
       end
 
       it "should return 401" do
-        get :index, access_token: token.token
+        get :index, params: { access_token: token.token }
         expect(response.status).to eq(401)
       end
     end

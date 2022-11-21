@@ -1,4 +1,6 @@
-class Project < ActiveRecord::Base
+# frozen_string_literal: true
+
+class Project < ApplicationRecord
   include RoleControl::Owned
   include Activatable
   include ExtendedCacheKey
@@ -113,9 +115,9 @@ class Project < ActiveRecord::Base
 
   def send_notifications
     if Panoptes.project_request.recipients
-      request_type = if beta_requested_changed? && beta_requested
+      request_type = if saved_change_to_beta_requested? && beta_requested
                        "beta"
-                     elsif launch_requested_changed? && launch_requested
+                     elsif saved_change_to_launch_requested? && launch_requested
                        "launch"
                      end
       ProjectRequestEmailWorker.perform_async(request_type, id) if request_type
