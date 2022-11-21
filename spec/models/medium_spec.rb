@@ -50,7 +50,7 @@ RSpec.describe Medium, :type => :model do
             text/html
             text/css
             application/javascript
-        ]
+          ]
           limited_list_of_unallowed_mime_types.each do |content_type|
             m = build(:medium, content_type: content_type)
             expect(m).not_to be_valid
