@@ -262,7 +262,6 @@ GEM
     nenv (0.3.0)
     net-http-persistent (4.0.1)
       connection_pool (~> 2.2)
-    netrc (0.11.0)
     newrelic_rpm (8.6.0)
     nio4r (2.5.8)
     nokogiri (1.13.9)
@@ -520,7 +519,7 @@ DEPENDENCIES
   guard-rspec
   honeybadger (~> 5.0)
   httparty
-  jquery-rails (~> 4.4)
+  jquery-rails (~> 4.5)
   json-schema (~> 2.8)
   librato-metrics (~> 2.1.2)
   listen (~> 3.7)
@@ -569,4 +568,4 @@ DEPENDENCIES
   zoo_stream (~> 1.0.1)
 
 BUNDLED WITH
-   1.17.3
+   2.3.26
