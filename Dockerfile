@@ -7,15 +7,15 @@ RUN apt-get update && apt-get -y upgrade && \
         build-essential \
         # git is required for installing gems from git repos
         git \
-        # libjemalloc1 (v3) provides big memory savings vs jemalloc v5+ (default on debian buster)
-        libjemalloc1 \
+        # install jemalloc (v5) for memory savings
+        libjemalloc2 \
         libpq-dev \
         nodejs \
         tmpreaper \
         && \
         apt-get clean
 
-ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.1
+ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.2
 
 # set a default RAILS_ENV for the build scripts
 # this is required for the `rake assets:precompile` script
