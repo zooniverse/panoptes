@@ -10,15 +10,10 @@ The Panoptes public API is documented [here](http://docs.panoptes.apiary.io), us
 
 Since Panoptes uses Docker to manage its environment, the requirements listed below are also found in `docker-compose.yml`. The means by which a new Panoptes instance is created with Docker is located in the `Dockerfile`. If you plan on using Docker to manage Panoptes, skip ahead to Installation.
 
-Panoptes is primarily developed against stable MRI, currently 2.4. If you're running MRI Ruby you'll need to have the Postgresql client libraries installed as well as have [Postgresql](http://postgresql.org) version 9.4 running.
+Panoptes is primarily developed against stable MRI. If you're running MRI Ruby you'll need to have the Postgresql client libraries installed as well as have [Postgresql](http://postgresql.org) version 11 running.
 
 * Ubuntu/Debian: `apt-get install libpq-dev`
 * OS X (with [homebrew](http://homebrew.io)): `brew install postgresql`
-
-Optionally, you can also run the following:
-
-* [Cellect Server](https://github.com/zooniverse/Cellect) version > 0.1.0
-* [Redis](http://redis.io) version > 2.8.19
 
 ## Installation
 
@@ -26,11 +21,7 @@ We only support running Panoptes via Docker and Docker Compose. If you'd like to
 
 ### Setup Docker and Docker Compose
 
-* Docker
-  * [OS X](https://docs.docker.com/installation/mac/) - Docker Machine
-  * [Ubuntu](https://docs.docker.com/installation/ubuntulinux/) - Docker
-  * [Windows](http://docs.docker.com/installation/windows/) - Boot2Docker
-
+* [Docker](https://docs.docker.com/get-docker/)
 * [Docker Compose](https://docs.docker.com/compose/)
 
 #### Usage
@@ -180,10 +171,10 @@ Thanks a bunch for wanting to help Zooniverse. Here are few quick guidelines to 
 0. Submit a Pull Request
 0. Wait for feedback or a merge!
 
-Your Pull Request will run on [travis-ci](https://travis-ci.org/zooniverse/Panoptes), and we'll probably wait for it to pass on MRI Ruby 2.4. For more information, [see the wiki](https://github.com/zooniverse/Panoptes/wiki/Contributing-to-Panoptes).
+Your Pull Request will run on via github actions. For more information, [see the wiki](https://github.com/zooniverse/Panoptes/wiki/Contributing-to-Panoptes).
 
 ## License
 
-Copyright 2014-2018 by the Zooniverse
+Copyright by the Zooniverse
 
 Distributed under the Apache Public License v2. See LICENSE
