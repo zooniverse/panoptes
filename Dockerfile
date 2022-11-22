@@ -15,6 +15,10 @@ RUN apt-get update && apt-get -y upgrade && \
         && \
         apt-get clean
 
+# configure jemalloc v5 with v3 behaviours (trade ram usage over performance)
+# https://twitter.com/nateberkopec/status/1442894624935137288
+# https://github.com/code-dot-org/code-dot-org/blob/5c8b24674d1c2f7e51e85dd32124e113dc423d84/cookbooks/cdo-jemalloc/attributes/default.rb#L10
+ENV MALLOC_CONF="narenas:2,background_thread:true,thp:never,dirty_decay_ms:1000,muzzy_decay_ms:0"
 ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.2
 
 # set a default RAILS_ENV for the build scripts
