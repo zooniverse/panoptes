@@ -1,4 +1,4 @@
-FROM ruby:2.6-slim-buster
+FROM ruby:2.7-slim-buster
 
 WORKDIR /rails_app
 
@@ -8,14 +8,18 @@ RUN apt-get update && apt-get -y upgrade && \
       # git is required for installing gems from git repos
       git \
       libpq-dev \
-      # debian buster has v11 by default
+      # debian buster and comes with pg client v11 by default
       postgresql-client-11 \
       tmpreaper
+
+# set MRI memory allocator to mimic jemalloc memory savings
+ENV MALLOC_ARENA_MAX=2
 
 ADD ./Gemfile /rails_app/
 ADD ./Gemfile.lock /rails_app/
 
 RUN bundle config --global jobs `cat /proc/cpuinfo | grep processor | wc -l | xargs -I % expr % - 1`
+RUN gem update --system
 RUN bundle install
 
 ADD ./ /rails_app
