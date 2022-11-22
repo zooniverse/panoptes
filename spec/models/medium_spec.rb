@@ -44,7 +44,7 @@ RSpec.describe Medium, :type => :model do
         end
       end
 
-      it 'does not allow invalid non-whitelisted content_types' do
+      it 'does not allow invalid non-allowlisted content_types' do
         aggregate_failures 'content types' do
           limited_list_of_unallowed_mime_types = %w[
             text/html
