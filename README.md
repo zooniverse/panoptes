@@ -171,7 +171,7 @@ Thanks a bunch for wanting to help Zooniverse. Here are few quick guidelines to 
 0. Submit a Pull Request
 0. Wait for feedback or a merge!
 
-Your Pull Request will run on via github actions. For more information, [see the wiki](https://github.com/zooniverse/Panoptes/wiki/Contributing-to-Panoptes).
+Your Pull Request will run via github actions.
 
 ## License
 
