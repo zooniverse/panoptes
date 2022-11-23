@@ -12,6 +12,9 @@ RUN apt-get update && apt-get -y upgrade && \
     && \
     apt-get clean
 
+# set MRI memory allocator to mimic jemalloc memory savings
+ENV MALLOC_ARENA_MAX=2
+
 # set a default RAILS_ENV for the build scripts
 # this is required for the `rake assets:precompile` script
 # to write assets to target dir set in `config.assets.prefix`
