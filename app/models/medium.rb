@@ -107,7 +107,7 @@ class Medium < ApplicationRecord
   end
 
   def validate_export_medium
-    errors.add(:content_type, "Content-Type must be one of #{ALLOWED_EXPORT_CONTENT_TYPES.join(", ")}") if !ALLOWED_EXPORT_CONTENT_TYPES.include?(content_type)
+    errors.add(:content_type, "Content-Type for exports must be one of #{ALLOWED_EXPORT_CONTENT_TYPES.join(", ")}") unless ALLOWED_EXPORT_CONTENT_TYPES.include?(content_type)
   end
 
   private
