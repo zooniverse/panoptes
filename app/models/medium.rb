@@ -12,15 +12,9 @@ class Medium < ApplicationRecord
   before_destroy :queue_medium_removal, unless: :external_link
 
   ALLOWED_EXPORT_CONTENT_TYPES = %w(text/csv).freeze
-  ALLOWED_CONTENT_TYPES = /jp(e)?g|gif|png|ico|txt|mp(3|4)|webm|og(a|g|m|v|x)|spx|opus|pdf|ttf|tar|gz|tgz|bz2|tbz2|zip|csv|mp(e)?g|svg|plain|m4(a|b)|json/
-  EXPORT_MEDIUM_TYPE_REGEX = /\A(project|workflow)_[a-z_]+_export\z/i
+  BLOCKED_CONTENT_TYPES = %r{html|javascript|css|spx|opus|ttf|tar|gz|tgz|bz2|tbz2|zip}
 
-  validate do |medium|
-    export_medium = medium.type.match?(EXPORT_MEDIUM_TYPE_REGEX)
-    if export_medium && !ALLOWED_EXPORT_CONTENT_TYPES.include?(medium.content_type)
-      medium.errors.add(:content_type, "Content-Type must be one of #{ALLOWED_EXPORT_CONTENT_TYPES.join(", ")}")
-    end
-  end
+  EXPORT_MEDIUM_TYPE_REGEX = /\A(project|workflow)_[a-z_]+_export\z/i
 
   validate :validate_content_type
 
@@ -106,7 +100,14 @@ class Medium < ApplicationRecord
   end
 
   def validate_content_type
-    errors.add(:content_type, 'Invalid file type') unless ALLOWED_CONTENT_TYPES.match?(content_type)
+    errors.add(:content_type, 'Invalid file type') if BLOCKED_CONTENT_TYPES.match?(content_type)
+
+    export_medium = type.match?(EXPORT_MEDIUM_TYPE_REGEX)
+    validate_export_medium if export_medium
+  end
+
+  def validate_export_medium
+    errors.add(:content_type, "Content-Type must be one of #{ALLOWED_EXPORT_CONTENT_TYPES.join(", ")}") if !ALLOWED_EXPORT_CONTENT_TYPES.include?(content_type)
   end
 
   private

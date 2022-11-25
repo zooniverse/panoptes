@@ -20,7 +20,7 @@ RSpec.describe Medium, :type => :model do
     end
 
     context 'when non-export medium types' do
-      it 'should be valid with allowed content_types' do
+      it 'is valid with allowed content_types' do
         aggregate_failures 'content types' do
           limited_list_of_allowed_mime_types = %w(
             image/jpeg
@@ -50,6 +50,7 @@ RSpec.describe Medium, :type => :model do
             text/html
             text/css
             application/javascript
+            test/html-json
           ]
           limited_list_of_unallowed_mime_types.each do |content_type|
             m = build(:medium, content_type: content_type)
