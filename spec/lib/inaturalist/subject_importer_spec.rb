@@ -105,49 +105,4 @@ describe Inaturalist::SubjectImporter do
       end
     end
   end
-
-    # context 'when a record fails to save!' do
-    #   let(:subject_double) { Subject.new }
-
-    #   before do
-    #     allow(subject_double).to receive(:save!).and_raise(ActiveRecord::RecordInvalid, subject_double)
-    #     allow(importer).to receive(:find_or_initialize_subject).and_return(subject_double)
-    #   end
-
-    #   it 'raises a relevant error' do
-    #     expect { importer.import(obs) }.to raise_error(Inaturalist::SubjectImporter::FailedImport)
-    #   end
-    # end
-
-    # context 'when a required record does not exist' do
-    #   it 'requires a valid user id' do
-    #     expect { described_class.new(1234, subject_set.id) }.to raise_error(ActiveRecord::RecordNotFound)
-    #   end
-
-    #   it 'requires a valid subject_set id' do
-    #     expect { described_class.new(subject_set.project.owner.id, 999999) }.to raise_error(ActiveRecord::RecordNotFound)
-    #   end
-    # end
-
-    # context 'when an upsert is required' do
-    #   before do
-    #     # First import is in before block, override with new metadata
-    #     allow(obs).to receive(:metadata).and_return({ 'completely' => 'different' })
-    #     # Reimport with new metadata
-    #     @same_subject = importer.import(obs)
-    #   end
-
-    #   it 'finds the existing subject' do
-    #     expect(@new_subject.id).to eq(@same_subject.id)
-    #   end
-
-    #   it 'updates the metadata' do
-    #     expect(@same_subject.metadata).to eq({ 'completely' => 'different' })
-    #   end
-
-    #   it 'does not duplicate existing locations' do
-    #     expect(@same_subject.locations.count).to eq(2)
-    #   end
-    # end
-  # end
 end
