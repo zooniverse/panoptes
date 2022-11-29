@@ -33,7 +33,7 @@ describe Inaturalist::SubjectImporter do
       end
 
       it 'sets src correctly' do
-        expect(new_subject.locations.map { |l| {'image/jpeg' => l.src} }).to eq(locations)
+        expect(new_subject.locations.map { |l| {'image/jpeg' => l.src} } ).to eq(locations)
       end
     end
 

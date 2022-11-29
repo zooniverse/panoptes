@@ -23,7 +23,7 @@ module Inaturalist
     end
 
     def import_subjects(subjects_to_import)
-      Subject.import subjects_to_import, on_duplicate_key_update: [:metadata, :updated_at]
+      Subject.import subjects_to_import, on_duplicate_key_update: %i[metadata updated_at]
     end
 
     def import_smses(smses_to_import)
