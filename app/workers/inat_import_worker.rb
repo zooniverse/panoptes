@@ -7,10 +7,6 @@ class InatImportWorker
   sidekiq_options retry: 0, queue: :dumpworker
   sidekiq_options lock: :until_and_while_executing
 
-  def self.import_batch_size
-    ENV.fetch('INAT_IMPORT_BATCH_SIZE', 200)
-  end
-
   def perform(user_id, taxon_id, subject_set_id, updated_since=nil)
     @inat = Inaturalist::ApiInterface.new(taxon_id: taxon_id, updated_since: updated_since)
     @importer = Inaturalist::SubjectImporter.new(user_id, subject_set_id)
@@ -39,6 +35,10 @@ class InatImportWorker
 
     # notify the user about the import success / failure
     InatImportCompletedMailerWorker.perform_async(ss_import.id)
+  end
+
+  def import_batch_size
+    ENV.fetch('INAT_IMPORT_BATCH_SIZE', 200)
   end
 
   def process_batch?(index)
