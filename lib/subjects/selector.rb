@@ -96,9 +96,7 @@ module Subjects
       end
 
       data_available = !subject_ids.empty?
-      if data_available && Panoptes.flipper[:selector_sync_error_reload].enabled?
-        NotifySubjectSelectorOfChangeWorker.perform_async(workflow.id)
-      end
+      NotifySubjectSelectorOfChangeWorker.perform_async(workflow.id) if data_available && Flipper.enabled?(:selector_sync_error_reload)
 
       subject_ids
     end

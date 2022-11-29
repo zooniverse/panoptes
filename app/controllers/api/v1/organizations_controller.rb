@@ -6,7 +6,6 @@ class Api::V1::OrganizationsController < Api::ApiController
   include FilterByTags
   include AdminAllowed
   include Slug
-  include MediumResponse
   include SyncResourceTranslationStrings
 
   require_authentication :update, :create, :destroy, scopes: [:organization]
@@ -20,9 +19,9 @@ class Api::V1::OrganizationsController < Api::ApiController
 
   def create
     @created_resources = Organization.transaction(requires_new: true) do
-      Array.wrap(create_params).map do |organization_params|
+      Array.wrap(create_params.to_h).map do |organization_params|
         operation = Organizations::Create.with(api_user: api_user)
-        operation.run!(schema_create_params: organization_params)
+        operation.run!(schema_create_params: organization_params.to_h)
       end
     end
 
@@ -31,7 +30,7 @@ class Api::V1::OrganizationsController < Api::ApiController
 
   def update
     @updated_resources = Organization.transaction(requires_new: true) do
-      Array.wrap(resource_ids).zip(Array.wrap(update_params)).map do |organization_id, organization_params|
+      Array.wrap(resource_ids).zip(Array.wrap(update_params.to_h)).map do |organization_id, organization_params|
         update_operation = Organizations::Update.with(api_user: api_user, id: organization_id)
         update_operation.run!(schema_update_params: organization_params)
       end

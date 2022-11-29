@@ -6,7 +6,7 @@ class ClassificationCountWorker
   def perform(subject_id, workflow_id, was_update=false)
     workflow = Workflow.eager_load(:project).find_without_json_attrs(workflow_id)
 
-    if workflow.project.live && Panoptes.flipper["classification_counters"].enabled?
+    if workflow.project.live && Flipper.enabled?(:classification_counters)
       count = nil
 
       Workflow.transaction do

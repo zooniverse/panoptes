@@ -8,14 +8,17 @@ require File.expand_path("../../config/environment", __FILE__)
 require "rspec/rails"
 require "sidekiq/testing"
 require 'flipper/adapters/memory'
+require 'webmock/rspec'
 
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
 ActiveRecord::Migration.maintain_test_schema!
 
+RSpec::Matchers.define_negated_matcher :not_change, :change
+
 RSpec.configure do |config|
   config.include FactoryBot::Syntax::Methods
-  config.include Devise::TestHelpers, type: :controller
+  config.include Devise::Test::ControllerHelpers, type: :controller
   config.include APIRequestHelpers, type: :controller
   config.include APIResponseHelpers, type: :controller
   config.include APIRequestHelpers, type: :request
@@ -36,9 +39,6 @@ RSpec.configure do |config|
 
   # disable standby reads to deal with testing transaction isolation
   Standby.disabled = true
-
-  # work around https://github.com/celluloid/celluloid/issues/696
-  Celluloid.shutdown_timeout = 1
 
   MOCK_REDIS ||= MockRedis.new
 

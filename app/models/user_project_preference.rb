@@ -1,4 +1,6 @@
-class UserProjectPreference < ActiveRecord::Base
+# frozen_string_literal: true
+
+class UserProjectPreference < ApplicationRecord
   include Preferences
 
   preferences_for :project

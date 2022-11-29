@@ -7,8 +7,7 @@ class Api::V1::ProjectsController < Api::ApiController
   include FilterByTags
   include AdminAllowed
   include Slug
-  include MediumResponse
-
+  include ExportMediumResponse
   require_authentication :update, :create, :destroy, :create_classifications_export,
     :create_subjects_export, :create_workflows_export, :create_workflow_contents_export, :copy,
     scopes: [:project]
@@ -66,17 +65,17 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def create_classifications_export
     medium = CreateClassificationsExport.with( api_user: api_user, object: controlled_resource ).run!(params)
-    medium_response(medium)
+    export_medium_response(medium)
   end
 
   def create_subjects_export
     medium = Projects::CreateSubjectsExport.with(api_user: api_user, object: controlled_resource).run!(params)
-    medium_response(medium)
+    export_medium_response(medium)
   end
 
   def create_workflows_export
     medium = Projects::CreateWorkflowsExport.with(api_user: api_user, object: controlled_resource).run!(params)
-    medium_response(medium)
+    export_medium_response(medium)
   end
 
   def create_workflow_contents_export
@@ -88,12 +87,30 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def copy
-    if project.configuration["template"] && !project.live
-      ProjectCopyWorker.perform_async(project.id, api_user.id)
-      head :accepted
-    else
-      head :method_not_allowed
+    # check we are copying a template project
+    template_project_to_copy = project.configuration.key?('template') && !project.live
+    unless template_project_to_copy
+      raise(
+        Api::MethodNotAllowed,
+        "Project with id #{project.id} can not be copied, the project must not be 'live' and the configuration json must have the 'template' attribute set"
+      )
     end
+
+    operations_params = params.to_unsafe_h.slice(:create_subject_set).merge(project: project)
+    copied_project = Projects::Copy.with(api_user: api_user).run!(operations_params)
+
+    created_resource_response(copied_project)
+  end
+
+  # ensure we avoid clobbering the workflow relations on a project via the
+  # relation manager when the workflow id is not in the array form, i.e. is singular
+  def update_links
+    # using an array form param ensures we use the concat form of relation adding vs overwriting the relation
+    # this is important for the project -> workflow relation
+    # as we never want to unlink a workflow when handling project links
+    # instead force the clients to explicitly delete workflows from the project
+    params[:workflows] = Array.wrap(params[:workflows])
+    super
   end
 
   private
@@ -107,9 +124,8 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def admin_allowed_params
-    [ :beta_approved, :launch_approved, :redirect,
-      :launched_row_order_position, :beta_row_order_position,
-      :experimental_tools, :featured ]
+    %i[ beta_approved launch_approved redirect launched_row_order_position
+        beta_row_order_position experimental_tools featured run_subject_set_completion_events ]
   end
 
   def build_resource_for_create(create_params)

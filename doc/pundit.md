@@ -58,7 +58,7 @@ controller actions suffixed with a question mark. The controller can then call
 *Note*: We don't currently use this. Nearly all actions will not be able to find
 any resource that the user isn't allowed to act upon. A good example of something
 that could use this would be `ProjectsController#create_classifications_export`
-which has this as a `before_filter`:
+which has this as a `before_action`:
 
 https://github.com/zooniverse/Panoptes/blob/fddc6e38dd4d1d61f3b767b2b3904d5496286a8a/app/controllers/api/v1/projects_controller.rb#L187
 

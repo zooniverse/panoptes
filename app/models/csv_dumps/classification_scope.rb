@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module CsvDumps
   class ClassificationScope < DumpScope
     attr_reader :cache
@@ -32,9 +34,11 @@ module CsvDumps
     end
 
     def completed_resource_classifications
-      resource.classifications
+      resource
+        .classifications
         .complete
-        .joins(:workflow).where(workflows: {activated_state: "active"})
+        .joins(:workflow)
+        .where(workflows: { activated_state: 'active' })
         .includes(:user, :workflow)
     end
 

@@ -4,7 +4,7 @@ class ApplicationController < ActionController::Base
 
   protect_from_forgery with: :null_session
 
-  before_filter :configure_devise_permitted_parameters, if: :devise_controller?
+  before_action :configure_devise_permitted_parameters, if: :devise_controller?
 
   def unknown_route
     exception = ActionController::RoutingError.new("Not Found")

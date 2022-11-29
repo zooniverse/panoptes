@@ -30,4 +30,5 @@ module ApiErrors
       super("Feature has been temporarily disabled")
     end
   end
+  class MethodNotAllowed < PanoptesApiError; end
 end

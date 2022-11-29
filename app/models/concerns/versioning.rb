@@ -33,7 +33,7 @@ module Versioning
       raise ConfigurationError, "Must call `versioned` DSL method if you include the Versioned module"
     end
 
-    if (changes.keys & self.class.versioned_attributes).present?
+    if (saved_changes.keys & self.class.versioned_attributes).present?
       build_version.save!
     end
   end

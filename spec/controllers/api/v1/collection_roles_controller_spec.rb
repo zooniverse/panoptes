@@ -34,7 +34,7 @@ RSpec.describe Api::V1::CollectionRolesController, type: :controller do
 
     context "filter by user_id" do
       before(:each) do
-        get :index, user_id: authorized_user.id
+        get :index, params: { user_id: authorized_user.id }
       end
 
       it 'should only reutrn roles belonging to the user' do
@@ -87,7 +87,7 @@ RSpec.describe Api::V1::CollectionRolesController, type: :controller do
 
       before(:each) do
         default_request scopes: scopes, user_id: user.id
-        post :create, create_params
+        post :create, params: create_params
       end
 
       it 'should return an error code' do

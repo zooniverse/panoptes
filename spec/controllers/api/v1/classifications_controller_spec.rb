@@ -7,7 +7,7 @@ def metadata_values
     workflow_version: "1.1",
     user_language: 'en',
     user_agent: "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:30.0) Gecko/20100101 Firefox/30.0",
-    utc_offset: Time.now.utc_offset
+    utc_offset: Time.zone.now.utc_offset.to_s
   }
 end
 
@@ -41,7 +41,7 @@ def setup_create_request(project_id: project.id,
   when invalid_property
     params[:classifications].merge!(invalid_property => "a fake value")
   end
-  post :create, params
+  post :create, params: params
 end
 
 def create_gold_standard
@@ -88,13 +88,13 @@ describe Api::V1::ClassificationsController, type: :controller do
       end
 
       it "should return the requested amount" do
-        get :index, page_size: 50
+        get :index, params: { page_size: 50 }
         expect(response_page_size).to eq(50)
       end
 
       it "should return the max limit" do
         limit = Panoptes.max_page_size_limit
-        get :index, page_size: limit + 1
+        get :index, params: { page_size: limit + 1 }
         expect(response_page_size).to eq(limit)
       end
     end
@@ -144,14 +144,14 @@ describe Api::V1::ClassificationsController, type: :controller do
     end
 
     it 'should be filterable by subject_id' do
-      get :project, subject_id: classifications.first.subject_ids.first
+      get :project, params: { subject_id: classifications.first.subject_ids.first }
       expect(json_response['classifications'].first['id'].to_i)
         .to eq(classifications.first.id)
     end
 
     it 'should be filterable by a list of subject ids' do
       ids = classifications.map{|c| c.subject_ids.first}.join(',')
-      get :project, subject_id: ids
+      get :project, params: { subject_id: ids }
       expect(json_response['classifications'].map{|c| c['id'].to_i})
         .to match_array(classifications.map(&:id))
     end
@@ -161,14 +161,14 @@ describe Api::V1::ClassificationsController, type: :controller do
       let!(:second) { create(:classification, user: authorized_user, project: project) }
 
       it "does not include classifications prior to given id", :aggregate_failures do
-        get :project, last_id: first.id, project_id: project.id
+        get :project, params: { last_id: first.id, project_id: project.id }
         resources = json_response[api_resource_name]
         expect(resources.length).to eq 1
         expect(resources).not_to include Classification.first
       end
 
       it 'returns an error if project id is missing' do
-        get :project, last_id: first.id
+        get :project, params: { last_id: first.id }
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
@@ -198,7 +198,7 @@ describe Api::V1::ClassificationsController, type: :controller do
         another_gs
         another_gs_in_workflow
         default_request scopes: scopes, user_id: authorized_user.id
-        get :gold_standard, admin: true
+        get :gold_standard, params: { admin: true }
       end
 
       it 'should only return gold standard classifications', :aggregate_failures do
@@ -221,7 +221,7 @@ describe Api::V1::ClassificationsController, type: :controller do
 
       it 'should be filterable by a workflow id' do
         another_gs.workflow.update_column(:public_gold_standard, true)
-        get :gold_standard, workflow_id: gs.workflow_id
+        get :gold_standard, params: { workflow_id: gs.workflow_id }
         expect(filtered_ids).to match_array([gs.id])
       end
 
@@ -229,12 +229,12 @@ describe Api::V1::ClassificationsController, type: :controller do
         before(:each) { another_gs_in_workflow }
 
         it 'should be filterable by a subject id' do
-          get :gold_standard, subject_id: gs.subject_ids.first
+          get :gold_standard, params: { subject_id: gs.subject_ids.first }
           expect(filtered_ids).to match_array([gs.id])
         end
 
         it 'should be filterable by a list of subject ids' do
-          get :gold_standard, subject_ids: gs.subject_ids.join(',')
+          get :gold_standard, params: { subject_ids: gs.subject_ids.join(',') }
           expect(filtered_ids).to match_array([gs.id])
         end
       end
@@ -244,7 +244,7 @@ describe Api::V1::ClassificationsController, type: :controller do
 
       it "should return all the gold standard data for the supplied workflow" do
         another_gs_in_workflow
-        get :gold_standard, workflow_id: workflow.id
+        get :gold_standard, params: { workflow_id: workflow.id }
         expect(json_response[api_resource_name].length).to eq(2)
       end
 
@@ -252,7 +252,7 @@ describe Api::V1::ClassificationsController, type: :controller do
         let(:public_gold_standard) { false }
 
         it "should return an empty resource set" do
-          get :gold_standard, workflow_id: workflow.id
+          get :gold_standard, params: { workflow_id: workflow.id }
           expect(json_response[api_resource_name].length).to eq(0)
         end
       end
@@ -324,7 +324,7 @@ describe Api::V1::ClassificationsController, type: :controller do
       end
 
       context "when the lifecycle should be processed immediately" do
-        before { Panoptes.flipper[:classification_lifecycle_in_background].disable }
+        before { Flipper.disable(:classification_lifecycle_in_background) }
 
         it "does not queue the job" do
           expect(ClassificationLifecycle).to_not receive(:perform_async)
@@ -340,7 +340,7 @@ describe Api::V1::ClassificationsController, type: :controller do
 
     context "a non-logged in user" do
       before(:each) do
-        stub_content_filter
+        default_request scopes: scopes
       end
 
       it "should not set the user" do
@@ -360,7 +360,7 @@ describe Api::V1::ClassificationsController, type: :controller do
     context "when redis is unavailable" do
       [Redis::CannotConnectError, Redis::TimeoutError, Timeout::Error].each do |redis_error|
         it 'should not raise an error but still report it' do
-          stub_content_filter
+          default_request user_id: authorized_user.id, scopes: scopes
           allow(ClassificationLifecycle).to receive(:queue).and_raise(redis_error)
           expect(Honeybadger).to receive(:notify)
           expect do
@@ -392,7 +392,7 @@ describe Api::V1::ClassificationsController, type: :controller do
         expect(controller).to receive(:lifecycle).with(:update, resource)
         default_request scopes: scopes, user_id: authorized_user.id
         params = update_params.merge(id: resource.id)
-        put :update, params
+        put :update, params: params
       end
     end
 
@@ -400,7 +400,7 @@ describe Api::V1::ClassificationsController, type: :controller do
       it 'should return 403' do
         default_request scopes: scopes, user_id: authorized_user.id
         classification = create(:classification, user: authorized_user, completed: true)
-        put :update, id: classification.id
+        put :update, params: { id: classification.id }
         expect(response).to have_http_status(:forbidden)
       end
     end
@@ -421,7 +421,7 @@ describe Api::V1::ClassificationsController, type: :controller do
         classification = create(:classification,
                                 user: authorized_user,
                                 completed: true)
-        delete :destroy, id: classification.id
+        delete :destroy, params: { id: classification.id }
         expect(response).to have_http_status(:forbidden)
       end
     end

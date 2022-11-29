@@ -1,4 +1,6 @@
-class FieldGuide < ActiveRecord::Base
+# frozen_string_literal: true
+
+class FieldGuide < ApplicationRecord
   include Translatable
   include LanguageValidation
   include Versioning

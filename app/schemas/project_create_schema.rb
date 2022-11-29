@@ -109,6 +109,10 @@ class ProjectCreateSchema < JsonSchema
       end
     end
 
+    property 'run_subject_set_completion_events' do
+      type 'boolean'
+    end
+
     property "links" do
       type "object"
       additional_properties false

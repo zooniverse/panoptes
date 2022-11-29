@@ -6,10 +6,6 @@ shared_examples "restricted scopes" do
       req
       expect(response.status).to eq(200)
     end
-
-    it 'should render the approval page' do
-      expect(req).to render_template(:new)
-    end
   end
 
   context 'requesting greater scopes' do
@@ -21,10 +17,12 @@ shared_examples "restricted scopes" do
   end
 
   context 'requesting no scopes' do
-    it 'should create a page with the apps default scopes' do
+    it 'uses the apps default scopes' do
       params.delete('scope')
+      allow(app).to receive(:default_scope).and_call_original
+      allow(controller).to receive(:client).and_return(app)
       req
-      expect(assigns(:pre_auth).scopes).to eq(['public', 'project', 'classification'])
+      expect(app).to have_received(:default_scope).at_least(1).time
     end
   end
 end
@@ -45,21 +43,21 @@ describe AuthorizationsController, type: :controller do
     let!(:app) { create(:first_party_app, owner: owner) }
 
     it 'should skip authorization and redirect' do
-      get :new, token_params
+      get :new, params: token_params
       expect(response).to redirect_to(/\A#{params[:redirect_uri]}?access_token/)
     end
   end
 
-  context "an implicit grant by an insecure application" do
+  context 'with an insecure application using an implicit grant' do
     let!(:app) { create(:application, owner: owner) }
-    let(:req) { get :new, token_params }
+    let(:req) { get :new, params: token_params }
 
     it_behaves_like 'restricted scopes'
   end
 
   context "an authorization grant by a secure application" do
     let!(:app) { create(:secure_app, owner: owner) }
-    let(:req) { get :new, code_params }
+    let(:req) { get :new, params: code_params }
 
     it_behaves_like 'restricted scopes'
   end
@@ -68,7 +66,7 @@ describe AuthorizationsController, type: :controller do
     let!(:app) { create(:application, owner: owner) }
 
     it 'should return 422 unprocessable entity' do
-      get :new, code_params
+      get :new, params: code_params
       expect(response.status).to eq(422)
     end
   end

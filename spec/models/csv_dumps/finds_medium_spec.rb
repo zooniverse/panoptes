@@ -61,5 +61,18 @@ describe CsvDumps::FindsMedium do
       file_name = "#{name}-#{type}.#{ext}"
       expect(medium.content_disposition).to eq("attachment; filename=\"#{file_name}\"")
     end
+
+    context 'when the resource is a subject-set' do
+      let(:resource) { create :subject_set }
+
+      it 'should update the medium content_disposition' do
+        finder.medium
+        medium.reload
+        type = medium.type.match(/\Aproject_(\w+)_export\z/)[1]
+        ext = MIME::Types[medium.content_type].first.extensions.first
+        file_name = "#{resource.display_name.parameterize}-#{type}.#{ext}"
+        expect(medium.content_disposition).to eq("attachment; filename=\"#{file_name}\"")
+      end
+    end
   end
 end

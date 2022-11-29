@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # This class contains the historical gold standard classification annotations.
 # They have been ported to this table as a read only resource, as they are
 # used to provide accuracy feedback for users in specific Zooniverse
@@ -9,7 +11,7 @@
 #
 # Long term this can probably go, but please check that the projects have
 # been retired and don't need this data for the feedback mechanism.
-class GoldStandardAnnotation < ActiveRecord::Base
+class GoldStandardAnnotation < ApplicationRecord
   belongs_to :workflow
   belongs_to :subject
   belongs_to :project

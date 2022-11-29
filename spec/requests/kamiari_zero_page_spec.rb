@@ -11,7 +11,7 @@ describe 'kaminari zero page requests', type: :request do
   end
 
   before do
-    get "/api/users/#{user.id}", { page_size: 0 }, api_default_params
+    get "/api/users/#{user.id}", params: { page_size: 0 }, headers: api_default_params
   end
 
   it 'returns the 422 error code' do

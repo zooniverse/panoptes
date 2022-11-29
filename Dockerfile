@@ -1,22 +1,25 @@
-# debian stretch has libjemalloc1 https://packages.debian.org/stretch/libjemalloc1
-FROM ruby:2.5-slim-stretch
+FROM ruby:2.7-slim
 
 WORKDIR /rails_app
 
-RUN rm -f /etc/apt/apt.conf.d/docker-clean; echo 'Binary::apt::APT::Keep-Downloaded-Packages "true";' > /etc/apt/apt.conf.d/keep-cache
-RUN --mount=type=cache,id=panoptes-apt-cache,target=/var/cache/apt --mount=type=cache,id=panoptes-apt-lib,target=/var/lib/apt \
-    apt-get update && apt-get -y upgrade && \
+RUN apt-get update && apt-get -y upgrade && \
     apt-get install --no-install-recommends -y \
         build-essential \
         # git is required for installing gems from git repos
         git \
-        # libjemalloc1 (v3) provides big memory savings vs jemalloc v5+ (default on debian buster)
-        libjemalloc1 \
+        # install jemalloc (v5) for memory savings
+        libjemalloc2 \
         libpq-dev \
         nodejs \
-        tmpreaper
+        tmpreaper \
+        && \
+        apt-get clean
 
-ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.1
+# configure jemalloc v5 with v3 behaviours (trade ram usage over performance)
+# https://twitter.com/nateberkopec/status/1442894624935137288
+# https://github.com/code-dot-org/code-dot-org/blob/5c8b24674d1c2f7e51e85dd32124e113dc423d84/cookbooks/cdo-jemalloc/attributes/default.rb#L10
+ENV MALLOC_CONF="narenas:2,background_thread:true,thp:never,dirty_decay_ms:1000,muzzy_decay_ms:0"
+ENV LD_PRELOAD=/usr/lib/x86_64-linux-gnu/libjemalloc.so.2
 
 # set a default RAILS_ENV for the build scripts
 # this is required for the `rake assets:precompile` script
@@ -28,7 +31,8 @@ ADD ./Gemfile /rails_app/
 ADD ./Gemfile.lock /rails_app/
 
 RUN bundle config --global jobs `cat /proc/cpuinfo | grep processor | wc -l | xargs -I % expr % - 1`
-RUN --mount=type=cache,id=panoptes-gems,target=/usr/local/bundle/cache bundle install --without development test
+RUN gem update --system
+RUN bundle install --without development test
 
 ADD ./ /rails_app
 

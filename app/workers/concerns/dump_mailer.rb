@@ -12,7 +12,7 @@ class DumpMailer
 
     mailer.perform_async(
       resource.id,
-      resource.class.to_s.downcase,
+      resource.model_name.singular,
       lab_export_url,
       emails
     )
@@ -23,29 +23,25 @@ class DumpMailer
   end
 
   def emails
-    metadata = medium&.metadata
-    if recipients = metadata&.dig("recipients")
-      User.where(id: recipients).pluck(:email)
-    else
-      resource_comms_emails
-    end
+    metadata = medium.metadata || {}
+    recipients = metadata['recipients']
+    # fallback to project communication emails if receipients are not set or empty
+    return resource.communication_emails if recipients.blank?
+
+    # find the specified recipient emails
+    User.where(id: recipients).pluck(:email)
   end
 
   def lab_export_url
-    # resources from export operations are projects but may not be
-    project_id =
-      if resource.is_a?(Workflow)
-        resource.project_id
-      else
-        resource.id
-      end
+    # lab urls should be identified by the project
+    project_id = resource.id
+    # use the SubjectSet | Workflow project id in the URL
+    project_id = resource.project_id if resource.respond_to?(:project_id)
 
-    "#{Panoptes.frontend_url}/lab/#{project_id}/data-exports"
-  end
+    suffix = ''
+    # add the unique ID for Subject Set specific suffix exports page behaviours
+    suffix = "?subject-sets=#{resource.id}" if resource.is_a?(SubjectSet)
 
-  private
-
-  def resource_comms_emails
-    resource.communication_emails
+    "#{Panoptes.frontend_url}/lab/#{project_id}/data-exports#{suffix}"
   end
 end

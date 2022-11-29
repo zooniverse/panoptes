@@ -36,10 +36,15 @@ Rails/SkipsModelValidations:
   AllowedMethods:
   - update_all
   - update_column
+  - update_columns
   - touch
 
 RSpec/MultipleMemoizedHelpers:
   Enabled: false
+RSpec/NestedGroups:
+  Max: 7
+RSpec/ExampleLength:
+  Max: 10
 
 Style/NumericLiterals:
   Enabled: false

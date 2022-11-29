@@ -6,7 +6,7 @@ class Api::V1::ClassificationsController < Api::ApiController
   class MissingParameter < StandardError; end
 
 
-  skip_before_filter :require_login, only: :create
+  skip_before_action :require_login, only: :create
   require_authentication :show, :index, :destroy, :update, :incomplete, :project,
     scopes: [:classification]
 
@@ -103,7 +103,7 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def lifecycle(action, classification)
-    if Panoptes.flipper[:classification_lifecycle_in_background].enabled?
+    if Flipper.enabled?(:classification_lifecycle_in_background)
       ClassificationLifecycle.queue(classification, action)
     else
       ClassificationLifecycle.perform(classification, action.to_s)

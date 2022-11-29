@@ -10,7 +10,8 @@ class ProjectSerializer
     :configuration, :live, :urls, :migrated, :classifiers_count, :slug, :redirect,
     :beta_requested, :beta_approved, :launch_requested, :launch_approved, :launch_date,
     :href, :workflow_description, :primary_language, :tags, :experimental_tools,
-    :completeness, :activity, :state, :researcher_quote, :mobile_friendly, :featured
+    :completeness, :activity, :state, :researcher_quote, :mobile_friendly, :featured,
+    :run_subject_set_completion_events
 
   optional :avatar_src
   can_include :workflows, :active_workflows, :subject_sets, :owners,

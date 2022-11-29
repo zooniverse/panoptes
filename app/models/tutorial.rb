@@ -1,4 +1,6 @@
-class Tutorial < ActiveRecord::Base
+# frozen_string_literal: true
+
+class Tutorial < ApplicationRecord
   include Translatable
   include Versioning
 

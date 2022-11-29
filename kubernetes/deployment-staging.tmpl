@@ -75,16 +75,17 @@ data:
   ZOO_STREAM_SOURCE: panoptes
   CELLECT_HOST: http://cellect-staging-app/
   CORS_ORIGINS_REGEX: '^https?:\/\/([a-z0-9-]+\.zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$'
+  CORS_ORIGINS_REJECT_HOSTS: 'panoptes-uploads.zooniverse.org,panoptes-uploads-staging.zooniverse.org'
   DESIGNATOR_API_HOST: http://designator-staging-app/
   DESIGNATOR_API_USERNAME: staging
   DUMP_CONGESTION_OPTS_INTERVAL: "60"
   DUMP_CONGESTION_OPTS_MIN_DELAY: "60"
   DUMP_WORKER_SIDEKIQ_QUEUE: dumpworker
   EMAIL_EXPORT_S3_BUCKET: zooniverse-exports
-  EVENTS_API_USERNAME: staging_api
   REDIRECTS_BASE: https://master.pfe-preview.zooniverse.org
   REDIRECTS_PASSWORD_RESET: /#/reset-password
   REDIRECTS_UNSUBSCRIBE: /#/unsubscribe
+  KINESIS_PAYLOAD_SIZE_ERROR_PROJECT_ID_INGORE_LIST: '1873'
   MAILER_ADDRESS: email-smtp.us-east-1.amazonaws.com
   MAILER_DOMAIN: zooniverse.org
   MEMCACHE_SERVERS: 'panoptes-staging-memcached:11211'
@@ -100,7 +101,7 @@ data:
   STORAGE_BUCKET: zooniverse-static
   STORAGE_PREFIX: panoptes-uploads.zooniverse.org/staging/
   SUBJECT_GROUP_UPLOADER_ID: '1'
-  SUBJECT_GROUP_WORKFLOW_ID_ALLOWLIST: '3451,3402,3412,3456'
+  SUBJECT_SET_IMPORT_MANIFEST_ROW_LIMIT: '100'
   AZURE_STORAGE_ACCOUNT: panoptesuploadsstaging
   AZURE_STORAGE_CONTAINER_PUBLIC: public
   AZURE_STORAGE_CONTAINER_PRIVATE: private
@@ -126,7 +127,7 @@ spec:
     spec:
       containers:
         - name: panoptes-staging-app
-          image: zooniverse/panoptes:__IMAGE_TAG__
+          image: ghcr.io/zooniverse/panoptes:__IMAGE_TAG__
           resources:
             requests:
               memory: "500Mi"
@@ -185,7 +186,7 @@ spec:
               exec:
                 command: ["/bin/bash", "-c", "cp -R /rails_app/public/* /static-assets"]
         - name: panoptes-staging-nginx
-          image: zooniverse/nginx:1.19.0
+          image: zooniverse/nginx
           resources:
             requests:
               memory: "25Mi"
@@ -283,7 +284,7 @@ spec:
     spec:
       containers:
         - name: panoptes-staging-sidekiq
-          image: zooniverse/panoptes:__IMAGE_TAG__
+          image: ghcr.io/zooniverse/panoptes:__IMAGE_TAG__
           resources:
             requests:
               memory: "500Mi"
@@ -300,6 +301,8 @@ spec:
           env:
           - name: SIDEKIQ_ARGS
             value: '-q dumpworker -q really_high -q high -q data_high -q data_medium -q default -q data_low'
+          - name: NEW_RELIC_APPLICATION_LOGGING_ENABLED
+            value: 'false'
           envFrom:
           - secretRef:
               name: panoptes-common-env-vars
@@ -340,7 +343,7 @@ spec:
     spec:
       containers:
         - name: panoptes-staging-sidekiq
-          image: zooniverse/panoptes:__IMAGE_TAG__
+          image: ghcr.io/zooniverse/panoptes:__IMAGE_TAG__
           resources:
             requests:
               memory: "500Mi"
@@ -354,6 +357,9 @@ spec:
                 - /rails_app/scripts/docker/sidekiq_status
             initialDelaySeconds: 20
           args: ["/rails_app/scripts/docker/start-sidekiq.sh"]
+          env:
+          - name: NEW_RELIC_APPLICATION_LOGGING_ENABLED
+            value: 'false'
           envFrom:
           - secretRef:
               name: panoptes-common-env-vars
@@ -532,15 +538,15 @@ spec:
       targetPort: 11211
   type: NodePort
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: panoptes-staging-ingress
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
     nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
+    nginx.ingress.kubernetes.io/proxy-body-size: 20m
     nginx.ingress.kubernetes.io/set-real-ip-from: "10.0.0.0/8"
 spec:
   tls:
@@ -551,10 +557,13 @@ spec:
   - host: panoptes-staging.zooniverse.org
     http:
       paths:
-      - backend:
-          serviceName: panoptes-staging-app
-          servicePort: 80
-        path: /(.*)
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: panoptes-staging-app
+            port:
+              number: 80
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate

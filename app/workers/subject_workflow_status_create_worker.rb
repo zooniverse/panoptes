@@ -2,7 +2,7 @@ class SubjectWorkflowStatusCreateWorker
   include Sidekiq::Worker
 
   def perform(subject_id, workflow_id)
-    return unless Panoptes.flipper[:subject_workflow_status_create_worker].enabled?
+    return unless Flipper.enabled?(:subject_workflow_status_create_worker)
 
     if SetMemberSubject.by_subject_workflow(subject_id, workflow_id).exists?
       SubjectWorkflowStatus.create!(

@@ -22,18 +22,20 @@ module Subjects
 
     def available
       query = Subjects::SetMemberSubjectSelector.new(workflow, user).set_member_subjects
-      subject_set_ids = if workflow.grouped
-                            # respect the user if they want to select from a training set
-                            opts[:subject_set_id]
-                          else
-                            # default mode: do not select from training sets
-                            workflow.non_training_subject_sets.pluck(:id)
-                          end
-      query.where(subject_set_id: subject_set_ids)
+      # use a rewhere in case we've applied this clause before
+      query.rewhere(subject_set_id: subject_set_ids)
     end
 
     def limit
       opts.fetch(:limit, 20).to_i
+    end
+
+    def subject_set_ids
+      # respect the user if they want to select from a training set
+      return Array.wrap(opts[:subject_set_id]) if workflow.grouped
+
+      # default mode: do not select from training sets
+      workflow.non_training_subject_sets.pluck(:id)
     end
   end
 end

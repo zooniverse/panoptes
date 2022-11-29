@@ -8,6 +8,8 @@ require "action_view/railtie"
 require "sprockets/railtie"
 require 'flipper/middleware/memoizer'
 require_relative 'cache_store'
+require_relative '../app/middleware/reject_patch_requests'
+require_relative '../app/middleware/catch_api_json_parse_errors'
 
 Bundler.require(*Rails.groups)
 
@@ -23,9 +25,9 @@ module Panoptes
     config.eager_load_paths += Dir[Rails.root.join('lib', '**/')]
 
     config.action_dispatch.perform_deep_munge = false
-    config.middleware.insert_before ActionDispatch::Cookies, "RejectPatchRequests"
+    config.middleware.insert_before ActionDispatch::Cookies, RejectPatchRequests
     config.action_controller.action_on_unpermitted_parameters = :raise
-    config.middleware.insert_before ActionDispatch::Cookies, "CatchApiJsonParseErrors"
+    config.middleware.insert_before ActionDispatch::Cookies, CatchApiJsonParseErrors
 
     config.active_record.schema_format = :sql
 
@@ -43,13 +45,16 @@ module Panoptes
       end
     end
 
-    config.middleware.use Flipper::Middleware::SetupEnv, -> { Panoptes.flipper }
-    config.middleware.use Flipper::Middleware::Memoizer
-
     if Panoptes::Cache.enabled?
-      # use ENV MEMCACHE_SERVERS var to configure the servers
-      # https://github.com/petergoldstein/dalli#usage-with-rails-3x-and-4x
-      config.cache_store = :dalli_store, nil, Panoptes::Cache.options
+      if (_rails4 = Gem::Version.new(Rails.version) < Gem::Version.new('5.0'))
+        # use ENV MEMCACHE_SERVERS var to configure the servers
+        # https://github.com/petergoldstein/dalli#usage-with-rails-3x-and-4x
+        config.cache_store = :dalli_store, nil, Panoptes::Cache.options
+      else
+        # Rails 5 configuration of memcache and dalli
+        # https://github.com/petergoldstein/dalli/wiki/Using-Dalli-with-Rails#cache-store
+        config.cache_store = :mem_cache_store, Panoptes::Cache.servers, Panoptes::Cache.options
+      end
     end
   end
 end

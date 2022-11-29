@@ -20,10 +20,10 @@ Rails.application.configure do
   # config.action_dispatch.rack_cache = true
 
   # Disable Rails's static asset server (Apache or nginx will already do this).
-  config.serve_static_files = false
+  config.public_file_server.enabled = false
 
   # Compress JavaScripts and CSS.
-  config.assets.js_compressor = Uglifier.new(harmony: true)
+  config.assets.js_compressor = Uglifier.new(harmony: true, mangle: false)
   # config.assets.css_compressor = :sass
 
   # use a non-default path to provide unique paths for use behind CDNs
@@ -99,12 +99,13 @@ Rails.application.configure do
   # Do not dump schema after migrations.
   config.active_record.dump_schema_after_migration = false
 
-  # Enable the logstasher logs for the current environment
-  config.logstasher.enabled = true
-  # Enable logging of controller params
-  config.logstasher.log_controller_parameters = true
-  # log to stdout
-  config.logstasher.logger = Logger.new(STDOUT)
-  # turn off rails logs
-  config.logstasher.suppress_app_log = true
+  # lograge configs for new relic
+  config.lograge.enabled = true
+  # don't log to the original rails log file
+  config.lograge.keep_original_rails_log = false
+  # use the new relic logger and formatter to ensure we have log in NR
+  config.lograge.logger = ::NewRelic::Agent::Logging::DecoratingLogger.new(
+    $stdout,
+    formatter: ::NewRelic::Agent::Logging::DecoratingFormatter.new
+  )
 end

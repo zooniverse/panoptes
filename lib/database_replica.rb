@@ -1,6 +1,6 @@
 class DatabaseReplica
   def self.read(feature_flag_key)
-    if Panoptes.flipper.enabled?(feature_flag_key)
+    if Flipper.enabled?(feature_flag_key)
       # read via the replica settings using Standby gem
       Standby.on_standby { yield }
     else
@@ -12,7 +12,7 @@ class DatabaseReplica
   # allow dump workers to have unlimited query time to fetch data
   # and ensure we reset the connection timeout back to default after query
   def self.read_without_timeout(feature_flag_key, &block)
-    if Panoptes.flipper.enabled?(feature_flag_key)
+    if Flipper.enabled?(feature_flag_key)
       # read via the replica settings using Standby gem
       Standby.on_standby do
         execute_without_timeout(&block)

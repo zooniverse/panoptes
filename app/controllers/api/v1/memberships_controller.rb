@@ -1,7 +1,7 @@
 class Api::V1::MembershipsController < Api::ApiController
   include JsonApiController::PunditPolicy
 
-  before_filter :require_login
+  before_action :require_login
   require_authentication :all, scopes: [:group]
   resource_actions :index, :show, :create, :update, :deactivate
   schema_type :strong_params

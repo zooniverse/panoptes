@@ -1,0 +1,135 @@
+{
+    "source": "panoptes",
+    "type": "classification",
+    "version": "1.0.0",
+    "timestamp": "2022-09-12T19:51:17Z",
+    "data": {
+        "id": "110709",
+        "created_at": "2022-09-12T19:51:17.680Z",
+        "updated_at": "2022-09-12T19:51:17.755Z",
+        "user_ip": "12.157.174.6",
+        "workflow_version": "4.8",
+        "gold_standard": null,
+        "expert_classifier": null,
+        "annotations": [
+            {
+                "task": "T0",
+                "value": [
+                    {
+                        "r": 128.8813503413908,
+                        "x": 427.69921875,
+                        "y": 127.0078125,
+                        "tool": 0,
+                        "angle": -52.83905177255981,
+                        "frame": 0,
+                        "details": []
+                    },
+                    {
+                        "r": 123.9794215692921,
+                        "x": 203.734375,
+                        "y": 235.6640625,
+                        "tool": 0,
+                        "angle": -38.182777356943184,
+                        "frame": 0,
+                        "details": []
+                    }
+                ]
+            }
+        ],
+        "metadata": {
+            "source": "api",
+            "session": "e39e2ece29af8bd9fedc4fcea4515b92406c30e5f0e16c1d157d2a5a52f4a52d",
+            "viewport": {
+                "width": 1792,
+                "height": 986
+            },
+            "started_at": "2022-09-12T19:51:12.898Z",
+            "user_agent": "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/104.0.0.0 Safari/537.36",
+            "utc_offset": "18000",
+            "finished_at": "2022-09-12T19:51:17.601Z",
+            "live_project": false,
+            "interventions": {
+                "opt_in": true,
+                "messageShown": false
+            },
+            "user_language": "en",
+            "user_group_ids": [],
+            "subject_dimensions": [
+                {
+                    "clientWidth": 690,
+                    "clientHeight": 682,
+                    "naturalWidth": 690,
+                    "naturalHeight": 682
+                }
+            ],
+            "subject_selection_state": {
+                "retired": false,
+                "selected_at": "2022-09-12T19:49:44.897Z",
+                "already_seen": false,
+                "selection_state": "internal_fallback",
+                "finished_workflow": false,
+                "user_has_finished_workflow": false
+            },
+            "workflow_translation_id": "1945",
+            "workflow_version": "4.8"
+        },
+        "href": "/classifications/110709",
+        "links": {
+            "project": "1663",
+            "user": "1325837",
+            "workflow": "2660",
+            "subjects": [
+                "48746"
+            ]
+        }
+    },
+    "linked": {
+        "projects": [
+            {
+                "id": "1663",
+                "display_name": "Wildcam Illuminati Zoo Watch!",
+                "created_at": "2016-10-05T20:04:50.297Z",
+                "updated_at": "2022-09-12T19:20:27.869Z",
+                "href": "/projects/1663"
+            }
+        ],
+        "users": [
+            {
+                "id": "1325837",
+                "login": "zwolf",
+                "href": "/users/1325837"
+            }
+        ],
+        "workflows": [
+            {
+                "id": "2660",
+                "display_name": "Triangle Spotter",
+                "retirement": {
+                    "options": {
+                        "count": 26
+                    },
+                    "criteria": "classification_count"
+                },
+                "created_at": "2016-10-05T20:07:36.544Z",
+                "updated_at": "2021-05-17T19:07:52.784Z",
+                "href": "/workflows/2660"
+            }
+        ],
+        "subjects": [
+            {
+                "id": "48746",
+                "locations": [
+                    {
+                        "image/jpeg": "https://panoptes-uploads-staging.zooniverse.org/subject_location/029ec528-87f7-4e47-b643-d6276854aeee.jpeg"
+                    }
+                ],
+                "metadata": {
+                    "Filename": "Cassidy-Bloomberg-Presidential-Trial-Balloon-690x682-1453648495.jpg"
+                },
+                "created_at": "2016-11-18T16:53:57.782Z",
+                "updated_at": "2016-11-18T16:53:57.782Z",
+                "href": "/subjects/48746"
+            }
+        ]
+    }
+}

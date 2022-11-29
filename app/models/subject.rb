@@ -1,4 +1,6 @@
-class Subject < ActiveRecord::Base
+# frozen_string_literal: true
+
+class Subject < ApplicationRecord
   include Activatable
   include OrderedLocations
 
@@ -6,8 +8,8 @@ class Subject < ActiveRecord::Base
   belongs_to :uploader, class_name: "User", foreign_key: "upload_user_id"
   has_many :collections_subjects, dependent: :restrict_with_exception
   has_many :collections, through: :collections_subjects
-  has_many :subject_sets, through: :set_member_subjects
   has_many :set_member_subjects, dependent: :destroy
+  has_many :subject_sets, through: :set_member_subjects
   has_many :workflows, through: :set_member_subjects
   has_many :subject_workflow_statuses, dependent: :restrict_with_exception
   has_many :locations,
@@ -24,9 +26,6 @@ class Subject < ActiveRecord::Base
   has_many :subject_group_members, dependent: :restrict_with_exception
   has_many :subject_groups, through: :subject_group_members
 
-  # Used by HttpCacheable
-  scope :private_scope, -> { where(project_id: Project.private_scope) }
-
   validates_presence_of :project, :uploader
 
   NONSTANDARD_MIMETYPES = {
@@ -39,7 +38,7 @@ class Subject < ActiveRecord::Base
       location_params = case loc
                         when String
                           { content_type: standardize_mimetype(loc) }
-                        when Hash
+                        when Hash, ActionController::Parameters
                           {
                             content_type: standardize_mimetype(loc.keys.first),
                             external_link: true,

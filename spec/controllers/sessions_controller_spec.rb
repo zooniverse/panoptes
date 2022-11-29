@@ -19,24 +19,24 @@ describe SessionsController, type: :controller do
           end
 
           it 'should respond with the user object' do
-            post :create, user: params
+            post :create, params: { user: params }
             expect(json_response).to include('users')
           end
 
           it 'should respond with a 200' do
-            post :create, user: params
+            post :create, params: { user: params }
             expect(response.status).to eq(200)
           end
 
           it 'should sign in the user' do
             expect(controller).to receive(:sign_in)
-            post :create, user: params
+            post :create, params: { user: params }
           end
 
           it "should ignore #{ attr } case" do
             expect(controller).to receive(:sign_in)
             params[:login] = user.send(attr).upcase
-            post :create, user: params
+            post :create, params: { user: params }
           end
         end
       end

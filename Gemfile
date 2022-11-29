@@ -1,32 +1,36 @@
+# frozen_string_literal: true
+
+def next?
+  File.basename(__FILE__) == 'Gemfile.next'
+end
+
 source 'https://rubygems.org'
 
 gem 'active_interaction', '~> 3.8.3'
-gem 'active_model_serializers', '0.10.0.rc2' # Event stream
-gem 'active_record_union', '~> 1.3.0'
-gem 'activerecord-import', '~> 1.2'
+gem 'active_model_serializers' # Event stream
+gem 'active_record_extended'
+gem 'activerecord-import', '~> 1.4'
 gem 'aws-sdk', '~> 2.10'
-gem 'azure-storage'
 gem 'azure-storage-blob'
-gem 'azure-storage-common'
 gem 'dalli'
-gem 'deep_cloneable', '~> 3.1.0'
+gem 'deep_cloneable', '~> 3.2.0'
 gem 'devise', '~> 4.7'
 gem 'doorkeeper', '~> 4.4'
 gem 'doorkeeper-jwt', '~> 0.2.1'
-gem 'faraday', '~> 0.17'
-gem 'faraday-http-cache', '~> 2.2'
-gem 'faraday_middleware', '~> 0.14'
+gem 'faraday', '~> 1.10'
+gem 'faraday-http-cache', '~> 2.4'
+gem 'faraday_middleware', '~> 1.2'
 gem 'flipper'
 gem 'flipper-active_record'
 gem 'flipper-ui'
 gem 'graphiql-rails'
 gem 'graphql'
-gem 'honeybadger', '~> 4.9'
+gem 'honeybadger', '~> 5.0'
 gem 'httparty'
-gem 'jquery-rails', '~> 4.4'
+gem 'jquery-rails', '~> 4.5'
 gem 'json-schema', '~> 2.8'
 gem 'librato-metrics', '~> 2.1.2'
-gem 'logstasher', '~> 1.4'
+gem 'lograge'
 gem 'mime-types'
 gem 'omniauth', '~> 1.9'
 gem 'omniauth-facebook', '~> 5.0'
@@ -35,18 +39,22 @@ gem 'p3p', '~> 2.0'
 gem 'panoptes-client'
 gem 'pg', '~> 0.21'
 gem 'pg_search'
-gem 'puma', '~> 5.5.1'
-gem 'pundit', '~> 2.1.1'
+gem 'puma', '~> 6.0.0'
+gem 'pundit', '~> 2.2.0'
 gem 'rack-cors', '~> 1.0', require: 'rack/cors'
-gem 'rails', '~> 4.2.11'
-gem 'ranked-model', '~> 0.4.7'
+if next?
+  gem 'rails', '~> 5.2'
+else
+  gem 'rails', '~> 5.1'
+end
+gem 'ranked-model', '~> 0.4.8'
 gem 'restpack_serializer', git: 'https://github.com/zooniverse/restpack_serializer.git', branch: 'panoptes-api-version', ref: 'cef0969cef'
 gem 'schema_plus_pg_indexes', '~> 0.1'
-gem 'scientist', '~> 1.6.0'
+gem 'scientist', '~> 1.6.3'
 gem 'sidekiq', '~> 5.2.5'
 gem 'sidekiq-congestion', '~> 0.1.0'
-gem 'sidekiq-unique-jobs'
-gem 'sidetiq', '~> 0.7'
+gem 'sidekiq-cron'
+gem 'sidekiq-unique-jobs', '~> 6.0'
 gem 'standby'
 gem 'stringex', '~> 2.8'
 gem 'strong_migrations'
@@ -66,8 +74,9 @@ group :development, :test do
   gem 'rubocop-performance'
   gem 'rubocop-rails'
   gem 'rubocop-rspec'
-  gem 'spring'
+  gem 'spring', '~>2.1.1' # remove constraint once on or past rails 5.2
   gem 'sprockets', '~>3.7'
+  gem 'ten_years_rails'
 end
 
 group :test do
@@ -79,4 +88,5 @@ group :test do
   gem 'rspec-its'
   gem 'rspec-rails'
   gem 'spring-commands-rspec'
+  gem 'webmock'
 end

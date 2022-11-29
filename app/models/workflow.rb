@@ -1,4 +1,6 @@
-class Workflow < ActiveRecord::Base
+# frozen_string_literal: true
+
+class Workflow < ApplicationRecord
   include Activatable
   include ExtendedCacheKey
   include RankedModel
@@ -45,9 +47,6 @@ class Workflow < ActiveRecord::Base
   JSON_ATTRIBUTES = %w(tasks retirement aggregation strings steps).freeze
 
   SELECTOR_PAGE_SIZE_KEY = 'subject_queue_page_size'.freeze
-
-  # Used by HttpCacheable
-  scope :private_scope, -> { where(project_id: Project.private_scope) }
 
   validates_presence_of :project, :display_name
 

@@ -87,14 +87,15 @@ data:
   ZOO_STREAM_SOURCE: panoptes
   CELLECT_HOST: http://cellect-production-app/
   CORS_ORIGINS_REGEX: '^https?:\/\/((www|staging)\.antislaverymanuscripts\.org|(www|relaunch|field-book)\.notesfromnature\.org|www\.scribesofthecairogeniza\.org|([a-z0-9-]+\.)?zooniverse\.org|[a-z0-9-]+\.(pfe-)?preview\.zooniverse\.org)(:\d+)?$'
+  CORS_ORIGINS_REJECT_HOSTS: 'panoptes-uploads.zooniverse.org,panoptes-uploads-staging.zooniverse.org'
   DESIGNATOR_API_HOST: http://designator-production-app/
   DESIGNATOR_API_USERNAME: production
   DUMP_WORKER_SIDEKIQ_QUEUE: dumpworker
   EMAIL_EXPORT_S3_BUCKET: zooniverse-exports
-  EVENTS_API_USERNAME: api
   REDIRECTS_BASE: https://www.zooniverse.org
   REDIRECTS_PASSWORD_RESET: /reset-password
   REDIRECTS_UNSUBSCRIBE: /unsubscribe
+  KINESIS_PAYLOAD_SIZE_ERROR_PROJECT_ID_INGORE_LIST: '17097'
   MAILER_ADDRESS: email-smtp.us-east-1.amazonaws.com
   MAILER_DOMAIN: zooniverse.org
   MEMCACHE_SERVERS: 'panoptes-production-memcached:11211'
@@ -112,14 +113,12 @@ data:
   STORAGE_BUCKET: zooniverse-static
   STORAGE_PREFIX: panoptes-uploads.zooniverse.org/production/
   SUBJECT_GROUP_UPLOADER_ID: '1'
-  SUBJECT_GROUP_WORKFLOW_ID_ALLOWLIST: '17619,18407,18510'
   AZURE_STORAGE_ACCOUNT: panoptesuploads
   AZURE_STORAGE_CONTAINER_PUBLIC: public
   AZURE_STORAGE_CONTAINER_PRIVATE: private
   TALK_API_HOST: http://talk-production-app
   TALK_API_USER: '1'
   TALK_API_APPLICATION: '1'
-  UPLOADED_SUBJECTS_COUNT_CACHE_EXPIRY: '604800'
   USER_SUBJECT_LIMIT: '10000'
 ---
 apiVersion: apps/v1
@@ -139,7 +138,7 @@ spec:
     spec:
       containers:
         - name: panoptes-production-app
-          image: zooniverse/panoptes:__IMAGE_TAG__
+          image: ghcr.io/zooniverse/panoptes:__IMAGE_TAG__
           resources:
             requests:
               memory: "1000Mi"
@@ -198,7 +197,7 @@ spec:
               exec:
                 command: ["/bin/bash", "-c", "cp -R /rails_app/public/* /static-assets"]
         - name: panoptes-production-nginx
-          image: zooniverse/nginx:1.19.0
+          image: zooniverse/nginx
           resources:
             requests:
               memory: "50Mi"
@@ -306,7 +305,7 @@ spec:
     spec:
       containers:
         - name: panoptes-production-sidekiq
-          image: zooniverse/panoptes:__IMAGE_TAG__
+          image: ghcr.io/zooniverse/panoptes:__IMAGE_TAG__
           resources:
             requests:
               memory: "2000Mi"
@@ -327,6 +326,8 @@ spec:
             value: '2'
           - name: SIDEKIQ_ARGS
             value: '-q dumpworker -q really_high -q high -q data_high -q data_medium -q default -q data_low'
+          - name: NEW_RELIC_APPLICATION_LOGGING_ENABLED
+            value: 'false'
           envFrom:
           - secretRef:
               name: panoptes-common-env-vars
@@ -367,13 +368,13 @@ spec:
     spec:
       containers:
         - name: panoptes-production-sidekiq
-          image: zooniverse/panoptes:__IMAGE_TAG__
+          image: ghcr.io/zooniverse/panoptes:__IMAGE_TAG__
           resources:
             requests:
-              memory: "500Mi"
+              memory: "1000Mi"
               cpu: "500m"
             limits:
-              memory: "2000Mi"
+              memory: "4000Mi"
               cpu: "2000m"
           livenessProbe:
             exec:
@@ -381,6 +382,9 @@ spec:
                 - /rails_app/scripts/docker/sidekiq_status
             initialDelaySeconds: 20
           args: ["/rails_app/scripts/docker/start-sidekiq.sh"]
+          env:
+          - name: NEW_RELIC_APPLICATION_LOGGING_ENABLED
+            value: 'false'
           envFrom:
           - secretRef:
               name: panoptes-common-env-vars
@@ -580,15 +584,15 @@ spec:
       targetPort: 11211
   type: NodePort
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: panoptes-production-ingress
   annotations:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/rewrite-target: /$1
     nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
+    nginx.ingress.kubernetes.io/proxy-body-size: 20m
     nginx.ingress.kubernetes.io/set-real-ip-from: "10.0.0.0/8"
 spec:
   tls:
@@ -601,26 +605,36 @@ spec:
   - host: panoptes.azure.zooniverse.org
     http:
       paths:
-      - backend:
-          serviceName: panoptes-production-app
-          servicePort: 80
-        path: /(.*)
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: panoptes-production-app
+            port:
+              number: 80
+
   - host: panoptes.zooniverse.org
     http:
       paths:
-      - backend:
-          serviceName: panoptes-production-app
-          servicePort: 80
-        path: /(.*)
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: panoptes-production-app
+            port:
+              number: 80
   - host: signin.zooniverse.org
     http:
       paths:
-      - backend:
-          serviceName: panoptes-production-app
-          servicePort: 80
-        path: /(.*)
+      - pathType: Prefix
+        path: /
+        backend:
+          service:
+            name: panoptes-production-app
+            port:
+              number: 80
 ---
-apiVersion: extensions/v1beta1
+apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: www-panoptes-production-ingress
@@ -628,6 +642,7 @@ metadata:
     kubernetes.io/ingress.class: nginx
     cert-manager.io/cluster-issuer: letsencrypt-prod
     nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
+    nginx.ingress.kubernetes.io/proxy-body-size: 20m
     nginx.ingress.kubernetes.io/set-real-ip-from: "10.0.0.0/8"
     nginx.ingress.kubernetes.io/upstream-vhost: "www.zooniverse.org"
 spec:
@@ -639,10 +654,13 @@ spec:
   - host: www-panoptes.zooniverse.org
     http:
       paths:
-      - backend:
-          serviceName: panoptes-production-app
-          servicePort: 80
+      - pathType: Prefix
         path: /
+        backend:
+          service:
+            name: panoptes-production-app
+            port:
+              number: 80
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate

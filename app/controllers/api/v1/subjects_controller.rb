@@ -1,6 +1,8 @@
 class Api::V1::SubjectsController < Api::ApiController
   include JsonApiController::PunditPolicy
 
+  RESERVED_METADATA_KEYS = ['#priority'].freeze
+
   require_authentication :update, :create, :destroy, :version, :versions,
     scopes: [:subject]
   resource_actions :show, :index, :create, :update, :deactivate
@@ -32,7 +34,7 @@ class Api::V1::SubjectsController < Api::ApiController
       .active
       .where(id: selected_subject_ids)
       .order(
-        "idx(array[#{selected_subject_ids.join(',')}], id)"
+        Arel.sql("idx(array[#{selected_subject_ids.join(',')}], id)")
       )
     end
 
@@ -53,7 +55,7 @@ class Api::V1::SubjectsController < Api::ApiController
   # special selection end point for known subject ids
   def selection
     # temporary feature flag in case we need a prod 'kill' switch for this feature
-    raise ApiErrors::FeatureDisabled unless Panoptes.flipper[:subject_selection_by_ids].enabled?
+    raise ApiErrors::FeatureDisabled unless Flipper.enabled?(:subject_selection_by_ids)
 
     skip_policy_scope
 
@@ -71,7 +73,7 @@ class Api::V1::SubjectsController < Api::ApiController
       if selected_subject_ids.empty?
         Subject.none
       else
-        Subject.active.where(id: selected_subject_ids).order("idx(array[#{selected_subject_ids.join(',')}], id)") # guardrails-disable-line
+        Subject.active.where(id: selected_subject_ids).order(Arel.sql("idx(array[#{selected_subject_ids.join(',')}], id)")) # guardrails-disable-line
       end
 
     # create a special 'fake' selector for the serializer
@@ -96,7 +98,7 @@ class Api::V1::SubjectsController < Api::ApiController
   # special selection end point create SubjectGroups
   def grouped
     # temporary feature flag in case we need a prod 'kill' switch for this feature
-    raise ApiErrors::FeatureDisabled unless Panoptes.flipper[:subject_group_selection].enabled?
+    raise ApiErrors::FeatureDisabled unless Flipper.enabled?(:subject_group_selection)
 
     skip_policy_scope
 
@@ -104,16 +106,11 @@ class Api::V1::SubjectsController < Api::ApiController
     selector_param_keys = %i[workflow_id subject_set_id num_rows num_columns http_cache admin]
     selector_params = params.permit(*selector_param_keys)
 
-    # Sanity check -- use a testing feature flag
-    # against an allow listed workflow id env var
-    allowed_workflow_ids = ENV.fetch('SUBJECT_GROUP_WORKFLOW_ID_ALLOWLIST').split(',')
-    raise ApiErrors::FeatureDisabled unless allowed_workflow_ids.include?(selector_params[:workflow_id])
-
     group_selection_result = SubjectGroups::Selection.run!(
       num_rows: selector_params.delete(:num_rows),
       num_columns: selector_params.delete(:num_columns),
       uploader_id: ENV.fetch('SUBJECT_GROUP_UPLOADER_ID'),
-      params: selector_params,
+      params: selector_params.to_h,
       user: api_user
     )
     # get the list of the groups 'placeholder' group_subject ids
@@ -122,7 +119,7 @@ class Api::V1::SubjectsController < Api::ApiController
     selected_subject_scope =
       Subject
       .where(id: group_subject_ids)
-      .order("idx(array[#{group_subject_ids.join(',')}], id)") # guardrails-disable-line
+      .order(Arel.sql("idx(array[#{group_subject_ids.join(',')}], id)")) # guardrails-disable-line
 
     selection_context = Subjects::SelectorContext.new(
       group_selection_result.subject_selector,
@@ -138,7 +135,8 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def create
-    raise ApiErrors::FeatureDisabled unless Panoptes.flipper[:subject_uploading].enabled?
+    raise ApiErrors::FeatureDisabled unless Flipper.enabled?(:subject_uploading)
+
     super do |subject|
       user = subject.uploader
       user.increment_subjects_count_cache
@@ -168,6 +166,7 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def build_resource_for_create(create_params)
+    downcase_reserved_metadata_keys(create_params)
     locations = create_params.delete(:locations)
     subject = super(create_params) do |object, linked|
       object[:uploader] = api_user.user
@@ -177,6 +176,7 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def build_update_hash(update_params, resource)
+    downcase_reserved_metadata_keys(update_params)
     locations = update_params.delete(:locations)
     new_locations = add_locations(locations, resource)
     subject.save!
@@ -198,6 +198,18 @@ class Api::V1::SubjectsController < Api::ApiController
       { url_format: :put }
     else
       { url_format: :get }
+    end
+  end
+
+  def downcase_reserved_metadata_keys(params)
+    return unless params.key?(:metadata)
+
+    params[:metadata].transform_keys! do |key|
+      if RESERVED_METADATA_KEYS.include?(key.downcase)
+        key.downcase
+      else
+        key
+      end
     end
   end
 end

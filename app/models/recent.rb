@@ -1,4 +1,6 @@
-class Recent < ActiveRecord::Base
+# frozen_string_literal: true
+
+class Recent < ApplicationRecord
   include OrderedLocations
 
   belongs_to :classification
