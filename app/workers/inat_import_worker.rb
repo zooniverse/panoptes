@@ -22,25 +22,16 @@ class InatImportWorker
       subjects_to_import << @importer.to_subject(obs)
       next unless process_batch?(i)
 
-      # Use activerecord-import to insert in batches
       subject_import_results = @importer.import_subjects(subjects_to_import)
-      # import_results = Subject.import subjects_to_import, validate: false
+      new_smses = @importer.build_smses(subject_import_results)
+      @importer.import_smses(new_smses)
 
       # Record import state
       save_status(subject_import_results)
 
-      # Create/init SMSes and insert in batches
-      @importer.import_smses(subject_import_results)
-      # set_member_subjects_to_import = import_results.ids.map do |subject_id|
-      #   sms = SetMemberSubject.find_or_initialize_by(subject_set_id: subject_set_id, subject_id: subject_id)
-      #   sms.random = rand unless sms.random?
-      #   sms
-      # end
-      # SetMemberSubject.import set_member_subjects_to_import, validate: false
-
       # Assist ruby GC wherever possible
-      subjects = []
-      import_results, sms = nil
+      subjects_to_import = []
+      import_results, new_smses, subject_import_results = nil
     end
 
     # Count that subject set, like right now
