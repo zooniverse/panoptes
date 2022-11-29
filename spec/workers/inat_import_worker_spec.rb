@@ -18,11 +18,19 @@ RSpec.describe InatImportWorker do
       instance_double('ActiveRecord::Import::Result', ids: [1, 2], failed_instances: nil)
     end
     let(:importer_double) do
-      instance_double(Inaturalist::SubjectImporter, to_subject: true, subject_set_import: ss_import, import_subjects: import_results_double, import_smses: true)
+      instance_double(
+        Inaturalist::SubjectImporter,
+        to_subject: true,
+        subject_set_import: ss_import,
+        import_subjects: import_results_double,
+        import_smses: import_results_double,
+        build_smses: true
+      )
     end
     let(:count_worker_double) do
       instance_double(SubjectSetSubjectCounterWorker, perform: true)
     end
+    let(:inat_worker) { described_class.new }
 
     before do
       allow(Inaturalist::SubjectImporter).to receive(:new).and_return(importer_double)
@@ -30,11 +38,11 @@ RSpec.describe InatImportWorker do
       allow(SubjectSetImport).to receive(:new).and_return(ss_import)
       allow(SubjectSetSubjectCounterWorker).to receive(:new).and_return(count_worker_double)
       allow(InatImportCompletedMailerWorker).to receive(:perform_async)
-      allow_any_instance_of(described_class).to receive(:import_batch_size).and_return(1)
-      allow_any_instance_of(described_class).to receive(:set_status).and_return(true)
+      allow(inat_worker).to receive(:set_status).and_return(true)
+      allow(inat_worker).to receive(:import_batch_size).and_return(1)
       allow(Subject).to receive(:import).and_return(import_results_double)
       allow(SetMemberSubject).to receive(:import).and_return(import_results_double)
-      described_class.new.perform(1, 1, 1)
+      inat_worker.perform(1, 1, 1)
     end
 
     context 'when the import is successful' do
@@ -42,12 +50,20 @@ RSpec.describe InatImportWorker do
         obs_array.each { |obs| expect(importer_double).to have_received(:to_subject).with(obs) }
       end
 
-      it 'invokes the importer to import a batch' do
+      it 'invokes the importer to import a batch of subjects' do
         expect(importer_double).to have_received(:import_subjects).with([true, true])
       end
 
+      it 'invokes the importer to build associated SetMemberSubjects' do
+        expect(importer_double).to have_received(:build_smses).with(import_results_double)
+      end
+
       it 'invokes the importer to import SetMemberSubjects' do
-        expect(importer_double).to have_received(:import_smses).with(import_results_double)
+        expect(importer_double).to have_received(:import_smses).with(true)
+      end
+
+      it 'saves the current status' do
+        expect(ss_import).to have_received(:save_imported_row_count).with(2)
       end
 
       it 'calls the subject set import mailer worker' do
@@ -70,11 +86,11 @@ RSpec.describe InatImportWorker do
       end
 
       it 'continues processing' do
-        expect { described_class.new.perform(1, 1, 1) }.not_to raise_error
+        expect { inat_worker.perform(1, 1, 1) }.not_to raise_error
       end
 
       it 'stores the failed count' do
-        described_class.new.perform(1, 1, 1)
+        inat_worker.perform(1, 1, 1)
         expect(ss_import).to have_received(:update_columns).with(failed_count: 2, failed_uuids: %w[1 2])
       end
     end
