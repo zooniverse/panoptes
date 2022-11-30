@@ -9,25 +9,33 @@ module Inaturalist
       @subject_set = SubjectSet.find(subject_set_id)
     end
 
-    def import(obs)
+    def to_subject(obs)
       subject = find_or_initialize_subject(obs.external_id)
+      subject.project_id = @subject_set.project_id
+      subject.uploader = @uploader
+      subject.metadata = obs.metadata
 
-      Subject.transaction do
-        subject.project_id = @subject_set.project_id
-        subject.uploader = @uploader
-        subject.metadata = obs.metadata
-        # Don't add the set if it exists on an upsert, or SetMemberSubjects insert won't validate
-        subject.subject_sets << @subject_set unless subject.subject_sets.include?(@subject_set)
-
-        Subject.location_attributes_from_params(obs.locations).each do |location_attributes|
-          # Don't insert a new location if an existing location shares the same src & content_type
-          subject.locations.build(location_attributes) unless location_exists?(location_attributes, subject.locations)
-        end
-        subject.save!
+      Subject.location_attributes_from_params(obs.locations).each do |location_attributes|
+        # Don't insert a new location if an existing location shares the same src & content_type
+        subject.locations.build(location_attributes) unless location_exists?(location_attributes, subject.locations)
       end
       subject
-    rescue ActiveRecord::RecordInvalid => e
-      raise FailedImport, e.message
+    end
+
+    def import_subjects(subjects_to_import)
+      Subject.import subjects_to_import, recursive: true, on_duplicate_key_update: %i[metadata updated_at]
+    end
+
+    def import_smses(smses_to_import)
+      SetMemberSubject.import smses_to_import, on_duplicate_key_ignore: true
+    end
+
+    def build_smses(subject_import_results)
+      subject_import_results.ids.map do |subject_id|
+        sms = SetMemberSubject.find_or_initialize_by(subject_set_id: @subject_set.id, subject_id: subject_id)
+        sms.random = rand unless sms.random?
+        sms
+      end
     end
 
     def find_or_initialize_subject(external_id)

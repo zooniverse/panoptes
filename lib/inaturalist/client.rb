@@ -25,7 +25,7 @@ module Inaturalist
     #   }
     # }
 
-    RISON_FIELDS = '(id:!t,observed_on:!t,time_observed_at:!t,quality_grade:!t,num_identification_agreements:!t,num_identification_disagreements:!t,location:!t,geoprivacy:!t,scientific_name:!t,license_code:!t,taxon:(name:!t),photos:(url:!t))'
+    RISON_FIELDS = '(id:!t,observed_on:!t,updated_at:!t,time_observed_at:!t,quality_grade:!t,num_identification_agreements:!t,num_identification_disagreements:!t,location:!t,geoprivacy:!t,scientific_name:!t,license_code:!t,taxon:(name:!t),photos:(url:!t))'
 
     def initialize
       @url = 'https://api.inaturalist.org/v2/observations'

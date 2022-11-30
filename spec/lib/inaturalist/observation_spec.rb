@@ -10,6 +10,7 @@ describe Inaturalist::Observation do
       id: 123456789,
       change: 'No changes were made to this image.',
       observed_on: '2011-10-01',
+      updated_at: '2018-06-25T19:03:17-07:00',
       time_observed_at: '2012-11-11T09:04:12-05:00',
       quality_grade: 'research',
       num_identification_agreements: 2,
