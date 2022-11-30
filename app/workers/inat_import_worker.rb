@@ -5,7 +5,8 @@ class InatImportWorker
 
   # skip retries for this job to avoid re-running imports with errors
   sidekiq_options retry: 0, queue: :dumpworker
-  sidekiq_options lock: :until_and_while_executing
+  sidekiq_options lock: :until_and_while_executing,
+                  on_conflict: { client: :log, server: :reject }
 
   def perform(user_id, taxon_id, subject_set_id, updated_since=nil)
     @inat = Inaturalist::ApiInterface.new(taxon_id: taxon_id, updated_since: updated_since)

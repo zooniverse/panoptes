@@ -5,16 +5,17 @@ require 'spec_helper'
 describe Inaturalist::SubjectImporter do
   let(:subject_set) { create(:subject_set) }
   let(:importer) { described_class.new(subject_set.project.owner.id, subject_set.id) }
+  let(:locations) {
+    [
+      { 'image/jpeg' => 'https://static.inaturalist.org/photos/12345/original.JPG' },
+      { 'image/jpeg' => 'https://static.inaturalist.org/photos/45678/original.JPG' }
+    ]
+  }
 
   describe '#to_subject' do
     let(:response) { JSON.parse(file_fixture('inat_observations.json').read) }
     let(:obs) { Inaturalist::Observation.new(response['results'][0]) }
-    let(:locations) {
-      [
-        { 'image/jpeg' => 'https://static.inaturalist.org/photos/12345/original.JPG' },
-        { 'image/jpeg' => 'https://static.inaturalist.org/photos/45678/original.JPG' }
-      ]
-    }
+
     let(:new_subject) { importer.to_subject(obs) }
 
     it 'sets metadata correctly' do
@@ -51,6 +52,13 @@ describe Inaturalist::SubjectImporter do
 
     it 'imports an array of subjects' do
       expect { importer.import_subjects(subjects_to_import) }.to change(Subject, :count).by(3)
+    end
+
+    it 'includes the locations' do
+      subjects_to_import.each do |s|
+        Subject.location_attributes_from_params(locations).each { |locattrs| s.locations.build(locattrs) }
+      end
+      expect { importer.import_subjects(subjects_to_import) }.to change(Medium, :count).by(6)
     end
   end
 
