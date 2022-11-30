@@ -54,7 +54,6 @@ module Inaturalist
       # Try to ensure as few objects are kept in memory as possible
       raw_response = nil
       response = nil
-      GC.start
       results
     end
 
