@@ -43,7 +43,9 @@ class InatImportWorker
   end
 
   def process_batch?(index)
-    (index % import_batch_size).zero? && index.positive?
+    index.positive? &&
+    # Catch the end of the last batch, but trim total_results to account for 0-indexing
+    ((index % import_batch_size).zero? || index == (@inat.total_results - 1))
   end
 
   def ss_import
