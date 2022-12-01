@@ -33,7 +33,7 @@ module Inaturalist
     def build_smses(subject_import_results)
       subject_import_results.ids.map do |subject_id|
         sms = SetMemberSubject.find_or_initialize_by(subject_set_id: @subject_set.id, subject_id: subject_id)
-        sms.random = rand unless sms.random?
+        sms.random ||= rand
         sms
       end
     end
