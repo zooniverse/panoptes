@@ -17,6 +17,7 @@ class Medium < ApplicationRecord
   EXPORT_MEDIUM_TYPE_REGEX = /\A(project|workflow)_[a-z_]+_export\z/i
 
   validate :validate_content_type
+  validate :validate_export_content_type, if: :export_medium
 
   def self.inheritance_column
     nil
@@ -99,14 +100,15 @@ class Medium < ApplicationRecord
     raise e
   end
 
-  def validate_content_type
-    errors.add(:content_type, 'Invalid file type') if BLOCKED_CONTENT_TYPES.match?(content_type)
-
-    export_medium = type.match?(EXPORT_MEDIUM_TYPE_REGEX)
-    validate_export_medium if export_medium
+  def export_medium
+    type.match?(EXPORT_MEDIUM_TYPE_REGEX)
   end
 
-  def validate_export_medium
+  def validate_content_type
+    errors.add(:content_type, 'Invalid file type') if BLOCKED_CONTENT_TYPES.match?(content_type)
+  end
+
+  def validate_export_content_type
     errors.add(:content_type, "Content-Type for exports must be one of #{ALLOWED_EXPORT_CONTENT_TYPES.join(", ")}") unless ALLOWED_EXPORT_CONTENT_TYPES.include?(content_type)
   end
 
