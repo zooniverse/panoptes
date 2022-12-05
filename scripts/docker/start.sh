@@ -12,9 +12,4 @@ tmpreaper 6h --mtime /tmp/
 mkdir -p tmp/pids/
 rm -f tmp/pids/*.pid
 
-if [ -f "commit_id.txt" ]
-then
-  cp commit_id.txt public/
-fi
-
 exec bundle exec puma -C config/puma.rb

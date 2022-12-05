@@ -21,6 +21,7 @@ module Inaturalist
       metadata['id'] = obs['id']
       metadata['change'] = 'No changes were made to this image.'
       metadata['observed_on'] = obs['observed_on']
+      metadata['updated_at'] = obs['updated_at']
       metadata['time_observed_at'] = obs['time_observed_at']
       metadata['quality_grade'] = obs['quality_grade']
       metadata['num_identification_agreements'] = obs['num_identification_agreements']
