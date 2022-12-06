@@ -12,7 +12,7 @@ class Medium < ApplicationRecord
   before_destroy :queue_medium_removal, unless: :external_link
 
   ALLOWED_EXPORT_CONTENT_TYPES = %w(text/csv).freeze
-  BLOCKED_CONTENT_TYPES = %r{html|javascript|css|spx|opus|ttf|tar|gz|tgz|bz2|tbz2|zip}
+  ALLOWED_CONTENT_TYPES = %w(application/json application/pdf audio/aac audio/midi audio/x-midi audio/mp3 audio/mp4 audio/x-m4a audio/mpeg audio/wav image/jpeg image/gif image/png image/tiff image/x-icon image/svg+xml text/csv text/plain video/mp4 video/mpeg).freeze
 
   EXPORT_MEDIUM_TYPE_REGEX = /\A(project|workflow)_[a-z_]+_export\z/i
 
@@ -105,7 +105,7 @@ class Medium < ApplicationRecord
   end
 
   def validate_content_type
-    errors.add(:content_type, 'Invalid file type') if BLOCKED_CONTENT_TYPES.match?(content_type)
+    errors.add(:content_type, 'Invalid file type') unless ALLOWED_CONTENT_TYPES.include?(content_type)
   end
 
   def validate_export_content_type
