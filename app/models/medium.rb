@@ -35,7 +35,7 @@ class Medium < ApplicationRecord
     'text/plain': 18,
     'video/mp4': 19,
     'video/mpeg': 20
-}.freeze
+  }.freeze
 
   EXPORT_MEDIUM_TYPE_REGEX = /\A(project|workflow)_[a-z_]+_export\z/i
 
