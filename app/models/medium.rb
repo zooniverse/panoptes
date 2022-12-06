@@ -12,7 +12,30 @@ class Medium < ApplicationRecord
   before_destroy :queue_medium_removal, unless: :external_link
 
   ALLOWED_EXPORT_CONTENT_TYPES = %w(text/csv).freeze
-  ALLOWED_CONTENT_TYPES = %w[application/json application/pdf audio/aac audio/midi audio/x-midi audio/mp3 audio/mp4 audio/x-m4a audio/mpeg audio/wav image/jpeg image/gif image/png image/tiff image/x-icon image/svg+xml text/csv text/plain video/mp4 video/mpeg].freeze
+  # We use an allow list to validate file types to keep consistent with UI file validation code
+  # See for client file validation: https://github.com/zooniverse/Panoptes-Front-End/blob/master/app/lib/put-file.js
+  ALLOWED_CONTENT_TYPES = {
+    'application/json': 1,
+    'application/pdf': 2,
+    'audio/aac': 3,
+    'audio/midi': 4,
+    'audio/x-midi': 5,
+    'audio/mp3': 6,
+    'audio/mp4': 7,
+    'audio/x-m4a': 8,
+    'audio/mpeg': 9,
+    'audio/wav': 10,
+    'image/jpeg': 11,
+    'image/gif': 12,
+    'image/png': 13,
+    'image/tiff': 14,
+    'image/x-icon': 15,
+    'image/svg+xml': 16,
+    'text/csv': 17,
+    'text/plain': 18,
+    'video/mp4': 19,
+    'video/mpeg': 20
+  }
 
   EXPORT_MEDIUM_TYPE_REGEX = /\A(project|workflow)_[a-z_]+_export\z/i
 
@@ -105,7 +128,7 @@ class Medium < ApplicationRecord
   end
 
   def validate_content_type
-    errors.add(:content_type, 'Invalid file type') unless ALLOWED_CONTENT_TYPES.include?(content_type)
+    errors.add(:content_type, "Invalid file type. Content-Type must be one of the following: #{ALLOWED_CONTENT_TYPES.keys.join(', ')}") unless ALLOWED_CONTENT_TYPES.with_indifferent_access.key?(content_type)
   end
 
   def validate_export_content_type
