@@ -12,7 +12,7 @@ class Medium < ApplicationRecord
   before_destroy :queue_medium_removal, unless: :external_link
 
   ALLOWED_EXPORT_CONTENT_TYPES = %w(text/csv).freeze
-  ALLOWED_CONTENT_TYPES = %w(application/json application/pdf audio/aac audio/midi audio/x-midi audio/mp3 audio/mp4 audio/x-m4a audio/mpeg audio/wav image/jpeg image/gif image/png image/tiff image/x-icon image/svg+xml text/csv text/plain video/mp4 video/mpeg).freeze
+  ALLOWED_CONTENT_TYPES = %w[application/json application/pdf audio/aac audio/midi audio/x-midi audio/mp3 audio/mp4 audio/x-m4a audio/mpeg audio/wav image/jpeg image/gif image/png image/tiff image/x-icon image/svg+xml text/csv text/plain video/mp4 video/mpeg].freeze
 
   EXPORT_MEDIUM_TYPE_REGEX = /\A(project|workflow)_[a-z_]+_export\z/i
 
