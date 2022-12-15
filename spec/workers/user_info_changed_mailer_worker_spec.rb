@@ -26,7 +26,7 @@ RSpec.describe UserInfoChangedMailerWorker do
       before(:each) do
         allow_any_instance_of(ActionMailer::MessageDelivery)
           .to receive(:deliver)
-          .and_raise(error_klass.new)
+          .and_raise(error_klass.new('test@example.com,ox'))
         allow(user).to receive("email").and_return("test@example.com,ox")
       end
 
