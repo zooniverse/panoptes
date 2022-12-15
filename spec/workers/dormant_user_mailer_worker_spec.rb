@@ -12,7 +12,7 @@ RSpec.describe DormantUserMailerWorker do
       before do
         allow_any_instance_of(ActionMailer::MessageDelivery)
         .to receive(:deliver)
-        .and_raise(error_klass.new)
+        .and_raise(error_klass.new('invalid_email@test,'))
       end
 
       it 'should attempt to send an email' do
