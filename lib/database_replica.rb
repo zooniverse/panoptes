@@ -33,5 +33,4 @@ class DatabaseReplica
       "SET statement_timeout = #{Panoptes.pg_statement_timeout}"
     )
   end
-  private_class_method :execute_without_timeout
 end
