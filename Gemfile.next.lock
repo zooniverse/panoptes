@@ -317,7 +317,7 @@ GEM
       coderay (~> 1.1)
       method_source (~> 1.0)
     public_suffix (5.0.0)
-    puma (6.0.0)
+    puma (6.0.2)
       nio4r (~> 2.0)
     pundit (2.2.0)
       activesupport (>= 3.0.0)
@@ -421,11 +421,11 @@ GEM
       nokogiri (>= 1.12.0)
     scientist (1.6.3)
     shellany (0.0.1)
-    sidekiq (5.2.10)
-      connection_pool (~> 2.2, >= 2.2.2)
+    sidekiq (6.0.7)
+      connection_pool (>= 2.2.2)
       rack (~> 2.0)
-      rack-protection (>= 1.5.0)
-      redis (~> 4.5, < 4.6.0)
+      rack-protection (>= 2.0.0)
+      redis (>= 4.1.0)
     sidekiq-congestion (0.1.1)
       congestion (~> 0.1)
       sidekiq (>= 3.0)
@@ -530,7 +530,7 @@ DEPENDENCIES
   pg (~> 0.21)
   pg_search
   pry
-  puma (~> 6.0.0)
+  puma (~> 6.0.2)
   pundit (~> 2.2.0)
   rack-cors (~> 1.0)
   rails (~> 5.2)
@@ -544,7 +544,7 @@ DEPENDENCIES
   rubocop-rails
   rubocop-rspec
   scientist (~> 1.6.3)
-  sidekiq (~> 5.2.5)
+  sidekiq (~> 6.0)
   sidekiq-congestion (~> 0.1.0)
   sidekiq-cron
   sidekiq-unique-jobs (~> 6.0)
