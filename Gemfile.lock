@@ -320,10 +320,10 @@ GEM
       activesupport (>= 3.0.0)
     raabro (1.4.0)
     racc (1.6.1)
-    rack (2.2.4)
+    rack (2.2.5)
     rack-cors (1.1.1)
       rack (>= 2.0.0)
-    rack-protection (2.2.2)
+    rack-protection (2.2.4)
       rack
     rack-test (2.0.2)
       rack (>= 1.3)
@@ -358,7 +358,10 @@ GEM
     rb-fsevent (0.11.1)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
-    redis (4.5.1)
+    redis (5.0.5)
+      redis-client (>= 0.9.0)
+    redis-client (0.12.0)
+      connection_pool
     regexp_parser (2.3.1)
     request_store (1.5.1)
       rack (>= 1.4)
@@ -418,11 +421,10 @@ GEM
       nokogiri (>= 1.12.0)
     scientist (1.6.3)
     shellany (0.0.1)
-    sidekiq (6.0.7)
+    sidekiq (6.4.0)
       connection_pool (>= 2.2.2)
       rack (~> 2.0)
-      rack-protection (>= 2.0.0)
-      redis (>= 4.1.0)
+      redis (>= 4.2.0)
     sidekiq-congestion (0.1.1)
       congestion (~> 0.1)
       sidekiq (>= 3.0)
@@ -537,7 +539,7 @@ DEPENDENCIES
   rubocop-rails
   rubocop-rspec
   scientist (~> 1.6.3)
-  sidekiq (~> 6.0)
+  sidekiq (~> 6.4)
   sidekiq-congestion (~> 0.1.0)
   sidekiq-cron
   sidekiq-unique-jobs (~> 6.0)
