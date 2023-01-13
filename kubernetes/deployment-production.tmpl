@@ -294,7 +294,7 @@ metadata:
   labels:
     app: panoptes-production-sidekiq-dumpworker
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: panoptes-production-sidekiq-dumpworker
@@ -321,9 +321,9 @@ spec:
           args: ["/rails_app/scripts/docker/start-sidekiq.sh"]
           env:
           - name: RAILS_MAX_THREADS
-            value: '2'
+            value: '1'
           - name: SIDEKIQ_CONCURRENCY
-            value: '2'
+            value: '1'
           - name: SIDEKIQ_ARGS
             value: '-q dumpworker -q really_high -q high -q data_high -q data_medium -q default -q data_low'
           - name: NEW_RELIC_APPLICATION_LOGGING_ENABLED
