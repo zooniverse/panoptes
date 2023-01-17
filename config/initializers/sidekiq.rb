@@ -19,8 +19,8 @@ Sidekiq.configure_server do |config|
   end
 
   config.server_middleware do |chain|
-    chain.add Sidekiq::Congestion::Limiter
     chain.add SidekiqUniqueJobs::Middleware::Server
+    chain.add Sidekiq::Congestion::Limiter
   end
 
   SidekiqUniqueJobs::Server.configure(config)
