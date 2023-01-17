@@ -544,10 +544,10 @@ DEPENDENCIES
   rubocop-rails
   rubocop-rspec
   scientist (~> 1.6.3)
-  sidekiq (~> 6.0)
+  sidekiq (< 7)
   sidekiq-congestion (~> 0.1.0)
   sidekiq-cron
-  sidekiq-unique-jobs (~> 6.0)
+  sidekiq-unique-jobs
   spring (~> 2.1.1)
   spring-commands-rspec
   sprockets (~> 3.7)
