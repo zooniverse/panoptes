@@ -1,12 +1,12 @@
 GIT
   remote: https://github.com/zooniverse/restpack_serializer.git
-  revision: cef0969cef79a31de774e71c63de2a934c9e9f7f
-  ref: cef0969cef
-  branch: panoptes-api-version
+  revision: 5f1ef6c2b230f291dd3b30b9c213bbeb64617801
+  ref: 5f1ef6c2b2
+  branch: upgrade-activesupport-and-activerecord-to-allow-6.0
   specs:
     restpack_serializer (0.5.9)
-      activerecord (>= 4.0.3, < 6.0)
-      activesupport (>= 4.0.3, < 6.0)
+      activerecord (>= 5.2, < 7.1)
+      activesupport (>= 5.2, < 7.1)
       kaminari (< 2.0)
 
 GEM
