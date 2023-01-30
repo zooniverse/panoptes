@@ -43,9 +43,9 @@ gem 'puma', '~> 6.0.2'
 gem 'pundit', '~> 2.2.0'
 gem 'rack-cors', '~> 1.0', require: 'rack/cors'
 if next?
-  gem 'rails', '~> 6.0'
+  gem 'rails', '~> 6.1'
 else
-  gem 'rails', '~> 5.2'
+  gem 'rails', '~> 6.1'
 end
 gem 'ranked-model', '~> 0.4.8'
 gem 'restpack_serializer', git: 'https://github.com/zooniverse/restpack_serializer.git', branch: 'panoptes-api-version', ref: '5f1ef6c2b2'
