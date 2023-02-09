@@ -45,7 +45,7 @@ module JsonApiController
       resource_class.transaction do
         destroy_relation(resource, relation, params[:link_ids])
         # as this resource may not have changed but the linked resources may have
-        # ensure we modify the upated_at timestamp to cache bust this resource
+        # ensure we modify the updated_at timestamp to cache bust this resource
         resource.updated_at = Time.zone.now
         resource.save!
       end
