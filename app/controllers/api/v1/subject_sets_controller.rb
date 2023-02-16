@@ -118,8 +118,13 @@ class Api::V1::SubjectSetsController < Api::ApiController
       new_sms_values = subject_ids_to_link.map do |subject_id|
         [ resource.id, subject_id, rand ]
       end
-
-      result = SetMemberSubject.import IMPORT_COLUMNS, new_sms_values, validate: false
+      # bulk import via SQL inserts - https://github.com/zdennis/activerecord-import#columns-and-arrays
+      result = SetMemberSubject.import(
+        IMPORT_COLUMNS, # columns to import
+        new_sms_values, # values that match columns in array form
+        validate: false, # ignore AR model validations
+        on_duplicate_key_ignore: true # ignore duplicate records, e.g. skip uniq index errors, https://github.com/zdennis/activerecord-import#duplicate-key-ignore
+      )
       SubjectMetadataWorker.perform_async(result.ids)
       result
     else
