@@ -219,6 +219,14 @@ describe Api::V1::SubjectSetsController, type: :controller do
           expect(response).to have_http_status(:unprocessable_entity)
         end
       end
+
+      context 'when the subjects already existin in the set' do
+        it 'does not raise a duplicate key error' do
+          SetMemberSubject.create!(subject_id: subjects.first.id, subject_set_id: resource.id)
+          run_update_links
+          expect(response).to have_http_status(:ok)
+        end
+      end
     end
 
     context 'with illegal link properties' do
