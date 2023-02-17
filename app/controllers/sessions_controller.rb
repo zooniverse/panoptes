@@ -19,8 +19,8 @@ class SessionsController < Devise::SessionsController
 
   def destroy
     respond_to do |format|
-      format.html { super }
       format.json { destroy_from_json }
+      format.html { super }
     end
   end
 
