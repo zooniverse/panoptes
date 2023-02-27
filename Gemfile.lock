@@ -248,7 +248,7 @@ GEM
       aggregate (~> 0.2.2)
       faraday
     libv8-node (16.10.0.0)
-    listen (3.7.1)
+    listen (3.8.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
     lograge (0.12.0)
@@ -381,7 +381,7 @@ GEM
     rake (13.0.6)
     ranked-model (0.4.8)
       activerecord (>= 4.2)
-    rb-fsevent (0.11.1)
+    rb-fsevent (0.11.2)
     rb-inotify (0.10.1)
       ffi (~> 1.0)
     redis (4.5.1)
@@ -547,7 +547,7 @@ DEPENDENCIES
   jquery-rails (~> 4.5)
   json-schema (~> 2.8)
   librato-metrics (~> 2.1.2)
-  listen (~> 3.7)
+  listen (~> 3.8)
   lograge
   mime-types
   mini_racer
