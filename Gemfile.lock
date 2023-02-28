@@ -214,7 +214,7 @@ GEM
       rspec (>= 2.99.0, < 4.0)
     hashdiff (1.0.1)
     hashie (5.0.0)
-    honeybadger (5.0.2)
+    honeybadger (5.1.0)
     http-accept (1.7.0)
     http-cookie (1.0.5)
       domain_name (~> 0.5)
@@ -542,7 +542,7 @@ DEPENDENCIES
   graphiql-rails
   graphql
   guard-rspec
-  honeybadger (~> 5.0)
+  honeybadger (~> 5.1)
   httparty
   jquery-rails (~> 4.5)
   json-schema (~> 2.8)
