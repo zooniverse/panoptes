@@ -19,6 +19,7 @@ class SessionsController < Devise::SessionsController
 
   def destroy
     respond_to do |format|
+      revoke_access_tokens!
       format.json { destroy_from_json }
       format.html { super }
     end
@@ -51,5 +52,16 @@ class SessionsController < Devise::SessionsController
   def set_csrf_headers
     response.headers['X-CSRF-Param'] = request_forgery_protection_token.to_s
     response.headers['X-CSRF-Token'] = form_authenticity_token.to_s
+  end
+
+  def revoke_access_tokens!
+    application_ids_to_revoke = Doorkeeper::Application.pluck(:id)
+    return if application_ids_to_revoke.empty?
+    users = Devise.mappings.keys.map { |s| warden.user(scope: s, run_callbacks: false) }
+
+    users.each { |user| Doorkeeper::AccessToken.revoke_all_for(
+      application_ids_to_revoke,
+      user
+    )}
   end
 end
