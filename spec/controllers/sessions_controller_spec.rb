@@ -59,6 +59,40 @@ describe SessionsController, type: :controller do
           delete :destroy
         end
       end
+
+      describe 'revoking access tokens' do
+        let(:oauth_app) { create(:non_confidential_first_party_app, owner: user) }
+        let(:user_token) { create(:access_token, application_id: oauth_app.id, resource_owner_id: user.id) }
+        let(:user_other_token) { create(:access_token, application_id: oauth_app.id, resource_owner_id: user.id) }
+        let(:user_revoked_token) { create(:access_token, application_id: oauth_app.id, resource_owner_id: user.id) }
+        let(:another_user) { create(:user) }
+        let(:other_user_token) { create(:access_token, application_id: oauth_app.id, resource_owner_id: another_user.id) }
+
+        before do
+          user_token
+          user_other_token
+          user_revoked_token.revoke
+          other_user_token
+          request.env['devise.user'] = user
+          sign_in user
+        end
+
+        it 'revokes all access tokens for the relevant client app' do
+          expect {
+            delete :destroy
+          }.to change {
+            Doorkeeper::AccessToken.where(application_id: oauth_app.id, resource_owner_id: user.id, revoked_at: nil).count
+          }.from(2).to(0)
+        end
+
+        it 'does not revoke access token for another user' do
+          expect {
+            delete :destroy
+          }.not_to change {
+            Doorkeeper::AccessToken.where(application_id: oauth_app.id, resource_owner_id: another_user.id, revoked_at: nil).count
+          }
+        end
+      end
     end
 
     describe "#new" do
