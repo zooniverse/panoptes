@@ -78,6 +78,7 @@ describe SessionsController, type: :controller do
         end
 
         it 'revokes all access tokens for the relevant client app' do
+          request.env['HTTP_AUTHORIZATION'] = "Bearer #{user_token.token}"
           expect {
             delete :destroy
           }.to change {
