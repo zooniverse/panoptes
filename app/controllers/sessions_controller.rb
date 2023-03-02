@@ -19,7 +19,6 @@ class SessionsController < Devise::SessionsController
 
   def destroy
     respond_to do |format|
-      revoke_access_tokens!
       format.json { destroy_from_json }
       format.html { super }
     end
@@ -36,6 +35,7 @@ class SessionsController < Devise::SessionsController
   end
 
   def destroy_from_json
+    revoke_access_tokens! if doorkeeper_token
     Devise.sign_out_all_scopes ? sign_out : sign_out(resource_name)
     yield if block_given?
     head :no_content
@@ -55,13 +55,13 @@ class SessionsController < Devise::SessionsController
   end
 
   def revoke_access_tokens!
-    application_ids_to_revoke = Doorkeeper::Application.pluck(:id)
-    return if application_ids_to_revoke.empty?
-    users = Devise.mappings.keys.map { |s| warden.user(scope: s, run_callbacks: false) }
 
-    users.each { |user| Doorkeeper::AccessToken.revoke_all_for(
-      application_ids_to_revoke,
+    application_id_to_revoke = doorkeeper_token&.application_id
+    return unless application_id_to_revoke
+    user = doorkeeper_token&.resource_owner_id
+    Doorkeeper::AccessToken.revoke_all_for(
+      application_id_to_revoke,
       user
-    )}
+    )
   end
 end
