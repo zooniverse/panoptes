@@ -527,7 +527,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  active_interaction (~> 3.8.3)
+  active_interaction
   active_model_serializers
   active_record_extended
   activerecord-import (~> 1.4)
