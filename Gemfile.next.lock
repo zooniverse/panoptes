@@ -50,8 +50,9 @@ GEM
       erubi (~> 1.4)
       rails-dom-testing (~> 2.0)
       rails-html-sanitizer (~> 1.1, >= 1.2.0)
-    active_interaction (3.8.3)
-      activemodel (>= 4, < 7)
+    active_interaction (5.2.0)
+      activemodel (>= 5.2, < 8)
+      activesupport (>= 5.2, < 8)
     active_model_serializers (0.10.13)
       actionpack (>= 4.1, < 7.1)
       activemodel (>= 4.1, < 7.1)
@@ -333,7 +334,7 @@ GEM
     parallel (1.22.1)
     parser (3.1.2.1)
       ast (~> 2.4.1)
-    pg (0.21.0)
+    pg (1.4.6)
     pg_search (2.3.6)
       activerecord (>= 5.2)
       activesupport (>= 5.2)
@@ -565,7 +566,7 @@ DEPENDENCIES
   omniauth-google-oauth2
   p3p (~> 2.0)
   panoptes-client
-  pg (~> 0.21)
+  pg (~> 1.4)
   pg_search
   pry
   puma (~> 6.0.2)
