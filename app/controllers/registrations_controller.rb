@@ -20,6 +20,7 @@ class RegistrationsController < Devise::RegistrationsController
   end
 
   def destroy
+    puts "MDY114 HITS REGISTRATIONS CONTROLLER DESTROY"
     if current_user.valid_password?(params[:user][:current_password])
       UserInfoScrubber.scrub_personal_info!(current_user)
       Activation.disable_instances!([current_user])
