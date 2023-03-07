@@ -215,7 +215,7 @@ GEM
       rspec (>= 2.99.0, < 4.0)
     hashdiff (1.0.1)
     hashie (5.0.0)
-    honeybadger (5.1.0)
+    honeybadger (5.2.0)
     http-accept (1.7.0)
     http-cookie (1.0.5)
       domain_name (~> 0.5)
@@ -294,7 +294,7 @@ GEM
     net-smtp (0.3.3)
       net-protocol
     netrc (0.11.0)
-    newrelic_rpm (8.16.0)
+    newrelic_rpm (9.0.0)
     nio4r (2.5.8)
     nokogiri (1.14.0)
       mini_portile2 (~> 2.8.0)
@@ -339,7 +339,7 @@ GEM
       coderay (~> 1.1)
       method_source (~> 1.0)
     public_suffix (4.0.7)
-    puma (6.0.2)
+    puma (6.1.1)
       nio4r (~> 2.0)
     pundit (2.3.0)
       activesupport (>= 3.0.0)
@@ -543,7 +543,7 @@ DEPENDENCIES
   graphiql-rails
   graphql
   guard-rspec
-  honeybadger (~> 5.1)
+  honeybadger (~> 5.2)
   httparty
   jquery-rails (~> 4.5)
   json-schema (~> 2.8)
@@ -562,7 +562,7 @@ DEPENDENCIES
   pg (~> 1.4)
   pg_search
   pry
-  puma (~> 6.0.2)
+  puma (~> 6.1.1)
   pundit (~> 2.3.0)
   rack-cors (~> 1.0)
   rails (~> 6.0)
