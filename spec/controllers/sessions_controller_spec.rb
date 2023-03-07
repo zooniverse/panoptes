@@ -67,12 +67,15 @@ describe SessionsController, type: :controller do
         let(:user_revoked_token) { create(:access_token, application_id: oauth_app.id, resource_owner_id: user.id) }
         let(:another_user) { create(:user) }
         let(:other_user_token) { create(:access_token, application_id: oauth_app.id, resource_owner_id: another_user.id) }
+        let(:other_oauth_app) { create(:non_confidential_first_party_app, owner: user) }
+        let(:other_app_token) { create(:access_token, application_id: other_oauth_app.id, resource_owner_id: user.id) }
 
         before do
           user_token
           user_other_token
           user_revoked_token.revoke
           other_user_token
+          other_app_token
           request.env['devise.user'] = user
           sign_in user
         end
@@ -87,10 +90,20 @@ describe SessionsController, type: :controller do
         end
 
         it 'does not revoke access token for another user' do
+          request.env['HTTP_AUTHORIZATION'] = "Bearer #{user_token.token}"
           expect {
             delete :destroy
           }.not_to change {
             Doorkeeper::AccessToken.where(application_id: oauth_app.id, resource_owner_id: another_user.id, revoked_at: nil).count
+          }
+        end
+
+        it 'does not revoke access tokens for other client apps' do
+          request.env['HTTP_AUTHORIZATION'] = "Bearer #{user_token.token}"
+          expect {
+            delete :destroy
+          }.not_to change {
+            Doorkeeper::AccessToken.where(application_id: other_oauth_app.id, resource_owner_id: user.id, revoked_at: nil).count
           }
         end
       end
