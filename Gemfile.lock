@@ -275,7 +275,7 @@ GEM
     mini_portile2 (2.8.1)
     mini_racer (0.6.3)
       libv8-node (~> 16.10.0.0)
-    minitest (5.17.0)
+    minitest (5.18.0)
     mock_redis (0.36.0)
       ruby2_keywords
     multi_json (1.15.0)
@@ -479,8 +479,8 @@ GEM
     standby (4.0.0)
       activerecord (>= 3.0.0)
     stringex (2.8.5)
-    strong_migrations (0.7.9)
-      activerecord (>= 5)
+    strong_migrations (1.4.3)
+      activerecord (>= 5.2)
     ten_years_rails (0.2.0)
       actionview
       activesupport
