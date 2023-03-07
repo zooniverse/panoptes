@@ -110,7 +110,7 @@ describe SessionsController, type: :controller do
         context 'when bearer token not supplied' do
           it 'does not revoke any access tokens' do
             expect {
-            delete :destroy
+              delete :destroy
             }.not_to change {
               Doorkeeper::AccessToken.where(application_id: oauth_app.id, resource_owner_id: user.id, revoked_at: nil).count
             }

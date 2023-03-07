@@ -18,7 +18,6 @@ class SessionsController < Devise::SessionsController
   end
 
   def destroy
-    request.headers.each { |key, value| puts "MDY114 KEY #{key} VALUE #{value}" }
     respond_to do |format|
       format.json { destroy_from_json }
       format.html { super }
@@ -58,6 +57,7 @@ class SessionsController < Devise::SessionsController
   def revoke_access_tokens!
     application_id_to_revoke = doorkeeper_token&.application_id
     return unless application_id_to_revoke
+
     user = User.find(doorkeeper_token&.resource_owner_id)
     Doorkeeper::AccessToken.revoke_all_for(
       application_id_to_revoke,
