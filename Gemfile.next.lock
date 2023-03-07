@@ -342,7 +342,7 @@ GEM
       coderay (~> 1.1)
       method_source (~> 1.0)
     public_suffix (5.0.0)
-    puma (6.0.2)
+    puma (6.1.1)
       nio4r (~> 2.0)
     pundit (2.3.0)
       activesupport (>= 3.0.0)
@@ -550,7 +550,7 @@ DEPENDENCIES
   graphiql-rails
   graphql
   guard-rspec
-  honeybadger (~> 5.1)
+  honeybadger (~> 5.2)
   httparty
   jquery-rails (~> 4.5)
   json-schema (~> 2.8)
@@ -569,7 +569,7 @@ DEPENDENCIES
   pg (~> 1.4)
   pg_search
   pry
-  puma (~> 6.0.2)
+  puma (~> 6.1.1)
   pundit (~> 2.3.0)
   rack-cors (~> 1.0)
   rails (~> 6.1)
