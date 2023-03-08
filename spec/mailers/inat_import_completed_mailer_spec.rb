@@ -35,7 +35,7 @@ RSpec.describe InatImportCompletedMailer, type: :mailer do
     end
 
     context 'with a failed subject set import' do
-      let(:ss_import) { create(:subject_set_import, subject_set: subject_set, failed_count: 1) }
+      let(:ss_import) { create(:subject_set_import, subject_set: subject_set, failed_count: 3, failed_uuids: [111, 222, 333]) }
 
       it 'includes the failed subject suffix' do
         expect(mail.subject).to include('Your iNaturalist subject import completed with errors')
@@ -43,6 +43,10 @@ RSpec.describe InatImportCompletedMailer, type: :mailer do
 
       it 'reports the failures statement' do
         expect(mail.body.encoded).to include('There were some errors when importing your iNaturalist observations.')
+      end
+
+      it 'includes the failed ids' do
+        expect(mail.body.encoded).to include('111, 222, 333')
       end
     end
   end
