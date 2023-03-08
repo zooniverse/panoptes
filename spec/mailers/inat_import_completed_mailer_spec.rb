@@ -34,7 +34,7 @@ RSpec.describe InatImportCompletedMailer, type: :mailer do
       expect(mail.body.encoded).to include('The iNaturalist observations have been imported successfully.')
     end
 
-    context 'with a failed subject set import', :focus do
+    context 'with a failed subject set import' do
       let(:ss_import) { create(:subject_set_import, subject_set: subject_set, failed_count: 3, failed_uuids: [111, 222, 333]) }
 
       it 'reports the failures statement' do
