@@ -59,6 +59,7 @@ class SessionsController < Devise::SessionsController
     return unless application_id_to_revoke
 
     user = User.find(doorkeeper_token&.resource_owner_id)
+    # revoke all tokens that this user owns for the client application this token is linked to, e.g. PFE, FEM, classrooms etc. 
     Doorkeeper::AccessToken.revoke_all_for(
       application_id_to_revoke,
       user
