@@ -1,6 +1,6 @@
 shared_examples "an api response" do
   it "should return the correct content type" do
-    expect(response.content_type).to include("application/vnd.api+json; version=1")
+    expect(response.content_type).to include('application/vnd.api+json; version=1')
   end
 
   it "should include allowed attributes" do
