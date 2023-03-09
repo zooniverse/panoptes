@@ -35,6 +35,7 @@ class SessionsController < Devise::SessionsController
   end
 
   def destroy_from_json
+    revoke_all_user_application_access_tokens! if doorkeeper_token
     Devise.sign_out_all_scopes ? sign_out : sign_out(resource_name)
     yield if block_given?
     head :no_content
@@ -51,5 +52,17 @@ class SessionsController < Devise::SessionsController
   def set_csrf_headers
     response.headers['X-CSRF-Param'] = request_forgery_protection_token.to_s
     response.headers['X-CSRF-Token'] = form_authenticity_token.to_s
+  end
+
+  def revoke_all_user_application_access_tokens!
+    application_id_to_revoke = doorkeeper_token.application_id
+    return unless application_id_to_revoke
+
+    # revoke all tokens that this user owns for the client application this token is linked to, e.g. PFE, FEM, classrooms etc.
+    user = User.find(doorkeeper_token.resource_owner_id)
+    Doorkeeper::AccessToken.revoke_all_for(
+      application_id_to_revoke,
+      user
+    )
   end
 end
