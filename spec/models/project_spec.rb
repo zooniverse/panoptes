@@ -81,7 +81,7 @@ describe Project, type: :model do
 
   describe "#live" do
     before(:each) do
-      project.update_attributes(live: nil)
+      project.update(live: nil)
     end
 
     it "should not accept nil values" do
