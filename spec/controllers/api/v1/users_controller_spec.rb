@@ -569,8 +569,8 @@ describe Api::V1::UsersController, type: :controller do
         expect(response.status).to eq(422)
       end
 
-      it "should return a specific error message in the response body" do
-        error_message = "param is missing or the value is empty: users"
+      it 'returns a specific error message in the response body' do
+        error_message = 'param is missing or the value is empty: users'
         errors = JSON.parse(response.body)['errors']
         expect(errors).not_to be_empty
         expect(errors[0]['message']).to include(error_message)
