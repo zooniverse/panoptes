@@ -3,7 +3,7 @@ class IdentityGroupNameValidator < ActiveModel::Validator
     if identity_group = user.try(:identity_membership).try(:user_group)
       unless identity_group.valid?
         error_list = name_errors(identity_group)
-        user.errors[:"identity_group.display_name"].concat(error_list)
+        error_list.each { |name_err| user.errors.add(:"identity_group.display_name", name_err) }
       end
     else
       user.errors.add(:identity_group, "can't be blank")
