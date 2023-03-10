@@ -253,14 +253,14 @@ describe Api::V1::OrganizationsController, type: :controller do
         end
 
         it "touches listed_at if listed is true" do
-          organization.update_attributes({listed: false, listed_at: nil})
+          organization.update({listed: false, listed_at: nil})
           params = { organizations: { listed: true }, id: organization.id }
           run_update(params)
           expect(json_response["organizations"].first['listed_at']).to be_truthy
         end
 
         it "nulls listed_at if listed is false" do
-          organization.update_attributes({listed: true, listed_at: Time.now })
+          organization.update({listed: true, listed_at: Time.now })
           params = { organizations: { listed: false }, id: organization.id }
           run_update(params)
           expect(json_response["organizations"].first['listed_at']).to be_nil
@@ -268,7 +268,7 @@ describe Api::V1::OrganizationsController, type: :controller do
 
         it "updates the categories" do
           new_categories = %w(fish snails worms)
-          organization.update_attributes({listed: true, listed_at: Time.now })
+          organization.update({listed: true, listed_at: Time.now })
           params = {
             organizations: {
               categories: new_categories

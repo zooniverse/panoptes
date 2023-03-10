@@ -58,7 +58,7 @@ RSpec.describe Formatter::Csv::Workflow do
         tasks: tasks, pairwise: !workflow.pairwise,
         grouped: !workflow.grouped, prioritized: !workflow.prioritized
       }
-      workflow.update_attributes(updates)
+      workflow.update(updates)
     end
 
     describe "#to_rows on the latest version" do
