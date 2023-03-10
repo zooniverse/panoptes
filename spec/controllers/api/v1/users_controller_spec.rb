@@ -561,7 +561,7 @@ describe Api::V1::UsersController, type: :controller do
       it_behaves_like "an api response"
     end
 
-    context "with a an invalid put operation" do
+    context 'with an invalid put operation' do
       before(:each) { update_request }
       let(:put_operations) { {} }
 
@@ -570,8 +570,10 @@ describe Api::V1::UsersController, type: :controller do
       end
 
       it "should return a specific error message in the response body" do
-        error_message = json_error_message("param is missing or the value is empty: users")
-        expect(response.body).to eq(error_message)
+        error_message = "param is missing or the value is empty: users"
+        errors = JSON.parse(response.body)['errors']
+        expect(errors).not_to be_empty
+        expect(errors[0]['message']).to include(error_message)
       end
 
       it "should not updated the resource attribute" do
