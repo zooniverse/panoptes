@@ -346,7 +346,7 @@ GEM
     raabro (1.4.0)
     racc (1.6.2)
     rack (2.2.6.4)
-    rack-cors (1.1.1)
+    rack-cors (2.0.0)
       rack (>= 2.0.0)
     rack-protection (2.2.2)
       rack
@@ -564,7 +564,7 @@ DEPENDENCIES
   pry
   puma (~> 6.1.1)
   pundit (~> 2.3.0)
-  rack-cors (~> 1.0)
+  rack-cors (~> 2.0)
   rails (~> 6.0)
   ranked-model (~> 0.4.8)
   restpack_serializer!
