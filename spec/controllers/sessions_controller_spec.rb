@@ -63,8 +63,6 @@ describe SessionsController, type: :controller do
       describe 'revoking access tokens' do
         let(:oauth_app) { create(:non_confidential_first_party_app, owner: user) }
         let(:user_token) { create(:access_token, application_id: oauth_app.id, resource_owner_id: user.id) }
-        let(:user_other_token) { create(:access_token, application_id: oauth_app.id, resource_owner_id: user.id) }
-        let(:user_revoked_token) { create(:access_token, application_id: oauth_app.id, resource_owner_id: user.id) }
         let(:another_user) { create(:user) }
         let(:other_user_token) { create(:access_token, application_id: oauth_app.id, resource_owner_id: another_user.id) }
         let(:other_oauth_app) { create(:non_confidential_first_party_app, owner: user) }
@@ -72,8 +70,6 @@ describe SessionsController, type: :controller do
 
         before do
           user_token
-          user_other_token
-          user_revoked_token.revoke
           other_user_token
           other_app_token
           request.env['devise.user'] = user
