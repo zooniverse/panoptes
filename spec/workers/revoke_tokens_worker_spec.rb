@@ -4,15 +4,15 @@ require 'spec_helper'
 
 describe RevokeTokensWorker do
   let(:worker) { described_class.new }
-  let(:user) { create(:user) }
-  let(:oauth_app) { create(:non_confidential_first_party_app, owner: user) }
-  let(:user_token) { create(:access_token, application_id: oauth_app.id, resource_owner_id: user.id) }
-  let(:user_other_token) { create(:access_token, application_id: oauth_app.id, resource_owner_id: user.id) }
-  let(:user_revoked_token) { create(:access_token, application_id: oauth_app.id, resource_owner_id: user.id) }
-  let(:another_user) { create(:user) }
-  let(:other_user_token) { create(:access_token, application_id: oauth_app.id, resource_owner_id: another_user.id) }
-  let(:other_oauth_app) { create(:non_confidential_first_party_app, owner: user) }
-  let(:other_app_token) { create(:access_token, application_id: other_oauth_app.id, resource_owner_id: user.id) }
+  let!(:user) { create(:user) }
+  let!(:oauth_app) { create(:non_confidential_first_party_app, owner: user) }
+  let!(:user_token) { create(:access_token, application_id: oauth_app.id, resource_owner_id: user.id) }
+  let!(:user_other_token) { create(:access_token, application_id: oauth_app.id, resource_owner_id: user.id) }
+  let!(:user_revoked_token) { create(:access_token, application_id: oauth_app.id, resource_owner_id: user.id) }
+  let!(:another_user) { create(:user) }
+  let!(:other_user_token) { create(:access_token, application_id: oauth_app.id, resource_owner_id: another_user.id) }
+  let!(:other_oauth_app) { create(:non_confidential_first_party_app, owner: user) }
+  let!(:other_app_token) { create(:access_token, application_id: other_oauth_app.id, resource_owner_id: user.id) }
 
   before do
     user_token
