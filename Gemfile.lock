@@ -145,7 +145,6 @@ GEM
     erubi (1.12.0)
     et-orbi (1.2.7)
       tzinfo
-    execjs (2.8.1)
     factory_bot (6.2.1)
       activesupport (>= 5.0.0)
     factory_bot_rails (6.2.0)
@@ -495,8 +494,6 @@ GEM
     timeout (0.3.2)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
-    uglifier (4.2.0)
-      execjs (>= 0.3.0, < 3)
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.8.2)
@@ -591,7 +588,6 @@ DEPENDENCIES
   stringex (~> 2.8)
   strong_migrations
   ten_years_rails
-  uglifier (~> 4.2)
   versionist (~> 2.0)
   webmock
   zoo_stream (~> 1.0.1)
