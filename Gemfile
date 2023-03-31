@@ -57,7 +57,6 @@ gem 'sidekiq-unique-jobs'
 gem 'standby'
 gem 'stringex', '~> 2.8'
 gem 'strong_migrations'
-gem 'uglifier', '~> 4.2'
 gem 'versionist', '~> 2.0'
 gem 'zoo_stream', '~> 1.0.1'
 

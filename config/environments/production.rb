@@ -22,10 +22,6 @@ Rails.application.configure do
   # Disable Rails's static asset server (Apache or nginx will already do this).
   config.public_file_server.enabled = false
 
-  # Compress JavaScripts and CSS.
-  config.assets.js_compressor = Uglifier.new(harmony: true, mangle: false)
-  # config.assets.css_compressor = :sass
-
   # use a non-default path to provide unique paths for use behind CDNs
   # E.g. avoid clashes with the PFE UI code uses as it uses '/assets'
   config.assets.prefix = '/api-assets'
