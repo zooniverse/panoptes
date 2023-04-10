@@ -451,7 +451,7 @@ GEM
     sanitize (6.0.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
-    scientist (1.6.3)
+    scientist (1.6.4)
     shellany (0.0.1)
     sidekiq (6.5.8)
       connection_pool (>= 2.2.5, < 3)
@@ -576,7 +576,7 @@ DEPENDENCIES
   rubocop-performance
   rubocop-rails
   rubocop-rspec
-  scientist (~> 1.6.3)
+  scientist (~> 1.6.4)
   sidekiq (< 7)
   sidekiq-congestion (~> 0.1.0)
   sidekiq-cron
