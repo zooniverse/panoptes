@@ -298,7 +298,7 @@ GEM
       net-protocol
     netrc (0.11.0)
     newrelic_rpm (9.1.0)
-    nio4r (2.5.8)
+    nio4r (2.5.9)
     nokogiri (1.14.3)
       mini_portile2 (~> 2.8.0)
       racc (~> 1.4)
@@ -342,7 +342,7 @@ GEM
       coderay (~> 1.1)
       method_source (~> 1.0)
     public_suffix (4.0.7)
-    puma (6.1.1)
+    puma (6.2.1)
       nio4r (~> 2.0)
     pundit (2.3.0)
       activesupport (>= 3.0.0)
@@ -563,7 +563,7 @@ DEPENDENCIES
   pg (~> 1.4)
   pg_search
   pry
-  puma (~> 6.1.1)
+  puma (~> 6.2.1)
   pundit (~> 2.3.0)
   rack-cors (~> 1.0)
   rails (~> 6.1)
