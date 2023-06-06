@@ -13,10 +13,11 @@ jobs:
       with:
         repo_name: panoptes
         commit_id: ${{ github.sha }}
-  
+
   deploy_production:
     name: Deploy to Production
     uses: zooniverse/ci-cd/.github/workflows/deploy_app.yaml@main
+    needs: build_and_push_image
     with:
       app_name: panoptes
       repo_name: panoptes
