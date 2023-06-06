@@ -1,6 +1,5 @@
 Rails.application.configure do
-  # ActiveSupport::Deprecation.silenced = ENV.fetch('DEPRECATION_WARNINGS_SILENCED', nil).present?
-  ActiveSupport::Deprecation.silenced = 1
+  ActiveSupport::Deprecation.silenced = ENV.fetch('DEPRECATION_WARNINGS_SILENCED', nil).present?
   # Settings specified here will take precedence over those in config/application.rb.
 
   # The test environment is used exclusively to run your application's
