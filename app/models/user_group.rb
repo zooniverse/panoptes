@@ -18,11 +18,11 @@ class UserGroup < ApplicationRecord
            source_type: "Project"
   has_many :collections, through: :owned_resources, source: :resource,
            source_type: "Collection"
-  
+
   enum stats_visibility: {
     restricted: 0,
     private_accessible: 1,
-    public_limited: 2, 
+    public_limited: 2,
     public_accessible: 3
   }
 
