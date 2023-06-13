@@ -166,6 +166,6 @@ class Project < ApplicationRecord
   end
 
   def communication_emails
-    users_with_project_roles(%w(owner communications)).pluck(:email)
+    users_with_project_roles(%w(owner collaborator communications)).pluck(:email)
   end
 end
