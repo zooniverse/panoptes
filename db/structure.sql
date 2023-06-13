@@ -1,10 +1,3 @@
---
--- PostgreSQL database dump
---
-
--- Dumped from database version 11.15 (Debian 11.15-1.pgdg90+1)
--- Dumped by pg_dump version 11.15
-
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
@@ -1671,7 +1664,8 @@ CREATE TABLE public.user_groups (
     display_name character varying,
     private boolean DEFAULT true NOT NULL,
     lock_version integer DEFAULT 0,
-    join_token character varying
+    join_token character varying,
+    stats_visibility integer DEFAULT 0
 );
 
 
@@ -4581,6 +4575,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20211007125705'),
 ('20211124175756'),
 ('20211201164326'),
-('20221018032140');
+('20221018032140'),
+('20230613165746');
 
 
