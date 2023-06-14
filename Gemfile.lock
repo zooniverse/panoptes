@@ -483,7 +483,7 @@ GEM
       sprockets (>= 3.0.0)
     standby (4.0.0)
       activerecord (>= 3.0.0)
-    stringex (2.8.5)
+    stringex (2.8.6)
     strong_migrations (1.4.4)
       activerecord (>= 5.2)
     ten_years_rails (0.2.0)
