@@ -25,7 +25,7 @@ class UserGroup < ApplicationRecord
   #
   # private_show_agg_and_ind: Only members of a user group can view aggregate stats. Individual stats is viewable by BOTH members and admins of the user group.
   # 
-  # public_agg_only: Anyone can view aggregate stats of the user group. However, only admins can view individual stats.
+  # public_agg_only: Anyone can view aggregate stats of the user group. However, only admins of the user group can view individual stats.
   #
   # public_show_all: Anyone can view aggregate stats of the user group and can view individual stats of the user group. 
   ##
