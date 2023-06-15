@@ -27,13 +27,16 @@ class UserGroup < ApplicationRecord
   # 
   # public_agg_only: Anyone can view aggregate stats of the user group. However, only admins of the user group can view individual stats.
   #
+  # public_agg_show_ind_if_member: Anyone can view aggregate stats of the user group. However, only members of the user group can view individual stats.
+  #
   # public_show_all: Anyone can view aggregate stats of the user group and can view individual stats of the user group. 
   ##
   enum stats_visibility: {
     private_agg_only: 0,
     private_show_agg_and_ind: 1,
     public_agg_only: 2,
-    public_show_all: 3
+    public_agg_show_ind_if_member: 3,
+    public_show_all: 4
   }
 
   validates :display_name, presence: true
