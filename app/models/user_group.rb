@@ -19,17 +19,17 @@ class UserGroup < ApplicationRecord
   has_many :collections, through: :owned_resources, source: :resource,
            source_type: "Collection"
 
-  ## 
+  ##
   # Stats_Visibility Levels (Used for ERAS stats service)
   # private_agg_only (default): Only members of a user group can view aggregate stats. However, individual stats only viewable by admins of the user group
   #
   # private_show_agg_and_ind: Only members of a user group can view aggregate stats. Individual stats is viewable by BOTH members and admins of the user group.
-  # 
+  #
   # public_agg_only: Anyone can view aggregate stats of the user group. However, only admins of the user group can view individual stats.
   #
   # public_agg_show_ind_if_member: Anyone can view aggregate stats of the user group. However, only members of the user group can view individual stats.
   #
-  # public_show_all: Anyone can view aggregate stats of the user group and can view individual stats of the user group. 
+  # public_show_all: Anyone can view aggregate stats of the user group and can view individual stats of the user group.
   ##
   enum stats_visibility: {
     private_agg_only: 0,
