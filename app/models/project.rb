@@ -48,7 +48,7 @@ class Project < ApplicationRecord
 
   has_many :project_versions, dependent: :destroy
 
-  versioned association: :project_versions, attributes: %w(private live beta_requested beta_approved launch_requested launch_approved display_name description workflow_description introduction url_labels researcher_quote)
+  versioned association: :project_versions, attributes: %w[private live beta_requested beta_approved launch_requested launch_approved display_name description workflow_description introduction url_labels researcher_quote]
 
   enum state: [:paused, :finished]
 
@@ -82,7 +82,7 @@ class Project < ApplicationRecord
   ranks :beta_row_order
 
   def self.translatable_attributes
-    %i(display_name title description workflow_description introduction researcher_quote url_labels)
+    %i[display_name title description workflow_description introduction researcher_quote url_labels]
   end
 
   def available_languages
@@ -102,7 +102,7 @@ class Project < ApplicationRecord
   end
 
   def owners_and_collaborators
-    users_with_project_roles(%w(owner collaborator)).select(:id)
+    users_with_project_roles(%w[owner collaborator]).select(:id)
   end
 
   def create_talk_admin(client)
@@ -166,6 +166,6 @@ class Project < ApplicationRecord
   end
 
   def communication_emails
-    users_with_project_roles(%w(owner collaborator communications)).pluck(:email)
+    users_with_project_roles(%w[owner collaborator communications]).pluck(:email)
   end
 end
