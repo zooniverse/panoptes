@@ -9,6 +9,9 @@ spec:
       - name: panoptes-migrate-db-staging
         image: ghcr.io/zooniverse/panoptes:__IMAGE_TAG__
         command: ["/rails_app/migrate.sh"]
+        env:
+        - name: PG_STATEMENT_TIMEOUT
+          value: '0'
         envFrom:
         - secretRef:
             name: panoptes-common-env-vars
