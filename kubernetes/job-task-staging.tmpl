@@ -9,6 +9,9 @@ spec:
       - name: panoptes-rake-task-staging
         image: ghcr.io/zooniverse/panoptes:__IMAGE_TAG__
         command: ["bundle",  "exec", "rake", __RAKE_TASK_NAME__]
+        env:
+        - name: PG_STATEMENT_TIMEOUT
+          value: '0'
         envFrom:
         - secretRef:
             name: panoptes-common-env-vars
