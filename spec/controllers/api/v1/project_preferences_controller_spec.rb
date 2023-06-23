@@ -168,9 +168,10 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
       end
     end
 
-    describe "updating a project as an admin" do
+    describe 'updating a project as an admin' do
       let(:admin_user) { create(:admin_user) }
-      it "lets the admin update UPP settings" do
+
+      it 'lets the admin update UPP settings' do
         default_request user_id: admin_user.id, scopes: scopes
         run_update
         expect(response.status).to eq(200)
