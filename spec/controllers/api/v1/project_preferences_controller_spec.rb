@@ -78,7 +78,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
     it_behaves_like 'is creatable'
   end
 
-  describe '#update_settings' do
+  describe '#update_settings', :focus, :focus do
     let!(:project) { create(:project, owner: authorized_user) }
     let!(:upp) { create(:user_project_preference, project: project) }
     let(:settings_params) do
@@ -165,6 +165,15 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
       it 'only updates settings of owned project' do
         run_update
         expect(response.status).to eq(403)
+      end
+    end
+
+    describe "updating a project as an admin" do
+      let(:admin_user) { create(:admin_user) }
+      it "lets the admin update UPP settings" do
+        default_request user_id: admin_user.id, scopes: scopes
+        run_update
+        expect(response.status).to eq(200)
       end
     end
 
