@@ -3,7 +3,7 @@ class UserGroupSerializer
   include RecentLinkSerializer
   include CachedSerializer
 
-  attributes :id, :name, :display_name, :classifications_count, :created_at, :updated_at, :type, :href, :join_token
+  attributes :id, :name, :display_name, :classifications_count, :created_at, :updated_at, :type, :href, :join_token, :stats_visibility
   can_include :memberships, :users,
               projects: { param: "owner", value: "name" },
               collections: { param: "owner", value: "name" }
