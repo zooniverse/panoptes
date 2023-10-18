@@ -84,6 +84,12 @@ describe ProjectCopier do
         field_guide = copied_project.field_guides.first
         expect(field_guide.translations.first.language).to eq(project.primary_language)
       end
+
+      it 'copies the field guide attached images' do
+        fg = create(:field_guide, project: project)
+        fg.attached_images << create(:medium, type: "field_guide_attached_image", linked: fg)
+        expect(copied_project.field_guides.first.attached_images[0]).to be_valid
+      end
     end
 
     context 'when a project has a project page' do

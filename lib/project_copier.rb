@@ -10,7 +10,8 @@ class ProjectCopier
     :tagged_resources,
     :avatar,
     :background,
-    { active_workflows: %i[tutorials attached_images] }
+    { active_workflows: %i[tutorials attached_images] },
+    { field_guides: %i[attached_images] }
   ].freeze
 
   def initialize(project_id, user_id)
