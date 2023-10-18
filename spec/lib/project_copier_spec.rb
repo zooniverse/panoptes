@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe ProjectCopier do
@@ -40,10 +42,11 @@ describe ProjectCopier do
     end
 
     it 'creates Talk roles for the new project and its owner' do
-      expect(TalkAdminCreateWorker)
-        .to receive(:perform_async)
-        .with(be_kind_of(Integer))
+      allow(TalkAdminCreateWorker).to receive(:perform_async)
       copied_project
+      expect(TalkAdminCreateWorker)
+        .to have_received(:perform_async)
+        .with(be_kind_of(Integer))
     end
 
     context 'when a project has active_worklfows' do
@@ -94,7 +97,7 @@ describe ProjectCopier do
 
       it 'copies the field guide attached images' do
         fg = create(:field_guide, project: project)
-        fg.attached_images << create(:medium, type: "field_guide_attached_image", linked: fg)
+        fg.attached_images << create(:medium, type: 'field_guide_attached_image', linked: fg)
         expect(copied_project.field_guides.first.attached_images[0]).to be_valid
       end
     end
