@@ -173,6 +173,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
 
       it 'lets the admin update UPP settings' do
         default_request user_id: admin_user.id, scopes: scopes
+        settings_params[:admin] = true
         run_update
         expect(response.status).to eq(200)
       end

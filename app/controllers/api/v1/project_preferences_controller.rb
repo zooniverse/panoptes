@@ -26,7 +26,7 @@ class Api::V1::ProjectPreferencesController < Api::ApiController
   end
 
   def user_allowed?
-    @upp.project.owners_and_collaborators.include?(api_user.user) || api_user.user.is_admin?
+    @upp.project.owners_and_collaborators.include?(api_user.user) || api_user.is_admin?
   end
 
   def update_settings_response
