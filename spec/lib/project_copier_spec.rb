@@ -39,6 +39,13 @@ describe ProjectCopier do
       expect(copied_project.configuration['source_project_id']).to be(project.id)
     end
 
+    it 'creates Talk roles for the new project and its owner' do
+      expect(TalkAdminCreateWorker)
+        .to receive(:perform_async)
+        .with(be_kind_of(Integer))
+      copied_project
+    end
+
     context 'when a project has active_worklfows' do
       it 'creates a valid workflow copy' do
         expect(copied_project.active_workflows.first).to be_valid

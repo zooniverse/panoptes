@@ -36,6 +36,9 @@ class ProjectCopier
       # to keep the translations system working with these copied resources
       setup_associated_primary_language_translations(copied_project)
 
+      # Creates Talk roles via background worker
+      TalkAdminCreateWorker.perform_async(copied_project.id)
+
       # return the newly copied project
       copied_project
     end
