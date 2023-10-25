@@ -4,13 +4,13 @@ class ProjectCopier
   EXCLUDE_ATTRIBUTES = %i[classifications_count launched_row_order beta_row_order].freeze
   INCLUDE_ASSOCIATIONS = [
     :tutorials,
-    :field_guides,
     :pages,
     :tags,
     :tagged_resources,
     :avatar,
     :background,
-    { active_workflows: %i[tutorials attached_images] }
+    { active_workflows: %i[tutorials attached_images] },
+    { field_guides: %i[attached_images] }
   ].freeze
 
   def initialize(project_id, user_id)
@@ -22,7 +22,7 @@ class ProjectCopier
     # Should this all be wrapped in a transaction?
     # to ensure we rollback an sub resource creations,
     # e.g. inband primary lang strings for the associated resources....
-    Project.transaction(requires_new: true) do
+    copied_project = Project.transaction(requires_new: true) do
       copied_project = copy_project
 
       # save the project and create the project versions for use in translation strings
@@ -35,9 +35,14 @@ class ProjectCopier
       # to keep the translations system working with these copied resources
       setup_associated_primary_language_translations(copied_project)
 
-      # return the newly copied project
       copied_project
     end
+
+    # Creates Talk roles via background worker
+    TalkAdminCreateWorker.perform_async(copied_project.id)
+
+    # return the newly copied project
+    copied_project
   end
 
   private
