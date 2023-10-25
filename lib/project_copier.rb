@@ -4,7 +4,6 @@ class ProjectCopier
   EXCLUDE_ATTRIBUTES = %i[classifications_count launched_row_order beta_row_order].freeze
   INCLUDE_ASSOCIATIONS = [
     :tutorials,
-    :field_guides,
     :pages,
     :tags,
     :tagged_resources,
