@@ -41,9 +41,7 @@ class UserGroup < ApplicationRecord
   enum stats_visibility: STATS_VISIBILITY_LEVELS
 
   validate do
-    if @invalid_stats_visibility
-      errors.add(:stats_visibility, "Not stats_visibility type, please select from the list: #{STATS_VISIBILITY_LEVELS.keys}")
-    end
+    errors.add(:stats_visibility, "Not valid stats_visibility type, please select from the list: #{STATS_VISIBILITY_LEVELS.keys}") if @invalid_stats_visibility
   end
 
   validates :display_name, presence: true
