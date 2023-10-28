@@ -69,6 +69,37 @@ describe Api::V1::UserGroupsController, type: :controller do
     end
 
     it_behaves_like 'is updatable'
+
+    describe 'updating stats_visibility' do
+      it 'updates stats_visibility' do
+        default_request scopes: scopes, user_id: authorized_user.id
+        params = {
+          id: resource.id,
+          user_groups: {
+            display_name: 'A-Different-Name',
+            stats_visibility: 'public_agg_only'
+          }
+        }
+        put :update, params: params
+        expect(response.status).to eq(200)
+
+        group = UserGroup.find(resource.id)
+        expect(group.stats_visibility).to eq('public_agg_only')
+      end
+
+      it 'does not update user_group if invalid stats_visibility' do
+        default_request scopes: scopes, user_id: authorized_user.id
+        params = {
+          id: resource.id,
+          user_groups: {
+            display_name: 'A-Different-Name',
+            stats_visibility: 'fake_stats_visibility'
+          }
+        }
+        put :update, params: params
+        expect(response.status).to eq(400)
+      end
+    end
   end
 
   describe '#show' do
@@ -117,6 +148,33 @@ describe Api::V1::UserGroupsController, type: :controller do
         group = UserGroup.find(group_id)
         membership = authorized_user.memberships.where(user_group: group).first
         expect(membership.roles).to include('group_admin')
+      end
+    end
+
+    describe 'setting stats_visibility' do
+      it 'sets the stats_visiblity when sending in stats_visiblity as string' do
+        default_request scopes: scopes, user_id: authorized_user.id
+        post :create, params: { user_groups: { name: 'GalaxyZoo', stats_visibility: 'public_agg_show_ind_if_member' } }
+        expect(response.status).to eq(201)
+
+        group = UserGroup.find(created_instance_id('user_groups'))
+        expect(group.stats_visibility).to eq('public_agg_show_ind_if_member')
+      end
+
+      it 'sets the stats_visibility when sending related integer corresponding to visibility level' do
+        default_request scopes: scopes, user_id: authorized_user.id
+        post :create, params: { user_groups: { name: 'GalaxyZoo', stats_visibility: 3 } }
+        expect(response.status).to eq(201)
+
+        # see app/models/user_group.rb L22-L40 for explanations of stats_visibliity levels
+        group = UserGroup.find(created_instance_id('user_groups'))
+        expect(group.stats_visibility).to eq('public_agg_show_ind_if_member')
+      end
+
+      it 'does not create group if stats_visibility is invalid' do
+        default_request scopes: scopes, user_id: authorized_user.id
+        post :create, params: { user_groups: { name: 'GalaxyZoo', stats_visibility: 7 } }
+        expect(response.status).to eq(400)
       end
     end
 

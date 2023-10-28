@@ -9,8 +9,8 @@ class Api::V1::UserGroupsController < Api::ApiController
 
   alias_method :user_group, :controlled_resource
 
-  allowed_params :create, :name, :display_name, links: [ users: [] ]
-  allowed_params :update, :name, :display_name
+  allowed_params :create, :name, :display_name, :stats_visibility, links: [ users: [] ]
+  allowed_params :update, :name, :stats_visibility, :display_name
 
   search_by do |name, query|
     query.search_name(name.join(" "))
