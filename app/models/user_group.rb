@@ -37,7 +37,7 @@ class UserGroup < ApplicationRecord
     public_agg_only: 2,
     public_agg_show_ind_if_member: 3,
     public_show_all: 4
-  }
+  }.freeze
   enum stats_visibility: STATS_VISIBILITY_LEVELS
 
   validate do
@@ -94,7 +94,7 @@ class UserGroup < ApplicationRecord
   end
 
   def stats_visibility=(value)
-    if !STATS_VISIBILITY_LEVELS.stringify_keys.keys.include?(value) && !STATS_VISIBILITY_LEVELS.values.include?(value)
+    if STATS_VISIBILITY_LEVELS.stringify_keys.keys.exclude?(value) && STATS_VISIBILITY_LEVELS.values.exclude?(value)
       @invalid_stats_visibility = true
     else
       super value
