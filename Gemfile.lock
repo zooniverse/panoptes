@@ -201,7 +201,8 @@ GEM
     graphiql-rails (1.9.0)
       railties
       sprockets-rails
-    graphql (2.0.17)
+    graphql (2.1.5)
+      racc (~> 1.4)
     guard (2.18.0)
       formatador (>= 0.2.4)
       listen (>= 2.7, < 4.0)
