@@ -72,7 +72,7 @@ group :development, :test do
   gem 'rubocop-performance'
   gem 'rubocop-rails'
   gem 'rubocop-rspec'
-  gem 'spring', '~>2.1.1' # remove constraint once on or past rails 5.2
+  gem 'spring', '~>4.1.2' # remove constraint once on or past rails 5.2
   gem 'sprockets', '~>3.7'
   gem 'ten_years_rails'
 end
