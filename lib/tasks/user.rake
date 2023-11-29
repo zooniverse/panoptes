@@ -48,6 +48,18 @@ namespace :user do
     end
   end
 
+  desc 'Backfill confirmed_at in batches (restartable)'
+  task backfill_confirmed_at: :environment do
+    mass_confirmed_at = Time.current.to_s(:db)
+    User.select(:id).find_in_batches do |users|
+      null_confirmed_at_user_scope = User.where(
+        id: users.map(&:id),
+        confirmed_at: nil
+      )
+      null_confirmed_at_user_scope.update_all(confirmed_at: mass_confirmed_at)
+    end
+  end
+
   namespace :limit do
 
     class UpdateUserLimitArgsError < StandardError; end
