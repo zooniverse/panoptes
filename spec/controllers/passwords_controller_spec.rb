@@ -72,8 +72,9 @@ describe PasswordsController, type: [ :controller, :mailer ] do
           expect(response.status).to eq(200)
         end
 
-        it "should not send an email to the account email address" do
-          expect(ActionMailer::Base.deliveries).to be_empty
+        it 'should send confirmation instructions to the account email address' do
+          expect(ActionMailer::Base.deliveries).not_to be_empty
+          expect(ActionMailer::Base.deliveries.first.body).to include('confirm your account')
         end
       end
 
