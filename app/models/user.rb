@@ -13,7 +13,7 @@ class User < ApplicationRecord
   attr_accessor :minor_age
 
   devise :database_authenticatable, :registerable,
-    :recoverable, :rememberable, :trackable, :validatable,
+    :recoverable, :rememberable, :trackable, :validatable, :confirmable,
     :omniauthable, omniauth_providers: [:facebook, :google_oauth2]
 
   has_many :classifications, dependent: :restrict_with_exception
@@ -56,14 +56,12 @@ class User < ApplicationRecord
   validates_with IdentityGroupNameValidator
 
   after_create :set_zooniverse_id
-  after_create :send_welcome_email, unless: :migrated
   before_create :set_ouroboros_api_key
 
   delegate :projects, to: :identity_group
   delegate :collections, to: :identity_group
   delegate :subjects, to: :identity_group
   delegate :owns?, to: :identity_group
-
 
   pg_search_scope :search_name,
     against: [:login],
@@ -202,6 +200,10 @@ class User < ApplicationRecord
 
   def self.find_by_lower_login(login)
     find_by("lower(login) = ?", login.downcase)
+  end
+
+  def after_confirmation
+    send_welcome_email
   end
 
   def subject_limit

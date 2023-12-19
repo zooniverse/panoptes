@@ -213,6 +213,17 @@ describe User, type: :model do
     end
   end
 
+  describe 'confirmation' do
+    context 'when a new user is saved' do
+      let(:user) { build(:user, confirmed_at: nil, confirmation_sent_at: nil) }
+
+      it 'sends a confirmation email' do
+        expect_any_instance_of(User).to receive(:send_confirmation_instructions).once
+        user.save!
+      end
+    end
+  end
+
   describe '::send_reset_password_instructions' do
     context 'when the user exists' do
       let(:user) { create(:user) }
@@ -872,17 +883,17 @@ describe User, type: :model do
     end
   end
 
-  describe "#send_welcome_email after_create callback" do
-    let(:user) { build(:user) }
+  describe "#send_welcome_email on confirm" do
+    let(:user) { create(:user, confirmed_at: nil) }
 
     it "should send the welcome email" do
       expect(user).to receive(:send_welcome_email).once
-      user.save!
+      user.confirm
     end
 
     it "should queue the worker with the user id" do
       allow(UserWelcomeMailerWorker).to receive :perform_async
-      user.save!
+      user.confirm
       expect(UserWelcomeMailerWorker).to have_received(:perform_async).with(user.id, nil).ordered
     end
 
@@ -890,24 +901,24 @@ describe User, type: :model do
       it "should not raise an error on save" do
         [ Timeout::Error, Redis::TimeoutError, Redis::CannotConnectError ].each do |redis_error|
           allow(UserWelcomeMailerWorker).to receive(:perform_async).and_raise(redis_error)
-          expect { user.save! }.not_to raise_error
+          expect { user.confirm }.not_to raise_error
         end
       end
 
       it "should send the welcome email in band" do
         allow(UserWelcomeMailerWorker).to receive(:perform_async).and_raise(Redis::CannotConnectError)
         expect_any_instance_of(UserWelcomeMailerWorker).to receive(:perform).with(Integer, nil)
-        user.save!
+        user.confirm
       end
     end
 
     context "when the user has a project id" do
       let(:project) { create :project }
-      let!(:user) { build(:user, project_id: project.id) }
+      let!(:user) { create(:user, project_id: project.id, confirmed_at: nil) }
 
       it "should queue the worker with the user id and project id" do
         allow(UserWelcomeMailerWorker).to receive :perform_async
-        user.save!
+        user.confirm
         expect(UserWelcomeMailerWorker).to have_received(:perform_async).with(user.id, project.id).ordered
       end
     end
@@ -917,7 +928,7 @@ describe User, type: :model do
 
       it "should not queue the worker with the user id" do
         expect(UserWelcomeMailerWorker).not_to receive(:perform_async)
-        user.save!
+        user.confirm
       end
     end
   end
