@@ -149,8 +149,8 @@ describe RegistrationsController, type: :controller do
           post :create, params: { user: user_attributes }
         end
 
-        it "should queue a welcome worker to send an email" do
-          expect(UserWelcomeMailerWorker).to receive(:perform_async)
+        it "should send a confirmation instructions email" do
+          expect_any_instance_of(User).to receive(:send_confirmation_instructions).once
           post :create, params: { user: user_attributes }
         end
 
@@ -212,8 +212,8 @@ describe RegistrationsController, type: :controller do
           end
         end
 
-        it "should not queue a welcome worker to send an email" do
-          expect(UserWelcomeMailerWorker).to_not receive(:perform_async)
+        it "should not send a confirmation instructions email" do
+          expect_any_instance_of(User).to_not receive(:send_confirmation_instructions)
           post :create, params: { user: user_attributes }
         end
       end
@@ -279,8 +279,8 @@ describe RegistrationsController, type: :controller do
           post :create, params: { user: user_attributes }
         end
 
-        it "should queue a welcome worker to send an email" do
-          expect(UserWelcomeMailerWorker).to receive(:perform_async)
+        it "should send a confirmation instructions email" do
+          expect_any_instance_of(User).to receive(:send_confirmation_instructions).once
           post :create, params: { user: user_attributes }
         end
       end
@@ -313,8 +313,8 @@ describe RegistrationsController, type: :controller do
           expect(User.where(login: user_attributes[:login])).to_not exist
         end
 
-        it "should not queue a welcome worker to send an email" do
-          expect(UserWelcomeMailerWorker).to_not receive(:perform_async)
+        it "should not send a confirmation instructions email" do
+          expect_any_instance_of(User).to_not receive(:send_confirmation_instructions)
           post :create, params: { user: user_attributes }
         end
       end

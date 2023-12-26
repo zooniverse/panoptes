@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe ProjectCopier do
@@ -37,6 +39,14 @@ describe ProjectCopier do
 
     it "adds the source project id to the copied project's configuration" do
       expect(copied_project.configuration['source_project_id']).to be(project.id)
+    end
+
+    it 'creates Talk roles for the new project and its owner' do
+      allow(TalkAdminCreateWorker).to receive(:perform_async)
+      copied_project
+      expect(TalkAdminCreateWorker)
+        .to have_received(:perform_async)
+        .with(be_kind_of(Integer))
     end
 
     context 'when a project has active_worklfows' do
@@ -83,6 +93,12 @@ describe ProjectCopier do
         create(:field_guide, project: project)
         field_guide = copied_project.field_guides.first
         expect(field_guide.translations.first.language).to eq(project.primary_language)
+      end
+
+      it 'copies the field guide attached images' do
+        fg = create(:field_guide, project: project)
+        fg.attached_images << create(:medium, type: 'field_guide_attached_image', linked: fg)
+        expect(copied_project.field_guides.first.attached_images[0]).to be_valid
       end
     end
 

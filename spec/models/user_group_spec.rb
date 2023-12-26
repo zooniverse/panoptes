@@ -71,6 +71,32 @@ describe UserGroup, :type => :model do
     end
   end
 
+  describe '#stats_visibility' do
+    it 'validates that it is one of the STATS_VISIBILITY levels' do
+      ug = build(:user_group, name: 'abc')
+      ug.stats_visibility = 'public_agg_only'
+      expect(ug).to be_valid
+    end
+
+    it 'allows stats_visibility to be integer corresponding to STATS_VISIBILITY level' do
+      ug = build(:user_group, name: 'abc')
+      ug.stats_visibility = 4
+      expect(ug).to be_valid
+    end
+
+    it 'does not allow stats_visibility to be outside STATS_VISIBILITY levels' do
+      ug = build(:user_group, name: 'abc')
+      ug.stats_visibility = 'fake_stats_level'
+      expect(ug).not_to be_valid
+    end
+
+    it 'does not allow stats_visibility to be outside STATS_VISIBILITY range' do
+      ug = build(:user_group, name: 'abc')
+      ug.stats_visibility = 9
+      expect(ug).not_to be_valid
+    end
+  end
+
   describe "#users" do
     let(:user_group) { create(:user_group_with_users) }
 

@@ -19,6 +19,31 @@ class UserGroup < ApplicationRecord
   has_many :collections, through: :owned_resources, source: :resource,
            source_type: "Collection"
 
+  ##
+  # Stats_Visibility Levels (Used for ERAS stats service)
+  # private_agg_only (default): Only members of a user group can view aggregate stats. Individual stats only viewable by only admins of the user group
+  #
+  # private_show_agg_and_ind: Only members of a user group can view aggregate stats. Individual stats is viewable by BOTH members and admins of the user group.
+  #
+  # public_agg_only: Anyone can view aggregate stats of the user group. Only admins of the user group can view individual stats.
+  #
+  # public_agg_show_ind_if_member: Anyone can view aggregate stats of the user group. Members and admins of the user group can view individual stats.
+  #
+  # public_show_all: Anyone can view aggregate stats of the user group and can view individual stats of the user group.
+  ##
+  STATS_VISIBILITY_LEVELS = {
+    private_agg_only: 0,
+    private_show_agg_and_ind: 1,
+    public_agg_only: 2,
+    public_agg_show_ind_if_member: 3,
+    public_show_all: 4
+  }.freeze
+  enum stats_visibility: STATS_VISIBILITY_LEVELS
+
+  validate do
+    errors.add(:stats_visibility, "Not valid stats_visibility type, please select from the list: #{STATS_VISIBILITY_LEVELS.keys}") if @invalid_stats_visibility
+  end
+
   validates :display_name, presence: true
   validates :name, presence: true,
     uniqueness: { case_sensitive: false },
@@ -64,6 +89,14 @@ class UserGroup < ApplicationRecord
 
   def verify_join_token(token_to_verify)
     join_token.present? && join_token == token_to_verify
+  end
+
+  def stats_visibility=(value)
+    if STATS_VISIBILITY_LEVELS.stringify_keys.keys.exclude?(value) && STATS_VISIBILITY_LEVELS.values.exclude?(value)
+      @invalid_stats_visibility = true
+    else
+      super value
+    end
   end
 
   private

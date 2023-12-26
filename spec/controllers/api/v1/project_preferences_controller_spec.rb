@@ -168,6 +168,17 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
       end
     end
 
+    describe 'updating a project as an admin' do
+      let(:admin_user) { create(:admin_user) }
+
+      it 'lets the admin update UPP settings' do
+        default_request user_id: admin_user.id, scopes: scopes
+        settings_params[:admin] = true
+        run_update
+        expect(response.status).to eq(200)
+      end
+    end
+
     describe "trying to update a resource that doesn't exist" do
       let(:unused_project) { create(:project) }
       let(:settings_params) do

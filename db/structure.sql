@@ -1,10 +1,3 @@
---
--- PostgreSQL database dump
---
-
--- Dumped from database version 11.15 (Debian 11.15-1.pgdg90+1)
--- Dumped by pg_dump version 11.15
-
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
@@ -59,8 +52,6 @@ COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching
 
 
 SET default_tablespace = '';
-
-SET default_with_oids = false;
 
 --
 -- Name: access_control_lists; Type: TABLE; Schema: public; Owner: -
@@ -1671,7 +1662,8 @@ CREATE TABLE public.user_groups (
     display_name character varying,
     private boolean DEFAULT true NOT NULL,
     lock_version integer DEFAULT 0,
-    join_token character varying
+    join_token character varying,
+    stats_visibility integer DEFAULT 0
 );
 
 
@@ -1808,7 +1800,10 @@ CREATE TABLE public.users (
     upload_whitelist boolean DEFAULT false NOT NULL,
     ux_testing_email_communication boolean DEFAULT false,
     intervention_notifications boolean DEFAULT true,
-    nasa_email_communication boolean DEFAULT false
+    nasa_email_communication boolean DEFAULT false,
+    confirmation_token character varying,
+    confirmed_at timestamp without time zone,
+    confirmation_sent_at timestamp without time zone
 );
 
 
@@ -3575,6 +3570,13 @@ CREATE INDEX index_users_on_beta_email_communication ON public.users USING btree
 
 
 --
+-- Name: index_users_on_confirmation_token; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_users_on_confirmation_token ON public.users USING btree (confirmation_token);
+
+
+--
 -- Name: index_users_on_display_name; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4581,6 +4583,8 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20211007125705'),
 ('20211124175756'),
 ('20211201164326'),
-('20221018032140');
+('20221018032140'),
+('20230613165746'),
+('20231025200957');
 
 

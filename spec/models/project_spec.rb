@@ -505,27 +505,54 @@ describe Project, type: :model do
     end
   end
 
-  describe "#communication_emails" do
+  describe '#communication_emails' do
     let(:project) { create(:project) }
     let(:owner_email) { project.owner.email }
 
-    it 'should return the owner by default' do
+    it 'return the owner email by default' do
       expect(project.communication_emails).to match_array([owner_email])
     end
 
-    context "with communication project roles" do
+    context 'with non-owner communication project roles' do
       let(:comms_user) { create(:user) }
+      let(:collaborator) { create(:user) }
+
       before do
         create(
           :access_control_list,
           user_group: comms_user.identity_group,
           resource: project,
-          roles: ["communications"]
+          roles: ['communications']
         )
       end
 
-      it 'should return the owner and comms roles emails' do
+      it 'returns the owner and comms roles emails' do
         expect(project.communication_emails).to match_array([owner_email, comms_user.email])
+      end
+
+      it 'returns emails of owner, collaborator, and comms roles' do
+        create(
+          :access_control_list,
+          user_group: collaborator.identity_group,
+          resource: project,
+          roles: ['collaborator']
+        )
+        expect(project.communication_emails).to match_array([owner_email, comms_user.email, collaborator.email])
+      end
+
+      it 'does not include email of user that is not associated with project' do
+        expect(project.communication_emails).not_to include(collaborator.email)
+      end
+
+      it 'does not include email of user with non-communications type role' do
+        translator = create(:user)
+        create(
+          :access_control_list,
+          user_group: translator.identity_group,
+          resource: project,
+          roles: ['translator']
+        )
+        expect(project.communication_emails).not_to include(translator.email)
       end
     end
   end
