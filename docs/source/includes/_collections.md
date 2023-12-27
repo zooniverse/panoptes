@@ -1,4 +1,4 @@
-# Collections [/collection/{id}]
+# Collections
 
 ```json
 {
