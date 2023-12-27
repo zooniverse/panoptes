@@ -152,9 +152,9 @@ A user is permitted to add subject if they are the collection owner or
 have edit permissions.
 
 
-## Remove subject links [/collection/{id}/links/subjects/{link_ids}]
+## Remove subject links
 ```http
-DELETE /api/collections/123/links/subjects/1 HTTP/1.1
+DELETE /api/collections/123/links/subjects/1,2 HTTP/1.1
 Accept: application/vnd.api+json; version=1
 Content-Type: application/json
 ```
