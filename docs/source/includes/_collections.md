@@ -68,6 +68,10 @@ Accept: application/vnd.api+json; version=1
 Content-Type: application/json
 ```
 
++ Parameters
+  + id (required, integer) ... integer id of the resource to retrieve
+  + display_name (string) ... project name filter
+
 ## Create a Collection
 A Collection only needs a *display name* to be created. By default
 name will be the underscored and downcased version of *display_name*,
