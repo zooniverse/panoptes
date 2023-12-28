@@ -14,9 +14,24 @@ toc_footers:
 includes:
   - authentication
   - json_api
+  - headers
+  - classifications
+  - collection_preferences
+  - collection_roles
+  - collections
+  - memberships
+  - organizations
+  - project_preferences
+  - project_roles
   - projects
   - subject_set_imports
+  - set_member_subjects
+  - subject_sets
+  - subject_workflow_statuses
+  - subjects
+  - user_groups
   - users
+  - workflows
 
 search: true
 ---
