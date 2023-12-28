@@ -82,7 +82,7 @@ updated_at | datetime | read-only
 All attributes except display_name are set by the API
 
 ## List all Subject Sets
-```
+```http
 GET /api/subject_sets HTTP/1.1
 Accept: application/vnd.api+json; version=1
 Content-Type: application/json
