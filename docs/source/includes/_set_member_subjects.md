@@ -121,7 +121,7 @@ priority. The state will be 'active' by default and the priority will
 be null by default.
 
 
-### Edit a SetMemberSubject
+## Edit a SetMemberSubject
 ```http
 PUT /api/set_member_subjects/123 HTTP/1.1
 Accept: application/vnd.api+json; version=1
