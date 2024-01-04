@@ -31,8 +31,6 @@ ADD ./Gemfile /rails_app/
 ADD ./Gemfile.lock /rails_app/
 
 RUN bundle config --global jobs `cat /proc/cpuinfo | grep processor | wc -l | xargs -I % expr % - 1`
-# Newest versions of rubygems-update is not compatible with Ruby2.7 (Only compatible with Ruby 3+)
-RUN gem i "rubygems-update:~>3.4.22" --no-document && update_rubygems
 RUN bundle install --without development test
 
 ADD ./ /rails_app
