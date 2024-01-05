@@ -392,6 +392,12 @@ describe Api::V1::UsersController, type: :controller do
       expect(result).to eq(user.upload_whitelist)
     end
 
+    it "should have the confirmed_at for the user" do
+      result = user_response["confirmed_at"]
+      # Dates are JSON serialized via iso8601 and .to_json adds quotes
+      expect(result).to eq(user.confirmed_at.iso8601(3))
+    end
+
     it_behaves_like "an api response"
   end
 
