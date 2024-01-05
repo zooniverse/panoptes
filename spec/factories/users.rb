@@ -8,8 +8,8 @@ FactoryBot.define do
     sequence(:email) {|n| "example#{n}@example.com"}
     password { 'password' }
     encrypted_password { User.new.send(:password_digest, 'password') }
-    confirmed_at { Time.current }
-    confirmation_sent_at { Time.current }
+    confirmed_at { Time.utc(2024, 1, 1, 12, 0, 0) }
+    confirmation_sent_at { Time.utc(2024, 1, 1, 12, 0, 0) }
     credited_name { 'Dr User' }
     activated_state { :active }
     sequence(:login) { |n| "new_user_#{n}" }
