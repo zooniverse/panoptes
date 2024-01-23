@@ -31,6 +31,7 @@ ADD ./Gemfile /rails_app/
 ADD ./Gemfile.lock /rails_app/
 
 RUN bundle config --global jobs `cat /proc/cpuinfo | grep processor | wc -l | xargs -I % expr % - 1`
+
 # run gem update system so installation of mini_racer does not fail
 # See: https://github.com/rubyjs/mini_racer/issues/289#issuecomment-1823077560
 # pinning gem update to 3.4.22 since anything higher requires updating Ruby version to 3+
