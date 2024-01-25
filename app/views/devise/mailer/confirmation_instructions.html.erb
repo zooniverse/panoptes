@@ -1,5 +1,9 @@
-<p>Welcome <%= @email %>!</p>
+<p>Welcome to the Zooniverse, <%= @email %>!</p>
 
-<p>You can confirm your account email through the link below:</p>
-
+<p>Please confirm your account email by clicking the link below:</p>
 <p><%= link_to 'Confirm my account', confirmation_url(@resource, confirmation_token: @token) %></p>
+
+While you are able to login and classify within projects, you will not be able to post on Talk discussion forums until you verify your email account.
+
+Thanks!
+The Zooniverse Team
