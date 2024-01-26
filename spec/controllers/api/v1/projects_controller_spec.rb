@@ -846,6 +846,11 @@ describe Api::V1::ProjectsController, type: :controller do
     let(:instances_to_disable) { [resource] }
 
     it_behaves_like 'is deactivatable'
+    
+    it "should append 'delete' to display_name" do
+      delete :destroy, params: {id: resource.id}
+      expect(resource.display_name).to end_with('delete')
+    end
   end
 
   describe '#copy' do
