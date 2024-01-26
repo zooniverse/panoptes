@@ -847,10 +847,12 @@ describe Api::V1::ProjectsController, type: :controller do
 
     it_behaves_like 'is deactivatable'
     
-    it "should append 'delete' to display_name" do
+    it "appends 'deleted' to display_name" do
+      stub_token(scopes: scopes, user_id: authorized_user.id)
+      set_preconditions
       delete :destroy, params: {id: resource.id}
-      expect(resource.display_name).to end_with('delete')
-    end
+      expect(resource.reload.display_name).to   end_with('deleted')
+    end 
   end
 
   describe '#copy' do
