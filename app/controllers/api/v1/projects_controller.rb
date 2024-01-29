@@ -66,9 +66,7 @@ class Api::V1::ProjectsController < Api::ApiController
   def destroy
     super do |resource|
       split_display_name = resource.display_name.split('_')
-      if split_display_name[split_display_name.length - 1] != 'deleted'
-        resource.update(display_name: "#{resource.display_name}_deleted")
-      end
+      resource.update(display_name: "#{resource.display_name}_deleted") unless split_display_name[split_display_name.length - 1] == 'deleted'
     end
   end
 
