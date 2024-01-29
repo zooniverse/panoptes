@@ -1,14 +1,20 @@
-<div class="form-container">
-  <h2>Resend confirmation instructions</h2>
+<div class="form-container panel panel-default">
+  <div class="panel-body">
+    <h2>Resend confirmation email</h2>
 
-  <%= form_for(resource, as: resource_name, url: confirmation_path(resource_name), html: { method: :post, class: "form" }) do |f| %>
-    <%= devise_error_messages! %>
+    <%= form_for(resource, as: resource_name, url: confirmation_path(resource_name), html: { method: :post, class: "form" }) do |f| %>
+      <%= render "devise/shared/error_messages", resource: resource %>
 
-    <fieldset class="fieldset--email"><%= f.label :email %><br />
-    <%= f.email_field :email, autofocus: true, required: true %></fieldset>
+      <fieldset class="fieldset--email">
+        <%= f.label :email, "Email Address" %><br />
+        <%= f.email_field :email, autofocus: true, required: true %>
+      </fieldset>
 
-    <div class="submit-container"><%= f.submit "Resend confirmation instructions" %></div>
-  <% end %>
+      <div class="submit-container"><%= f.submit "Submit" %></div>
+    <% end %>
+  </div>
 
-  <%= render "devise/shared/links" %>
+  <div class="panel-footer">
+    <%= render "devise/shared/links" %>
+  </div>
 </div>
