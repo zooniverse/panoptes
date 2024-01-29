@@ -845,7 +845,7 @@ describe Api::V1::ProjectsController, type: :controller do
     let(:resource) { create(:full_project, owner: user) }
     let(:instances_to_disable) { [resource] }
 
-    it_behaves_like 'is deactivatable'    
+    it_behaves_like 'is deactivatable'
     it "appends 'deleted' to display_name" do
       stub_token(scopes: scopes, user_id: authorized_user.id)
       set_preconditions
