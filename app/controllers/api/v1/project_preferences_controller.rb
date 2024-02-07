@@ -7,6 +7,7 @@ class Api::V1::ProjectPreferencesController < Api::ApiController
   extra_schema_actions :update_settings
   schema_type :json_schema
   before_action :find_upp_for_update_settings, only: [:update_settings]
+  before_action :find_project, only: [:read_settings]
 
   def read_settings
     skip_policy_scope
@@ -20,7 +21,9 @@ class Api::V1::ProjectPreferencesController < Api::ApiController
     read_and_update_settings_response
   end
 
-  private
+  def find_project
+    @project = Project.find(params[:project_id])
+  end
 
   def find_upp_for_update_settings
     @upp = UserProjectPreference.find_by!(
@@ -35,7 +38,7 @@ class Api::V1::ProjectPreferencesController < Api::ApiController
   end
 
   def read_and_update_settings_response
-    set_last_modified_header if action_name == "update_settings"
+    set_last_modified_header if action_name == 'update_settings'
 
     render_json_response
   end
@@ -47,14 +50,12 @@ class Api::V1::ProjectPreferencesController < Api::ApiController
   end
 
   def render_json_response
-    if action_name == "update_settings"
+    preferences = if action_name == 'update_settings'
       preferences = UserProjectPreference.where(id: @upp.id)
     else
-      project = Project.find_by!(id: params[:project_id])
-      preferences = project.user_project_preference.where.not(email_communication: nil)
+      preferences = @project.user_project_preference.where.not(email_communication: nil)
       preferences = params[:user_id].present? ? preferences.where(user_id: params[:user_id]) : preferences
-    end
-  
+    end  
     render(
       status: :ok,
       json_api: serializer.resource({}, preferences, context)

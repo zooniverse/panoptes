@@ -202,6 +202,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
     let!(:project) { create(:project, owner: authorized_user) }
     let!(:upp) { create(:user_project_preference, project: project) }
     let(:run_generic_read) { get :read_settings, params: { project_id: project.id, format: :json } }
+    let(:run_invalid_project) { get :read_settings, params: { project_id: 500, format: :json } }
     let(:unauthorised_user) { create(:user) }
     let(:run_unauthorised_user_read) { get :read_settings, params: { project_id: project.id, user_id: unauthorised_user.id, format: :json } }
 
@@ -214,7 +215,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
       it 'responds with a 200' do
         expect(response.status).to eq(200)
       end
-  
+
       it 'returns the correct response data' do
         json_response = JSON.parse(response.body)
         expect(json_response["project_preferences"]).to be_a(Array)
@@ -222,8 +223,19 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
       end
     end
 
+    describe 'invalid project' do
+      before do
+        default_request user_id: authorized_user.id, scopes: scopes
+        run_invalid_project
+      end
+
+      it 'responds with a 404' do
+        expect(response.status).to eq(404)
+      end
+    end
+
     describe 'user specific preferences' do
-      before(:each) do
+      before do
         default_request user_id: unauthorised_user.id, scopes: scopes
         run_unauthorised_user_read
       end
@@ -231,10 +243,10 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
       it 'responds with a 200' do
         expect(response.status).to eq(200)
       end
-  
+
       it 'returns the correct response data' do
         json_response = JSON.parse(response.body)
-        expect(json_response["project_preferences"].count).to eq(0)
+        expect(json_response['project_preferences'].count).to eq(0)
       end
     end
   end
