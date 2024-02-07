@@ -43,14 +43,12 @@ class Api::V1::ProjectPreferencesController < Api::ApiController
     render_json_response
   end
 
-  private
-  
   def set_last_modified_header
     response.headers['Last-Modified'] = @upp.updated_at.httpdate
   end
 
   def render_json_response
-    preferences = if action_name == 'update_settings'
+    if action_name == 'update_settings'
       preferences = UserProjectPreference.where(id: @upp.id)
     else
       preferences = @project.user_project_preference.where.not(email_communication: nil)
