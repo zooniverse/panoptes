@@ -54,6 +54,7 @@ class Api::V1::ProjectPreferencesController < Api::ApiController
       preferences = @project.user_project_preference.where.not(email_communication: nil)
       preferences = params[:user_id].present? ? preferences.where(user_id: params[:user_id]) : preferences
     end  
+
     render(
       status: :ok,
       json_api: serializer.resource({}, preferences, context)
