@@ -15,6 +15,7 @@ class Project < ApplicationRecord
   has_many :tutorials
   has_many :field_guides, dependent: :destroy
   belongs_to :organization
+  has_many :user_project_preference
   # uses the activated_state enum on the workflow
   has_many :workflows,
     -> { where(serialize_with_project: true).active},

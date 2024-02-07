@@ -8,11 +8,16 @@ class Api::V1::ProjectPreferencesController < Api::ApiController
   schema_type :json_schema
   before_action :find_upp_for_update_settings, only: [:update_settings]
 
+  def read_settings
+    skip_policy_scope
+    read_and_update_settings_response
+  end
+
   def update_settings
     skip_policy_scope
     @upp.settings.merge! params_for[:settings]
     @upp.save!
-    update_settings_response
+    read_and_update_settings_response
   end
 
   private
@@ -29,15 +34,30 @@ class Api::V1::ProjectPreferencesController < Api::ApiController
     @upp.project.owners_and_collaborators.include?(api_user.user) || api_user.is_admin?
   end
 
-  def update_settings_response
+  def read_and_update_settings_response
+    set_last_modified_header if action_name == "update_settings"
+
+    render_json_response
+  end
+
+  private
+  
+  def set_last_modified_header
     response.headers['Last-Modified'] = @upp.updated_at.httpdate
+  end
+
+  def render_json_response
+    if action_name == "update_settings"
+      preferences = UserProjectPreference.where(id: @upp.id)
+    else
+      project = Project.find_by!(id: params[:project_id])
+      preferences = project.user_project_preference.where.not(email_communication: nil)
+      preferences = params[:user_id].present? ? preferences.where(user_id: params[:user_id]) : preferences
+    end
+  
     render(
       status: :ok,
-      json_api: serializer.resource(
-        {},
-        UserProjectPreference.where(id: @upp.id),
-        context
-      )
+      json_api: serializer.resource({}, preferences, context)
     )
   end
 end
