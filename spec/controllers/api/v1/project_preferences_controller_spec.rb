@@ -239,13 +239,8 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
         run_unauthorised_user_read
       end
 
-      it 'responds with a 200' do
-        expect(response.status).to eq(200)
-      end
-
-      it 'returns the correct response data' do
-        json_response = JSON.parse(response.body)
-        expect(json_response['project_preferences'].count).to eq(0)
+      it 'only fetches settings of owned project' do
+        expect(response.status).to eq(403)
       end
     end
   end
