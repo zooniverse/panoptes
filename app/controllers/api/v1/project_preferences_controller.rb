@@ -6,7 +6,7 @@ class Api::V1::ProjectPreferencesController < Api::ApiController
   resource_actions :create, :update, :show, :index, :update_settings
   extra_schema_actions :update_settings
   schema_type :json_schema
-  before_action :find_upp, only: [:update_settings, :read_settings]
+  before_action :find_upp, only: %i[update_settings read_settings]
 
   def read_settings
     skip_policy_scope
@@ -37,12 +37,15 @@ class Api::V1::ProjectPreferencesController < Api::ApiController
   end
 
   def find_upp
-    @upp_list = action_name == 'read_settings' ? UserProjectPreference.where(project_id: params[:project_id], email_communication: !nil) : UserProjectPreference.where(user_id: params_for[:user_id], project_id: params_for[:project_id])
+    if action_name == 'read_settings'
+      @upp_list = UserProjectPreference.where(project_id: params[:project_id]).where.not(email_communication: nil)
+      @upp_list = @upp_list.where(user_id: params[:user_id]) if params[:user_id].present?
+    else
+      @upp_list = UserProjectPreference.where(user_id: params_for[:user_id], project_id: params_for[:project_id])
+    end
 
     @upp = @upp_list.first
-    raise ActiveRecord::RecordNotFound unless @upp.present?
-
-    @upp_list = action_name == 'read_settings' && params[:user_id].present? ? @upp_list.where(user_id: params[:user_id]) : @upp_list
+    raise ActiveRecord::RecordNotFound unless !@upp.blank?
 
     raise Api::Unauthorized, 'You must be the project owner or a collaborator' unless user_allowed?
   end

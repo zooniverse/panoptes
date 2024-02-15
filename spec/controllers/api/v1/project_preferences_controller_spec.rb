@@ -240,7 +240,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
       end
 
       it 'only fetches settings of owned project' do
-        expect(response.status).to eq(403)
+        expect(response.status).to eq(404)
       end
     end
   end
