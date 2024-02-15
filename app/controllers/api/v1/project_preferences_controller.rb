@@ -36,16 +36,19 @@ class Api::V1::ProjectPreferencesController < Api::ApiController
     )
   end
 
-  def find_upp
+  def fetch_upp_list
     if action_name == 'read_settings'
       @upp_list = UserProjectPreference.where(project_id: params[:project_id]).where.not(email_communication: nil)
       @upp_list = @upp_list.where(user_id: params[:user_id]) if params[:user_id].present?
     else
       @upp_list = UserProjectPreference.where(user_id: params_for[:user_id], project_id: params_for[:project_id])
     end
+  end
 
+  def find_upp
+    fetch_upp_list
     @upp = @upp_list.first
-    raise ActiveRecord::RecordNotFound unless !@upp.blank?
+    raise ActiveRecord::RecordNotFound unless @upp.present?
 
     raise Api::Unauthorized, 'You must be the project owner or a collaborator' unless user_allowed?
   end
