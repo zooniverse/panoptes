@@ -13,7 +13,24 @@ class Api::V1::UserGroupsController < Api::ApiController
   allowed_params :update, :name, :stats_visibility, :display_name
 
   search_by do |name, query|
-    query.search_name(name.join(" "))
+    search_names = name.join(" ")
+    print('MDY114 SEARCH NAMES')
+    print(search_names)
+    display_name_search = query.where("lower(display_name) = ?", search_names)
+    print('MDY114 DISPLAY NAME SEARCH')
+    print(display_name_search.to_a)
+
+    if display_name_search.exists?
+      print('MDY114 HITS HERE DISPLAY NAME SEARCH EXISTS')
+      display_name_search
+    else
+      if search_names.present? && search_names.length >= 3
+        print('MDY114 SEARCH FULL DISPLAY NAME')
+        query.full_search_display_name(search_names)
+      else
+        UserGroup.none
+      end
+    end
   end
 
   def destroy_links

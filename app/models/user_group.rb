@@ -55,9 +55,24 @@ class UserGroup < ApplicationRecord
   scope :public_groups, -> { where(private: false) }
 
   pg_search_scope :search_name,
-    against: :display_name,
-    using: :trigram,
-    ranked_by: ":trigram"
+    against: [:display_name],
+    using: {
+      tsearch: {
+        dictionary: "english",
+        tsvector_column: "tsv"
+      }
+    }
+
+  pg_search_scope :full_search_display_name,
+    against: [:display_name],
+    using: {
+      tsearch: {
+        dictionary: "english",
+        tsvector_column: "tsv"
+      },
+      trigram: {}
+    },
+    :ranked_by => ":tsearch + (0.25 * :trigram)"
 
   def self.roles_allowed_to_access(action, klass=nil)
     roles = case action
