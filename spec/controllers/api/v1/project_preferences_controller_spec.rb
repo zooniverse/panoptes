@@ -241,7 +241,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
         expect(response.status).to eq(404)
       end
 
-      it 'only fetches settings of the authorized user' do
+      it 'only fetches settings of the specified user' do
         default_request user_id: authorized_user.id, scopes: scopes
         get :read_settings, params: { project_id: project.id, user_id: authorized_user.id, format: :json }
         json_response = JSON.parse(response.body)
