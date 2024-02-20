@@ -199,14 +199,15 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
   end
 
   describe '#read_settings' do
+    let!(:second_authorized_user) { create(:user) }
     let!(:project) { create(:project, owner: authorized_user) }
-    let!(:upp) { create(:user_project_preference, project: project) }
+    let!(:first_upp) { create(:user_project_preference, project: project, user_id: authorized_user.id) }
+    let!(:second_upp) { create(:user_project_preference, project: project, user_id: second_authorized_user.id) }
     let(:run_generic_read) { get :read_settings, params: { project_id: project.id, format: :json } }
     let(:run_invalid_project) { get :read_settings, params: { project_id: 500, format: :json } }
     let(:unauthorised_user) { create(:user) }
-    let(:run_unauthorised_user_read) { get :read_settings, params: { project_id: project.id, user_id: unauthorised_user.id, format: :json } }
 
-    describe 'genetic preferences' do
+    describe 'generic preferences' do
       before do
         default_request user_id: authorized_user.id, scopes: scopes
         run_generic_read
@@ -218,7 +219,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
 
       it 'returns the correct response data' do
         json_response = JSON.parse(response.body)
-        expect(json_response['project_preferences'].count).to eq(1)
+        expect(json_response['project_preferences'].count).to eq(2)
       end
     end
 
@@ -234,13 +235,17 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
     end
 
     describe 'user specific preferences' do
-      before do
+      it 'only fetches settings of owned project' do
         default_request user_id: unauthorised_user.id, scopes: scopes
-        run_unauthorised_user_read
+        get :read_settings, params: { project_id: project.id, user_id: unauthorised_user.id, format: :json }
+        expect(response.status).to eq(404)
       end
 
-      it 'only fetches settings of owned project' do
-        expect(response.status).to eq(404)
+      it 'only fetches settings of the authorized user' do
+        default_request user_id: authorized_user.id, scopes: scopes
+        get :read_settings, params: { project_id: project.id, user_id: authorized_user.id, format: :json }
+        json_response = JSON.parse(response.body)
+        expect(json_response['project_preferences'].count).to eq(1)
       end
     end
   end
