@@ -50,12 +50,12 @@ describe Api::V1::UserGroupsController, type: :controller do
     end
 
     describe 'search' do
-      let(:user_group_with_uniq_name) {create(:user_group, private: false, display_name: 'My Unique Group')}
+      let(:user_group_with_uniq_name) { create(:user_group, private: false, display_name: 'My Unique Group')}
 
       before do
-        #force an update of all user_groups to set the tsv column
+        # force an update of all user_groups to set the tsv column
         user_group_with_uniq_name.reload
-        user_groups.each { |user_group| user_group.reload }
+        user_groups.each(&:reload)
       end
 
       it 'returns the user_group with exact matched display_name' do
