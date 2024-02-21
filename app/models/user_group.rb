@@ -5,19 +5,19 @@ class UserGroup < ApplicationRecord
   include PgSearch::Model
 
   has_many :memberships, dependent: :destroy
-  has_many :active_memberships, -> { active.not_identity }, class_name: "Membership"
-  has_one  :identity_membership, -> { identity }, class_name: "Membership"
+  has_many :active_memberships, -> { active.not_identity }, class_name: 'Membership'
+  has_one  :identity_membership, -> { identity }, class_name: 'Membership'
   has_many :users, through: :memberships
   has_many :classifications, dependent: :restrict_with_exception
   has_many :access_control_lists, dependent: :destroy
 
   has_many :owned_resources, -> { where("roles && '{owner}'") },
-           class_name: "AccessControlList"
+           class_name: 'AccessControlList'
 
   has_many :projects, through: :owned_resources, source: :resource,
-           source_type: "Project"
+                      source_type: 'Project'
   has_many :collections, through: :owned_resources, source: :resource,
-           source_type: "Collection"
+                         source_type: 'Collection'
 
   ##
   # Stats_Visibility Levels (Used for ERAS stats service)
@@ -46,38 +46,38 @@ class UserGroup < ApplicationRecord
 
   validates :display_name, presence: true
   validates :name, presence: true,
-    uniqueness: { case_sensitive: false },
-    format: { with: User::USER_LOGIN_REGEX }
+                   uniqueness: { case_sensitive: false },
+                   format: { with: User::USER_LOGIN_REGEX }
 
-  before_validation :default_display_name, on: [:create, :update]
+  before_validation :default_display_name, on: %i[create update]
   before_validation :default_join_token, on: [:create]
 
   scope :public_groups, -> { where(private: false) }
 
   pg_search_scope :search_name,
-    against: [:display_name],
-    using: {
-      tsearch: {
-        dictionary: "english",
-        tsvector_column: "tsv"
-      }
-    }
+                  against: [:display_name],
+                  using: {
+                    tsearch: {
+                      dictionary: 'english',
+                      tsvector_column: 'tsv'
+                    }
+                  }
 
   pg_search_scope :full_search_display_name,
-    against: [:display_name],
-    using: {
-      tsearch: {
-        dictionary: "english",
-        tsvector_column: "tsv"
-      },
-      trigram: {}
-    },
-    :ranked_by => ":tsearch + (0.25 * :trigram)"
+                  against: [:display_name],
+                  using: {
+                    tsearch: {
+                      dictionary: 'english',
+                      tsvector_column: 'tsv'
+                    },
+                    trigram: {}
+                  },
+                  ranked_by: ':tsearch + (0.25 * :trigram)'
 
   def self.roles_allowed_to_access(action, klass=nil)
     roles = case action
             when :show, :index
-              [:group_admin, :group_member]
+              %i[group_admin group_member]
             else
               [:group_admin]
             end

@@ -50,7 +50,7 @@ describe Api::V1::UserGroupsController, type: :controller do
     end
 
     describe 'search' do
-      let(:user_group_with_uniq_name) { create(:user_group, private: false, display_name: 'My Unique Group')}
+      let(:user_group_with_uniq_name) { create(:user_group, private: false, display_name: 'My Unique Group') }
 
       before do
         # force an update of all user_groups to set the tsv column
@@ -58,24 +58,24 @@ describe Api::V1::UserGroupsController, type: :controller do
         user_groups.each(&:reload)
       end
 
-      it 'returns the user_group with exact matched display_name' do
+      it 'returns exact matched user_group' do
         get :index, params: { search: user_group_with_uniq_name.display_name }
         expect(json_response[api_resource_name].length).to eq(1)
         expect(json_response[api_resource_name][0]['id']).to eq(user_group_with_uniq_name.id.to_s)
       end
 
-      it 'returns no user_groups if search is less than 3 chars and no exact match' do
+      it 'returns no user_groups if search is < than 3 chars' do
         get :index, params: { search: 'my' }
         expect(json_response[api_resource_name].length).to eq(0)
       end
 
-      it 'does a full text search against display_name when no exact match' do
+      it 'does a full text search on display_name when no exact match' do
         get :index, params: { search: 'my uniq' }
         expect(json_response[api_resource_name].length).to eq(1)
         expect(json_response[api_resource_name][0]['id']).to eq(user_group_with_uniq_name.id.to_s)
       end
 
-      it 'does a full text search against display_name on public and accessible user_groups' do
+      it 'does a full text search on display_name on public and accessible user_groups' do
         get :index, params: { search: 'group' }
         # returns user_group_with_users, user_group_with_uniq_name, the public user_group
         expect(json_response[api_resource_name].length).to eq(3)
