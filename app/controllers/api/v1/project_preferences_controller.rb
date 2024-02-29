@@ -12,6 +12,7 @@ class Api::V1::ProjectPreferencesController < Api::ApiController
     skip_policy_scope
     project = Project.find(params[:project_id])
     raise Api::Unauthorized, 'You must be the project owner or a collaborator' unless user_allowed?(project)
+
     upp_list = fetch_upp_list
 
     render(
@@ -63,7 +64,6 @@ class Api::V1::ProjectPreferencesController < Api::ApiController
       include_settings?: true,
       include_email_communication?: false,
       include_legacy_count?: false,
-      include_activity_count?: false,
       include_preferences?: false,
       include_activity_count?: false,
       include_activity_count_by_workflow?: false
