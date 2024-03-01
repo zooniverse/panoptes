@@ -221,6 +221,21 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
         json_response = JSON.parse(response.body)
         expect(json_response['project_preferences'].count).to eq(2)
       end
+
+      it 'returns the correct serialized data' do
+        json_response = JSON.parse(response.body)
+        first_response = json_response['project_preferences'].first
+
+        expect(first_response).to have_key "settings"
+      end
+
+      it 'does not return irrelivant data' do
+        json_response = JSON.parse(response.body)
+        first_response = json_response['project_preferences'].first
+
+        expect(first_response).to_not have_key "activity_count_by_workflow"
+        expect(first_response).to_not have_key "email_communication"
+      end
     end
 
     describe 'invalid project' do
