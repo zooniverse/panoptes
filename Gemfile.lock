@@ -278,7 +278,7 @@ GEM
     mini_portile2 (2.8.4)
     mini_racer (0.6.3)
       libv8-node (~> 16.10.0.0)
-    minitest (5.19.0)
+    minitest (5.22.2)
     mock_redis (0.36.0)
       ruby2_keywords
     multi_json (1.15.0)
@@ -485,7 +485,7 @@ GEM
     standby (4.0.0)
       activerecord (>= 3.0.0)
     stringex (2.8.6)
-    strong_migrations (1.4.4)
+    strong_migrations (1.7.0)
       activerecord (>= 5.2)
     ten_years_rails (0.2.0)
       actionview
@@ -514,7 +514,7 @@ GEM
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
     yard (0.9.36)
-    zeitwerk (2.6.10)
+    zeitwerk (2.6.13)
     zoo_stream (1.0.1)
       aws-sdk
 
