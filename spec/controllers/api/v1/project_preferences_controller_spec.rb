@@ -222,6 +222,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
         expect(json_response['project_preferences'].count).to eq(2)
       end
 
+      # relevant attributes are id, href and settings from UPP
       it 'returns the correct serialized attributes' do
         json_response = JSON.parse(response.body)
         first_response = json_response['project_preferences'].first
