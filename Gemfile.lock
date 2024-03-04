@@ -165,7 +165,7 @@ GEM
     faraday-em_http (1.0.0)
     faraday-em_synchrony (1.0.0)
     faraday-excon (1.1.0)
-    faraday-http-cache (2.4.1)
+    faraday-http-cache (2.5.1)
       faraday (>= 0.8)
     faraday-httpclient (1.0.1)
     faraday-multipart (1.0.4)
@@ -283,7 +283,7 @@ GEM
       ruby2_keywords
     multi_json (1.15.0)
     multi_xml (0.6.0)
-    multipart-post (2.3.0)
+    multipart-post (2.4.0)
     nenv (0.3.0)
     net-http-persistent (4.0.1)
       connection_pool (~> 2.2)
@@ -536,7 +536,7 @@ DEPENDENCIES
   doorkeeper-jwt (~> 0.2.1)
   factory_bot_rails
   faraday (~> 1.10)
-  faraday-http-cache (~> 2.4)
+  faraday-http-cache (~> 2.5)
   faraday_middleware (~> 1.2)
   flipper
   flipper-active_record
