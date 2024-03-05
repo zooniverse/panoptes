@@ -483,7 +483,10 @@ describe Api::V1::UsersController, type: :controller do
       end
 
       it "sets valid_email parameter to true" do
-        expect(user.valid_email).to be_truthy
+        # updating the valid email to false before the request as it is set at true by default
+        user.update(valid_email: false)
+        update_request
+        expect(user.reload.valid_email).to be_truthy
       end
 
       describe "with an email that already exists" do
