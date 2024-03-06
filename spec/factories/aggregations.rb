@@ -1,7 +1,8 @@
 FactoryBot.define do
   factory :aggregation do
     workflow
-    subject
-    aggregation { { data: "goes here", workflow_version: "1.1" } }
+    user
+    uuid { SecureRandom.uuid }
+    task_id { SecureRandom.uuid }
   end
 end

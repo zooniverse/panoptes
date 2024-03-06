@@ -1,20 +1,13 @@
 # frozen_string_literal: true
 
 class Aggregation < ApplicationRecord
-
   belongs_to :workflow
-  belongs_to :subject
+  belongs_to :user
+  validates :workflow, presence: true
+  validates :user, presence: true
+  validates :user_id, uniqueness: { scope: :workflow_id }
 
-  validates_presence_of :workflow, :subject, :aggregation
-  validates_uniqueness_of :subject_id, scope: :workflow_id
-  validate :aggregation, :workflow_version_present
+  self.ignored_columns = ["subject_id", "aggregation"]
 
-  private
-
-  def workflow_version_present
-    wv_key = :workflow_version
-    if aggregation && !aggregation.symbolize_keys.has_key?(wv_key)
-      errors.add(:aggregation, "must have #{wv_key} metadata")
-    end
-  end
+  enum status: [:pending, :completed, :failed]
 end

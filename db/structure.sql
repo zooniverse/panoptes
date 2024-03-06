@@ -53,6 +53,8 @@ COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching
 
 SET default_tablespace = '';
 
+SET default_with_oids = false;
+
 --
 -- Name: access_control_lists; Type: TABLE; Schema: public; Owner: -
 --
@@ -94,10 +96,12 @@ ALTER SEQUENCE public.access_control_lists_id_seq OWNED BY public.access_control
 CREATE TABLE public.aggregations (
     id integer NOT NULL,
     workflow_id integer,
-    subject_id integer,
-    aggregation jsonb DEFAULT '{}'::jsonb NOT NULL,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    user_id integer,
+    uuid character varying,
+    task_id character varying,
+    status integer
 );
 
 
@@ -2800,13 +2804,6 @@ CREATE INDEX index_access_control_lists_on_user_group_id ON public.access_contro
 
 
 --
--- Name: index_aggregations_on_subject_id_and_workflow_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_aggregations_on_subject_id_and_workflow_id ON public.aggregations USING btree (subject_id, workflow_id);
-
-
---
 -- Name: index_aggregations_on_workflow_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3901,14 +3898,6 @@ ALTER TABLE ONLY public.subject_groups
 
 
 --
--- Name: aggregations fk_rails_28a7ada458; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.aggregations
-    ADD CONSTRAINT fk_rails_28a7ada458 FOREIGN KEY (subject_id) REFERENCES public.subjects(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
 -- Name: project_contents fk_rails_305e6d8bf1; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4058,6 +4047,14 @@ ALTER TABLE ONLY public.subject_set_imports
 
 ALTER TABLE ONLY public.collections_projects
     ADD CONSTRAINT fk_rails_895b025564 FOREIGN KEY (project_id) REFERENCES public.projects(id);
+
+
+--
+-- Name: aggregations fk_rails_8eb620b6f6; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.aggregations
+    ADD CONSTRAINT fk_rails_8eb620b6f6 FOREIGN KEY (user_id) REFERENCES public.users(id) NOT VALID;
 
 
 --
@@ -4585,6 +4582,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20211201164326'),
 ('20221018032140'),
 ('20230613165746'),
-('20231025200957');
+('20231025200957'),
+('20240304201959');
 
 
