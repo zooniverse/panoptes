@@ -9,7 +9,7 @@ class UserSerializer
     project_email_communication beta_email_communication nasa_email_communication
     uploaded_subjects_count subject_limit admin login_prompt zooniverse_id
     upload_whitelist valid_email ux_testing_email_communication
-    intervention_notifications banned
+    intervention_notifications banned confirmed_at
   ).freeze
 
   attributes :id, :login, :display_name, :credited_name, :email, :languages,
@@ -18,7 +18,7 @@ class UserSerializer
     :subject_limit, :uploaded_subjects_count, :admin, :href, :login_prompt,
     :private_profile, :zooniverse_id, :upload_whitelist, :avatar_src,
     :valid_email, :ux_testing_email_communication, :intervention_notifications,
-    :banned
+    :banned, :confirmed_at
 
   can_include :classifications, :project_preferences, :collection_preferences,
     projects: { param: "owner", value: "login" },

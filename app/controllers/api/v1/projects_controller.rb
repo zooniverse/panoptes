@@ -63,6 +63,13 @@ class Api::V1::ProjectsController < Api::ApiController
     end
   end
 
+  def destroy
+    super do |resource|
+      split_display_name = resource.display_name.split('_')
+      resource.update(display_name: "#{resource.display_name}_deleted") unless split_display_name[split_display_name.length - 1] == 'deleted'
+    end
+  end
+
   def create_classifications_export
     medium = CreateClassificationsExport.with( api_user: api_user, object: controlled_resource ).run!(params)
     export_medium_response(medium)

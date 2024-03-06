@@ -392,6 +392,12 @@ describe Api::V1::UsersController, type: :controller do
       expect(result).to eq(user.upload_whitelist)
     end
 
+    it "should have the confirmed_at for the user" do
+      result = user_response["confirmed_at"]
+      # Dates are JSON serialized via iso8601 and .to_json adds quotes
+      expect(result).to eq(user.confirmed_at.iso8601(3))
+    end
+
     it_behaves_like "an api response"
   end
 
@@ -474,6 +480,13 @@ describe Api::V1::UsersController, type: :controller do
 
       it "sends an email to the new address if user is valid" do
         expect(UserInfoChangedMailerWorker).to receive(:perform_async).with(user.id, "email")
+      end
+
+      it "sets valid_email parameter to true" do
+        # updating the valid email to false before the request as it is set at true by default
+        user.update(valid_email: false)
+        update_request
+        expect(user.reload.valid_email).to be_truthy
       end
 
       describe "with an email that already exists" do
