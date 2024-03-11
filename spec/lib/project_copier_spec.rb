@@ -43,7 +43,7 @@ describe ProjectCopier do
 
     it 'sets the value of each excluded attribute to their default' do
       # N.B, to be updated once ProjectCopier::EXCLUDE_ATTRIBUTES values are updated aswell
-      default_values = %i[0 0 nil 0.0 0 0]
+      default_values = [0, 0, nil, 0.0, 0, 0]
       # excluding launched_row_order and beta_row_order as they are primary keys and don't have a fixed default value
       excluded_attributes = ProjectCopier::EXCLUDE_ATTRIBUTES.reject { |attr| [:launched_row_order, :beta_row_order].include?(attr) }
       excluded_attributes.each_with_index do |key, i|
