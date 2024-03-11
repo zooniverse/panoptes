@@ -41,6 +41,24 @@ describe ProjectCopier do
       expect(copied_project.configuration['source_project_id']).to be(project.id)
     end
 
+    it "sets the value of each excluded attribute to their default" do
+      # N.B, to be updated once ProjectCopier::EXCLUDE_ATTRIBUTES values are updated aswell
+      default_values = [0, 0, nil, 0.0, 0, 0]
+      # excluding launched_row_order and beta_row_order as they are primary keys and don't have a fixed default value
+      excluded_attributes = ProjectCopier::EXCLUDE_ATTRIBUTES.reject { |attr| [:launched_row_order, :beta_row_order].include?(attr) }
+      attribute_values_pair = excluded_attributes.zip(default_values).to_h
+      attribute_values_pair.each_with_index do |(key, value), i|
+        expect(copied_project[key]).to be(default_values[i])
+      end
+    end
+
+    it "checks the type of excluded primary keys" do
+      ranked_attributes = %i[launched_row_order beta_row_order]
+      ranked_attributes.each do |value|
+        expect(copied_project[value]).to be_kind_of(Integer)
+      end
+    end
+
     it 'creates Talk roles for the new project and its owner' do
       allow(TalkAdminCreateWorker).to receive(:perform_async)
       copied_project
