@@ -41,20 +41,11 @@ describe ProjectCopier do
       expect(copied_project.configuration['source_project_id']).to be(project.id)
     end
 
-    it 'sets the value of each excluded attribute to their default' do
-      # N.B, to be updated once ProjectCopier::EXCLUDE_ATTRIBUTES values are updated aswell
-      default_values = [0, 0, nil, 0.0, 0, 0]
-      # excluding launched_row_order and beta_row_order as they are primary keys and don't have a fixed default value
-      excluded_attributes = ProjectCopier::EXCLUDE_ATTRIBUTES.reject { |attr| [:launched_row_order, :beta_row_order].include?(attr) }
-      excluded_attributes.each_with_index do |key, i|
-        expect(copied_project[key]).to be(default_values[i])
-      end
-    end
-
-    it 'checks the type of excluded primary keys' do
-      ranked_attributes = %i[launched_row_order beta_row_order]
-      ranked_attributes.each do |value|
-        expect(copied_project[value]).to be_kind_of(Integer)
+    it 'does not copy over excluded attributes' do
+      project_with_excluded_keys = create(:full_project, classifications_count: 3, classifiers_count: 2, launch_date: Date.yesterday, completeness: 0.5, activity: 1, lock_version: 8)
+      other_copied_project = described_class.new(project_with_excluded_keys.id, copyist.id).copy
+      ProjectCopier::EXCLUDE_ATTRIBUTES.each do |attr|
+          expect(other_copied_project[attr]).not_to eq(project_with_excluded_keys[attr])
       end
     end
 
