@@ -1,7 +1,17 @@
 class ProjectCopier
   attr_reader :project_to_copy, :user
 
-  EXCLUDE_ATTRIBUTES = %i[classifications_count launched_row_order beta_row_order].freeze
+  EXCLUDE_ATTRIBUTES = %i[
+    classifications_count
+    classifiers_count
+    launch_date
+    completeness
+    activity
+    lock_version
+    launched_row_order
+    beta_row_order
+  ].freeze
+  
   INCLUDE_ASSOCIATIONS = [
     :tutorials,
     :pages,

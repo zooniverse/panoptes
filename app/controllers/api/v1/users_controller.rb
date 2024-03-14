@@ -52,6 +52,7 @@ class Api::V1::UsersController < Api::ApiController
       super do |user|
         if user.email_changed?
           update_email_user_ids << user.id
+          user.update_attribute(:valid_email, true)
         end
       end
 

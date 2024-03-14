@@ -482,6 +482,13 @@ describe Api::V1::UsersController, type: :controller do
         expect(UserInfoChangedMailerWorker).to receive(:perform_async).with(user.id, "email")
       end
 
+      it "sets valid_email parameter to true" do
+        # updating the valid email to false before the request as it is set at true by default
+        user.update(valid_email: false)
+        update_request
+        expect(user.reload.valid_email).to be_truthy
+      end
+
       describe "with an email that already exists" do
         let(:put_operations) { {users: {email: User.where.not(id: user.id).first.email}} }
         it "doesn't send an email to the new address if user is not valid" do
