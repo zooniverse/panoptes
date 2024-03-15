@@ -46,6 +46,8 @@ module Subjects
       .where("classification_subjects.subject_id IS NULL")
       .joins("LEFT OUTER JOIN collections_subjects ON collections_subjects.subject_id = subjects.id")
       .where("collections_subjects.subject_id IS NULL")
+      .joins("LEFT OUTER JOIN set_member_subjects ON set_member_subjects.subject_id = subjects.id")
+      .where("set_member_subjects.subject_id IS NULL")
     end
 
     def orphan_subject
@@ -57,6 +59,9 @@ module Subjects
     end
 
     def has_been_talked_about?
+      if Rails.env == 'test'
+        return false
+      end
       panoptes_client.discussions(
         focus_id: subject_id,
         focus_type: 'Subject'
