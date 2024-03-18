@@ -410,13 +410,13 @@ describe Api::V1::SubjectSetsController, type: :controller do
 
     it 'calls the subject removal worker' do
       subject_set.subjects.each_with_index do |s, index|
-        allow(SubjectRemovalWorker).to receive(:perform_in).with(index.seconds, s.id)
+        allow(SubjectRemovalWorker).to receive(:perform_in).with(index.seconds, s.id, subject_set.id)
       end
       delete_resources
       subject_set.subjects.each_with_index do |s, index|
         expect(SubjectRemovalWorker)
           .to have_received(:perform_in)
-          .with(index.seconds, s.id)
+          .with(index.seconds, s.id, subject_set.id)
       end
     end
   end
