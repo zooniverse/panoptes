@@ -53,6 +53,8 @@ COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching
 
 SET default_tablespace = '';
 
+SET default_with_oids = false;
+
 --
 -- Name: access_control_lists; Type: TABLE; Schema: public; Owner: -
 --
@@ -1663,7 +1665,8 @@ CREATE TABLE public.user_groups (
     private boolean DEFAULT true NOT NULL,
     lock_version integer DEFAULT 0,
     join_token character varying,
-    stats_visibility integer DEFAULT 0
+    stats_visibility integer DEFAULT 0,
+    tsv tsvector
 );
 
 
@@ -3542,6 +3545,13 @@ CREATE INDEX index_user_groups_on_private ON public.user_groups USING btree (pri
 
 
 --
+-- Name: index_user_groups_on_tsv; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_groups_on_tsv ON public.user_groups USING gin (tsv);
+
+
+--
 -- Name: index_user_project_preferences_on_project_id_and_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3763,6 +3773,13 @@ CREATE INDEX users_idx_trgm_login ON public.users USING gin (COALESCE((login)::t
 --
 
 CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE ON public.projects FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('tsv', 'pg_catalog.english', 'display_name');
+
+
+--
+-- Name: user_groups tsvectorupdate; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE ON public.user_groups FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('tsv', 'pg_catalog.english', 'display_name');
 
 
 --
@@ -4585,6 +4602,9 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20211201164326'),
 ('20221018032140'),
 ('20230613165746'),
-('20231025200957');
+('20231025200957'),
+('20240216142515'),
+('20240216171653'),
+('20240216171937');
 
 
