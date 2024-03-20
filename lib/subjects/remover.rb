@@ -57,14 +57,12 @@ module Subjects
     end
 
     def has_been_talked_about?
-      begin
-        panoptes_client.discussions(
-          focus_id: subject_id,
-          focus_type: 'Subject'
-        ).any?
-      rescue StandardError => e
-        return false
-      end
+      panoptes_client.discussions(
+        focus_id: subject_id,
+        focus_type: 'Subject'
+      ).any?
+    rescue StandardError => _
+      false
     end
 
     def notify_subject_selector(workflow_ids)

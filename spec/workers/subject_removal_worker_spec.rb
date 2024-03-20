@@ -4,6 +4,7 @@ RSpec.describe SubjectRemovalWorker do
   let(:subject_id) { 1 }
   let(:feature_name) { "remove_orphan_subjects" }
   let(:panoptes_client) { instance_double(Panoptes::Client) }
+  let(:subject_remover) {described_class.new}
   let(:remover) { instance_double(Subjects::Remover, panoptes_client: panoptes_client) }
 
   describe 'flipper enabled' do
@@ -26,33 +27,35 @@ RSpec.describe SubjectRemovalWorker do
 
     context 'when running orphan remover cleanup function' do
       it 'should call the orphan remover cleanup when enabled' do
-        expect(Subjects::Remover).to receive(:new).with(subject_id).and_return(remover)
-        expect(remover).to receive(:cleanup)
-        subject.perform(subject_id)
+        allow(Subjects::Remover).to receive(:new).with(subject_id).and_return(remover)
+        allow(remover).to receive(:cleanup)
+        subject_remover.perform(subject_id)
+        expect(Subjects::Remover).to have_received(:new)
+        expect(remover).to have_received(:cleanup)
       end
     end
 
     context 'when deleting subjects' do
       it 'deletes subject not associated with set_member_subject' do
         stub_discussions_request(first_subject.id.to_i)
-        subject.perform(first_subject.id, subject_set.id)
-        expect(Subject.exists?(first_subject.id)).to be_falsey
+        subject_remover.perform(first_subject.id, subject_set.id)
+        expect(Subject.where(id: first_subject.id)).not_to exist
       end
 
       it 'does not delete subject assicociated with another set_member_subject' do
         create(:set_member_subject, subject: second_subject, subject_set: subject_sets.first)
         create(:set_member_subject, subject: second_subject, subject_set: subject_sets.last)
         stub_discussions_request(second_subject.id.to_i)
-        subject.perform(second_subject.id, subject_sets.first.id)
-        Subject.where(id: second_subject.id).should exist
-        SetMemberSubject.where(subject_set_id: subject_sets.first.id, subject_id: second_subject.id).should exist
+        subject_remover.perform(second_subject.id, subject_sets.first.id)
+        expect(Subject.where(id: second_subject.id)).to exist
+        expect(SetMemberSubject.where(subject_set_id: subject_sets.first.id, subject_id: second_subject.id)).to exist
       end
     end
   end
 
   it 'should not call the orphan remover cleanup when disabled' do
-    expect(Subjects::Remover).not_to receive(:new)
-    expect(remover).not_to receive(:cleanup)
-    subject.perform(subject_id)
+    allow(Subjects::Remover).to receive(:new)
+    subject_remover.perform(subject_id)
+    expect(remover).to_not receive(:cleanup)
   end
 end
