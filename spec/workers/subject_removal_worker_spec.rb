@@ -4,7 +4,7 @@ RSpec.describe SubjectRemovalWorker do
   let(:subject_id) { 1 }
   let(:feature_name) { "remove_orphan_subjects" }
   let(:panoptes_client) { instance_double(Panoptes::Client) }
-  let(:subject_remover) {described_class.new}
+  let(:subject_remover) { described_class.new }
   let(:remover) { instance_double(Subjects::Remover, panoptes_client: panoptes_client) }
 
   describe 'flipper enabled' do
@@ -56,6 +56,6 @@ RSpec.describe SubjectRemovalWorker do
   it 'should not call the orphan remover cleanup when disabled' do
     allow(Subjects::Remover).to receive(:new)
     subject_remover.perform(subject_id)
-    expect(remover).to_not receive(:cleanup)
+    expect(remover).not_to receive(:cleanup)
   end
 end

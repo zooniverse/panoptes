@@ -61,7 +61,7 @@ module Subjects
         focus_id: subject_id,
         focus_type: 'Subject'
       ).any?
-    rescue StandardError => _
+    rescue StandardError => _e
       false
     end
 
