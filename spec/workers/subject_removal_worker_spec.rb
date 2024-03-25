@@ -17,8 +17,9 @@ RSpec.describe SubjectRemovalWorker do
     let!(:second_subject) { subjects.second }
 
     def stub_discussions_request(subject_id)
-      stub_request(:get, "#{discussions_url}?focus_id=#{subject_id}&focus_type=Subject")
-        .to_return(status: 200, body: '[]', headers: {})
+      stub_request(:get, discussions_url)
+        .with(query: { focus_id: subject_id, focus_type: "Subject" })
+        .to_return(status: 200, body: "[]", headers: {})
     end
 
     before do
@@ -27,7 +28,7 @@ RSpec.describe SubjectRemovalWorker do
 
     context 'when running orphan remover cleanup function' do
       it 'should call the orphan remover cleanup when enabled' do
-        allow(Subjects::Remover).to receive(:new).with(subject_id).and_return(remover)
+        allow(Subjects::Remover).to receive(:new).with(subject_id, nil, nil).and_return(remover)
         allow(remover).to receive(:cleanup)
         subject_remover.perform(subject_id)
         expect(Subjects::Remover).to have_received(:new)
@@ -37,7 +38,7 @@ RSpec.describe SubjectRemovalWorker do
 
     context 'when deleting subjects' do
       it 'deletes subject not associated with set_member_subject' do
-        stub_discussions_request(first_subject.id.to_i)
+        stub_discussions_request(first_subject.id)
         subject_remover.perform(first_subject.id, subject_set.id)
         expect(Subject.where(id: first_subject.id)).not_to exist
       end
@@ -45,7 +46,7 @@ RSpec.describe SubjectRemovalWorker do
       it 'does not delete subject assicociated with another set_member_subject' do
         create(:set_member_subject, subject: second_subject, subject_set: subject_sets.first)
         create(:set_member_subject, subject: second_subject, subject_set: subject_sets.last)
-        stub_discussions_request(second_subject.id.to_i)
+        stub_discussions_request(second_subject.id)
         subject_remover.perform(second_subject.id, subject_sets.first.id)
         expect(Subject.where(id: second_subject.id)).to exist
         expect(SetMemberSubject.where(subject_set_id: subject_sets.first.id, subject_id: second_subject.id)).to exist
