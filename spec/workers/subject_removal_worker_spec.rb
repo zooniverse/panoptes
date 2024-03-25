@@ -18,8 +18,8 @@ RSpec.describe SubjectRemovalWorker do
 
     def stub_discussions_request(subject_id)
       stub_request(:get, discussions_url)
-        .with(query: { focus_id: subject_id, focus_type: "Subject" })
-        .to_return(status: 200, body: "[]", headers: {})
+        .with(query: { focus_id: subject_id, focus_type: 'Subject' })
+        .to_return(status: 200, body: '[]', headers: {})
     end
 
     before do

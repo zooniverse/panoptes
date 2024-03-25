@@ -60,9 +60,9 @@ module Subjects
     end
 
     def belongs_to_other_subject_set?
-      return false if !subject_set_id
+      return false unless subject_set_id != nil
 
-      orphan_subject.set_member_subjects.where.not(subject_set_id: subject_set_id).count > 0
+      orphan_subject.set_member_subjects.where.not(subject_set_id: subject_set_id).count.positive?
     end
 
     def has_been_talked_about?

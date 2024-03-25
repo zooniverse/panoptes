@@ -105,11 +105,11 @@ RSpec.describe Subjects::Remover do
         expect { SetMemberSubject.find(sms_ids) }.to raise_error(ActiveRecord::RecordNotFound)
       end
 
-      context "with multiple subject sets" do
+      context 'with multiple subject sets' do
         let(:alternate_subject_set) { create(:subject_set) }
-        let(:remover) { Subjects::Remover.new(subject.id, panoptes_client, alternate_subject_set.id) }
-        it "should not remove subjects associated with multiple set_member_subjects" do
-          create(:set_member_subject, subject: subject, subject_set: alternate_subject_set)
+        let(:remover) { described_class.new(subject.id, panoptes_client, alternate_subject_set.id) }
+        let(:new_sms) { create(:set_member_subject, subject: subject, subject_set: alternate_subject_set) }
+        it 'should not remove subjects associated with multiple set_member_subjects' do
           remover.cleanup
           expect(Subject.where(id: subject.id)).to exist
         end
