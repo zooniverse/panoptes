@@ -10,7 +10,7 @@ RSpec.describe AggregationClient do
 
     let(:headers) { { 'Content-Type': 'application/json', 'Accept': 'application/json' } }
     let(:params) { { project_id: 1, workflow_id: 10, user_id: 100 } }
-    let(:body) { { task_id: '1234-asdf-1234'} }
+    let(:body) { { task_id: '1234-asdf-1234' } }
     let(:path) { '/run_aggregation' }
 
     it 'was successful' do

@@ -13,7 +13,7 @@ class AggregationClient
   end
 
   def connect!(adapter)
-    Faraday.new(@host, ssl: {verify: false}) do |faraday|
+    Faraday.new(@host, ssl: { verify: false }) do |faraday|
       faraday.request :json
       faraday.response :json, content_type: /\bjson$/
       faraday.adapter(*adapter)

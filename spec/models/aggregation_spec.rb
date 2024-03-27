@@ -24,16 +24,16 @@ RSpec.describe Aggregation, :type => :model do
                           user: aggregation.user)
     end
 
-    it 'should not be valid' do
+    it 'is not be valid' do
       expect(duplicate).not_to be_valid
     end
 
-    it 'should have the correct error message on user_id' do
+    it 'has the correct error message on user_id' do
       duplicate.valid?
       expect(duplicate.errors[:user_id]).to include('has already been taken')
     end
 
-    it 'should raise a uniq index db error' do
+    it 'raises a uniq index db error' do
       expect { duplicate.save! }.to raise_error(ActiveRecord::RecordInvalid)
     end
   end
