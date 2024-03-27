@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
 class AggregationClient
-
   class ConnectionError < StandardError; end
   class ResourceNotFound < ConnectionError; end
   class ServerError < ConnectionError; end
@@ -10,7 +9,7 @@ class AggregationClient
 
   def initialize(adapter=Faraday.default_adapter)
     @connection = connect!(adapter)
-    @host ||= ENV.fetch('CELLECT_HOST', "http://test.example.com")
+    @host ||= ENV.fetch('AGGREGATION_HOST', 'http://test.example.com')
   end
 
   def connect!(adapter)

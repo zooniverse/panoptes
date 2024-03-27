@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class RefactorAggregationModel < ActiveRecord::Migration[6.1]
   def up
     # delete existing unused columns

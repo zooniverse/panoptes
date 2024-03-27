@@ -1,11 +1,11 @@
 # frozen_string_literal: true
 
-require "spec_helper"
+require 'spec_helper'
 
 RSpec.describe AggregationClient do
-  describe "#send_aggregation_request" do
+  describe '#send_aggregation_request' do
     before do
-      allow(described_class).to receive(:host).and_return("http://test.example.com")
+      allow(described_class).to receive(:host).and_return('http://test.example.com')
     end
 
     let(:headers) { { 'Content-Type': 'application/json', 'Accept': 'application/json' } }
@@ -16,7 +16,7 @@ RSpec.describe AggregationClient do
     it 'was successful' do
       stubs = Faraday::Adapter::Test::Stubs.new do |stub|
         stub.post(path, params.to_json, headers) do
-          [200, { 'Content-Type':  'application/json' }, body.to_json]
+          [200, { 'Content-Type': 'application/json' }, body.to_json]
         end
       end
 
@@ -43,7 +43,7 @@ RSpec.describe AggregationClient do
             stub.post(path, params.to_json, headers) do
               [
                 500,
-                { 'Content-Type':  'application/json' },
+                { 'Content-Type': 'application/json' },
                 { 'errors' => { 'detail' => 'Server internal error' } }.to_json
               ]
             end

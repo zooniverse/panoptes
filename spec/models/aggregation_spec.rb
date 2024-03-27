@@ -15,7 +15,7 @@ RSpec.describe Aggregation, :type => :model do
     expect(build(:aggregation, user: nil)).not_to be_valid
   end
 
-  context "when there is a duplicate user_id workflow_id entry" do
+  context 'when there is a duplicate user_id workflow_id entry' do
     before(:each) do
       aggregation.save
     end
@@ -24,16 +24,16 @@ RSpec.describe Aggregation, :type => :model do
                           user: aggregation.user)
     end
 
-    it "should not be valid" do
+    it 'should not be valid' do
       expect(duplicate).not_to be_valid
     end
 
-    it "should have the correct error message on user_id" do
+    it 'should have the correct error message on user_id' do
       duplicate.valid?
-      expect(duplicate.errors[:user_id]).to include("has already been taken")
+      expect(duplicate.errors[:user_id]).to include('has already been taken')
     end
 
-    it "should raise a uniq index db error" do
+    it 'should raise a uniq index db error' do
       expect { duplicate.save! }.to raise_error(ActiveRecord::RecordInvalid)
     end
   end
