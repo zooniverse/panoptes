@@ -22,7 +22,7 @@ describe AggregationPolicy do
       context 'for an anonymous user' do
         let(:api_user) { ApiUser.new(anonymous_user) }
 
-        it "returns nothing" do
+        it 'returns nothing' do
           expect(resolved_scope).to match_array([])
         end
       end
@@ -30,7 +30,7 @@ describe AggregationPolicy do
       context 'for a normal user' do
         let(:api_user) { ApiUser.new(logged_in_user) }
 
-        it "returns nothing" do
+        it 'returns nothing' do
           expect(resolved_scope).to be_empty
         end
       end
@@ -38,7 +38,7 @@ describe AggregationPolicy do
       context 'for the resource owner' do
         let(:api_user) { ApiUser.new(resource_owner) }
 
-        it "includes aggregations" do
+        it 'includes aggregations' do
           expect(resolved_scope).to include(aggregation)
         end
       end
@@ -61,7 +61,7 @@ describe AggregationPolicy do
       context 'for an anonymous user' do
         let(:api_user) { ApiUser.new(anonymous_user) }
 
-        it "returns nothing" do
+        it 'returns nothing' do
           expect(resolved_scope).to be_empty
         end
       end
@@ -69,7 +69,7 @@ describe AggregationPolicy do
       context 'for a normal user' do
         let(:api_user) { ApiUser.new(logged_in_user) }
 
-        it "returns nothing" do
+        it 'returns nothing' do
           expect(resolved_scope).to be_empty
         end
       end

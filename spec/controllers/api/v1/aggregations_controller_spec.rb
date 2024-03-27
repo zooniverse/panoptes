@@ -32,7 +32,7 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
     let(:authorized_user) { workflow.project.owner }
     let(:test_attr) { :workflow_id }
     let(:test_attr_value) { workflow.id }
-    let(:fake_response) {double }
+    let(:fake_response) { double }
     let(:mock_agg) { instance_double(AggregationClient) }
 
     let(:create_params) do
@@ -48,7 +48,7 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
 
     before do
       allow(AggregationClient).to receive(:new).and_return(mock_agg)
-      allow(fake_response).to receive(:body).and_return({'task_id': 'asdf-1234-asdf'})
+      allow(fake_response).to receive(:body).and_return({ 'task_id': 'asdf-1234-asdf' })
       allow(mock_agg).to receive(:send_aggregation_request).and_return(fake_response)
       default_request scopes: scopes, user_id: authorized_user.id
     end
