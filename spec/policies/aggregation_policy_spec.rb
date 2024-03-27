@@ -23,7 +23,7 @@ describe AggregationPolicy do
         let(:api_user) { ApiUser.new(anonymous_user) }
 
         it 'returns nothing' do
-          expect(resolved_scope).to match_array([])
+          expect(resolved_scope).to be_empty
         end
       end
 
