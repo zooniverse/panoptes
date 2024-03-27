@@ -2,7 +2,6 @@ class AggregationUpdateSchema < JsonSchema
   schema do
     type "object"
     description "An Aggregation for a workflow"
-    required "links"
     additional_properties false
 
     property "uuid" do
@@ -13,23 +12,8 @@ class AggregationUpdateSchema < JsonSchema
       type "string"
     end
 
-    property "user_id" do
-      type "string", "integer"
-    end
-
     property "status" do
       type "string"
-    end
-
-    property "links" do
-      type "object"
-      required "workflow"
-      additional_properties false
-
-      property "workflow" do
-        type "integer", "string"
-        pattern "^[0-9]*$"
-      end
     end
   end
 end

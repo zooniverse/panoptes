@@ -13,10 +13,6 @@ class AggregationCreateSchema < JsonSchema
       type "string"
     end
 
-    property "user_id" do
-      type "string", "integer"
-    end
-
     property "status" do
       type "string"
     end
@@ -27,6 +23,11 @@ class AggregationCreateSchema < JsonSchema
       additional_properties false
 
       property "workflow" do
+        type "integer", "string"
+        pattern "^[0-9]*$"
+      end
+
+      property "user" do
         type "integer", "string"
         pattern "^[0-9]*$"
       end
