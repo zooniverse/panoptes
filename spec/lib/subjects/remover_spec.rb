@@ -109,7 +109,8 @@ RSpec.describe Subjects::Remover do
         let(:alternate_subject_set) { create(:subject_set) }
         let(:remover) { described_class.new(subject.id, panoptes_client, alternate_subject_set.id) }
         let(:new_sms) { create(:set_member_subject, subject: subject, subject_set: alternate_subject_set) }
-        it 'should not remove subjects associated with multiple set_member_subjects' do
+
+        it 'does not remove subjects associated with multiple set_member_subjects' do
           remover.cleanup
           expect(Subject.where(id: subject.id)).to exist
         end

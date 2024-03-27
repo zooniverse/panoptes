@@ -19,7 +19,7 @@ RSpec.describe SubjectRemovalWorker do
     def stub_discussions_request(subject_id)
       stub_request(:get, discussions_url)
         .with(query: { focus_id: subject_id, focus_type: 'Subject' })
-        .to_return(status: 200, body: '[]', headers: {})
+        .to_return(status: 200, body: '{"discussions": []}', headers: {})
     end
 
     before do
@@ -27,7 +27,7 @@ RSpec.describe SubjectRemovalWorker do
     end
 
     context 'when running orphan remover cleanup function' do
-      it 'should call the orphan remover cleanup when enabled' do
+      it 'calls the orphan remover cleanup when enabled' do
         allow(Subjects::Remover).to receive(:new).with(subject_id, nil, nil).and_return(remover)
         allow(remover).to receive(:cleanup)
         subject_remover.perform(subject_id)
@@ -43,7 +43,7 @@ RSpec.describe SubjectRemovalWorker do
         expect(Subject.where(id: first_subject.id)).not_to exist
       end
 
-      it 'does not delete subject assicociated with another set_member_subject' do
+      it 'does not delete subjects associated with another set_member_subject' do
         create(:set_member_subject, subject: second_subject, subject_set: subject_sets.first)
         create(:set_member_subject, subject: second_subject, subject_set: subject_sets.last)
         stub_discussions_request(second_subject.id)

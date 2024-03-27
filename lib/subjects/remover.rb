@@ -60,7 +60,7 @@ module Subjects
     end
 
     def belongs_to_other_subject_set?
-      return false unless subject_set_id != nil
+      return false unless !subject_set_id.nil?
 
       orphan_subject.set_member_subjects.where.not(subject_set_id: subject_set_id).count.positive?
     end
@@ -70,8 +70,6 @@ module Subjects
         focus_id: subject_id,
         focus_type: 'Subject'
       ).any?
-    rescue TypeError => _e
-      false
     end
 
     def notify_subject_selector(workflow_ids)
