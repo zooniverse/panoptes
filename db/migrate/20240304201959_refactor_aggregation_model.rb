@@ -14,10 +14,9 @@ class RefactorAggregationModel < ActiveRecord::Migration[6.1]
   end
 
   def down
-    add_column :aggregations, :subject_id
-    add_column :aggregations, :aggregation
+    add_column :aggregations, :subject_id, :integer
+    add_column :aggregations, :aggregation, :jsonb
 
-    remove_column :aggregations, :workflow_id
     remove_column :aggregations, :user_id
     remove_column :aggregations, :uuid
     remove_column :aggregations, :task_id
