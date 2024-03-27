@@ -10,7 +10,7 @@ class RefactorAggregationModel < ActiveRecord::Migration[6.1]
 
     add_column :aggregations, :uuid, :string
     add_column :aggregations, :task_id, :string
-    add_column :aggregations, :status, :integer
+    add_column :aggregations, :status, :integer, default: 0
   end
 
   def down
