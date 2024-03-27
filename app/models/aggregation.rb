@@ -9,5 +9,11 @@ class Aggregation < ApplicationRecord
 
   self.ignored_columns = ["subject_id", "aggregation"]
 
-  enum status: [:pending, :completed, :failed]
+  enum status: {
+    created: 0,
+    pending: 1,
+    completed: 2,
+    failed: 3
+  }
+
 end
