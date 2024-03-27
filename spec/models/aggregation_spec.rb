@@ -3,15 +3,15 @@ require 'spec_helper'
 RSpec.describe Aggregation, :type => :model do
   let(:aggregation) { build(:aggregation) }
 
-  it 'should have a valid factory' do
+  it 'has a valid factory' do
     expect(aggregation).to be_valid
   end
 
-  it 'should not be valid without a workflow' do
+  it 'is not be valid without a workflow' do
     expect(build(:aggregation, workflow: nil)).not_to be_valid
   end
 
-  it 'should not be valid without a user' do
+  it 'is not be valid without a user' do
     expect(build(:aggregation, user: nil)).not_to be_valid
   end
 
