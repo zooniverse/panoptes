@@ -41,6 +41,14 @@ describe ProjectCopier do
       expect(copied_project.configuration['source_project_id']).to be(project.id)
     end
 
+    it 'does not copy over excluded attributes' do
+      project_with_excluded_keys = create(:full_project, classifications_count: 3, classifiers_count: 2, launch_date: Date.yesterday, completeness: 0.5, activity: 1, lock_version: 8)
+      other_copied_project = described_class.new(project_with_excluded_keys.id, copyist.id).copy
+      ProjectCopier::EXCLUDE_ATTRIBUTES.each do |attr|
+        expect(other_copied_project[attr]).not_to eq(project_with_excluded_keys[attr])
+      end
+    end
+
     it 'creates Talk roles for the new project and its owner' do
       allow(TalkAdminCreateWorker).to receive(:perform_async)
       copied_project
