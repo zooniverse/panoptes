@@ -1,7 +1,7 @@
 FactoryBot.define do
   factory :aggregation do
     workflow
-    subject
-    aggregation { { data: "goes here", workflow_version: "1.1" } }
+    user
+    status { Aggregation.statuses[:pending] }
   end
 end
