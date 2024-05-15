@@ -18,7 +18,7 @@ class WorkflowSerializer
 
   can_filter_by :active, :mobile_friendly
 
-  can_sort_by :completeness
+  can_sort_by :completeness, :id
 
   preload :subject_sets, :attached_images, :classifications_export, :published_version
 
