@@ -36,44 +36,34 @@ describe MembershipPolicy do
 
     context 'a normal user', :aggregate_failures do
       let(:api_user) { ApiUser.new(logged_in_user) }
+      let(:other_user) { create(:user)  }
+      let(:other_user_public_membership) { create(:membership, user: other_user, user_group: public_user_group) }
+      let(:other_user_private_membership) { create(:membership, user: other_user, user_group: private_user_group) }
+      let(:logged_in_user_public_membership) { create(:membership, user: logged_in_user, user_group: public_user_group) }
+      let(:logged_in_user_private_membership) { create(:membership, user: logged_in_user, user_group: private_user_group) }
 
       it 'can see other people in public groups' do
-        other_user = create :user
-        membership1 = create :membership, user: other_user, user_group: public_user_group
-        membership2 = create :membership, user: other_user, user_group: private_user_group
-        membership3 = create :membership, user_group: public_user_group, state: :inactive
+        inactive_membership = create :membership, user_group: public_user_group, state: :inactive
 
-        expect(scope.resolve(:index)).to contain_exactly(membership1, group_admin_public_membership)
-        expect(scope.resolve(:show)).to contain_exactly(membership1, group_admin_public_membership)
-        expect(scope.resolve(:index)).not_to include(membership2)
-        expect(scope.resolve(:show)).not_to include(membership2)
-        expect(scope.resolve(:index)).not_to include(membership3)
-        expect(scope.resolve(:show)).not_to include(membership3)
+        expect(scope.resolve(:index)).to contain_exactly(other_user_public_membership, group_admin_public_membership)
+        expect(scope.resolve(:show)).to contain_exactly(other_user_public_membership, group_admin_public_membership)
+        expect(scope.resolve(:index)).not_to include(other_user_private_membership)
+        expect(scope.resolve(:show)).not_to include(other_user_private_membership)
+        expect(scope.resolve(:index)).not_to include(inactive_membership)
+        expect(scope.resolve(:show)).not_to include(inactive_membership)
       end
 
       it 'can see who are members of private groups they are in' do
-        other_user = create :user
-        membership1 = create :membership, user: logged_in_user, user_group: public_user_group
-        membership2 = create :membership, user: logged_in_user, user_group: private_user_group
-        membership3 = create :membership, user: other_user, user_group: public_user_group
-        membership4 = create :membership, user: other_user, user_group: private_user_group
-
-        expect(scope.resolve(:index)).to contain_exactly(membership1, membership2, membership3, membership4, group_admin_public_membership, group_admin_private_membership)
-        expect(scope.resolve(:show)).to contain_exactly(membership1, membership2, membership3, membership4, group_admin_private_membership, group_admin_public_membership)
+        expect(scope.resolve(:index)).to contain_exactly(logged_in_user_public_membership, logged_in_user_private_membership, other_user_public_membership, other_user_private_membership, group_admin_public_membership, group_admin_private_membership)
+        expect(scope.resolve(:show)).to contain_exactly(logged_in_user_public_membership, logged_in_user_private_membership, other_user_public_membership, other_user_private_membership, group_admin_public_membership, group_admin_private_membership)
       end
 
       it "cannot modify other user's memberships" do
-        other_user = create :user
-        membership1 = create :membership, user: logged_in_user, user_group: public_user_group
-        membership2 = create :membership, user: logged_in_user, user_group: private_user_group
-        membership3 = create :membership, user: other_user, user_group: public_user_group
-        membership4 = create :membership, user: other_user, user_group: private_user_group
+        expect(scope.resolve(:update)).to include(logged_in_user_public_membership, logged_in_user_private_membership)
+        expect(scope.resolve(:destroy)).to include(logged_in_user_public_membership, logged_in_user_private_membership)
 
-        expect(scope.resolve(:update)).to include(membership1, membership2)
-        expect(scope.resolve(:destroy)).to include(membership1, membership2)
-
-        expect(scope.resolve(:update)).not_to include(membership3, membership4, group_admin_private_membership, group_admin_public_membership)
-        expect(scope.resolve(:destroy)).not_to include(membership3, membership4, group_admin_private_membership, group_admin_public_membership)
+        expect(scope.resolve(:update)).not_to include(other_user_private_membership, other_user_public_membership, group_admin_private_membership, group_admin_public_membership)
+        expect(scope.resolve(:destroy)).not_to include(other_user_private_membership, other_user_public_membership, group_admin_private_membership, group_admin_public_membership)
       end
     end
 
