@@ -36,7 +36,7 @@ describe MembershipPolicy do
 
     context 'a normal user', :aggregate_failures do
       let(:api_user) { ApiUser.new(logged_in_user) }
-      let(:other_user) { create(:user)  }
+      let(:other_user) { create(:user) }
       let(:other_user_public_membership) { create(:membership, user: other_user, user_group: public_user_group) }
       let(:other_user_private_membership) { create(:membership, user: other_user, user_group: private_user_group) }
       let(:logged_in_user_public_membership) { create(:membership, user: logged_in_user, user_group: public_user_group) }
