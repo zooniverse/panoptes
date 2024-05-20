@@ -76,8 +76,18 @@ describe MembershipPolicy do
         expect(scope.resolve(:update)).to include(logged_in_user_public_membership, logged_in_user_private_membership)
         expect(scope.resolve(:destroy)).to include(logged_in_user_public_membership, logged_in_user_private_membership)
 
-        expect(scope.resolve(:update)).not_to include(other_user_private_membership, other_user_public_membership, group_admin_private_membership, group_admin_public_membership)
-        expect(scope.resolve(:destroy)).not_to include(other_user_private_membership, other_user_public_membership, group_admin_private_membership, group_admin_public_membership)
+        expect(scope.resolve(:update)).not_to include(
+          other_user_private_membership,
+          other_user_public_membership,
+          group_admin_private_membership,
+          group_admin_public_membership
+        )
+        expect(scope.resolve(:destroy)).not_to include(
+          other_user_private_membership,
+          other_user_public_membership,
+          group_admin_private_membership,
+          group_admin_public_membership
+        )
       end
     end
 
@@ -88,10 +98,30 @@ describe MembershipPolicy do
         membership1 = create :membership, user: logged_in_user, user_group: public_user_group
         membership2 = create :membership, user: logged_in_user, user_group: private_user_group
 
-        expect(scope.resolve(:index)).to contain_exactly(membership1, membership2, group_admin_private_membership, group_admin_public_membership)
-        expect(scope.resolve(:show)).to contain_exactly(membership1, membership2, group_admin_private_membership, group_admin_public_membership)
-        expect(scope.resolve(:update)).to include(membership1, membership2, group_admin_private_membership, group_admin_public_membership)
-        expect(scope.resolve(:destroy)).to include(membership1, membership2, group_admin_private_membership, group_admin_public_membership)
+        expect(scope.resolve(:index)).to contain_exactly(
+          membership1,
+          membership2,
+          group_admin_private_membership,
+          group_admin_public_membership
+        )
+        expect(scope.resolve(:show)).to contain_exactly(
+          membership1,
+          membership2,
+          group_admin_private_membership,
+          group_admin_public_membership
+        )
+        expect(scope.resolve(:update)).to include(
+          membership1,
+          membership2,
+          group_admin_private_membership,
+          group_admin_public_membership
+        )
+        expect(scope.resolve(:destroy)).to include(
+          membership1,
+          membership2,
+          group_admin_private_membership,
+          group_admin_public_membership
+        )
       end
     end
   end
