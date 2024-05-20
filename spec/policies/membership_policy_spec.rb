@@ -62,7 +62,14 @@ describe MembershipPolicy do
           group_admin_public_membership,
           group_admin_private_membership
         )
-        expect(scope.resolve(:show)).to contain_exactly(logged_in_user_public_membership, logged_in_user_private_membership, other_user_public_membership, other_user_private_membership, group_admin_public_membership, group_admin_private_membership)
+        expect(scope.resolve(:show)).to contain_exactly(
+          logged_in_user_public_membership,
+          logged_in_user_private_membership,
+          other_user_public_membership,
+          other_user_private_membership,
+          group_admin_public_membership,
+          group_admin_private_membership
+        )
       end
 
       it "cannot modify other user's memberships" do
