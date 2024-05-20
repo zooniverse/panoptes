@@ -54,7 +54,14 @@ describe MembershipPolicy do
       end
 
       it 'can see who are members of private groups they are in' do
-        expect(scope.resolve(:index)).to contain_exactly(logged_in_user_public_membership, logged_in_user_private_membership, other_user_public_membership, other_user_private_membership, group_admin_public_membership, group_admin_private_membership)
+        expect(scope.resolve(:index)).to contain_exactly(
+          logged_in_user_public_membership,
+          logged_in_user_private_membership,
+          other_user_public_membership,
+          other_user_private_membership,
+          group_admin_public_membership,
+          group_admin_private_membership
+        )
         expect(scope.resolve(:show)).to contain_exactly(logged_in_user_public_membership, logged_in_user_private_membership, other_user_public_membership, other_user_private_membership, group_admin_public_membership, group_admin_private_membership)
       end
 
