@@ -36,20 +36,20 @@ describe Api::V1::MembershipsController, type: :controller do
 
     it_behaves_like "is updatable"
 
-    context 'membership roles update' do
+    context 'when updating roles as group_admin' do
       let(:other_user) { create(:user) }
       let(:other_user_group) { create(:user_group, admin: authorized_user, private: true) }
-      let(:other_user_membership) { create(:membership, user: other_user, user_group: other_user_group, roles: ["group_member"]) }
+      let(:other_user_membership) { create(:membership, user: other_user, user_group: other_user_group, roles: ['group_member']) }
 
       it 'allows update of membership roles' do
         default_request user_id: authorized_user.id, scopes: scopes
-        params =  {
-          memberships: { roles: ["group_admin"] },
+        params = {
+          memberships: { roles: ['group_admin'] },
           id: other_user_membership.id
         }
 
         put :update, params: params
-        expect(other_user_membership.reload.roles).to eq(["group_admin"])
+        expect(other_user_membership.reload.roles).to eq(['group_admin'])
       end
     end
   end
