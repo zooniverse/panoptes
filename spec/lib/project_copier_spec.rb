@@ -18,7 +18,7 @@ describe ProjectCopier do
 
     it 'appends copy and current timestamp to display_name' do
       allow(Time).to receive(:now).and_return(Time.utc(2024, 5, 17, 12, 0, 0))
-      expect(copied_project.display_name).to include("(copy: 2024-05-17 12:00:00)")
+      expect(copied_project.display_name).to eq("#{project.display_name} (copy: 2024-05-17 12:00:00)")
     end
 
     it 'resets the live attribute' do
