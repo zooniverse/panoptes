@@ -61,9 +61,7 @@ class ProjectCopier
     copied_project = project_to_copy.deep_clone include: INCLUDE_ASSOCIATIONS, except: EXCLUDE_ATTRIBUTES
     copied_project.owner = user
 
-    current_timestamp = Time.now.utc.strftime('%Y-%m-%d %H:%M:%S')
-    copied_project.display_name += ' (copy)' if user == project_to_copy.owner
-    copied_project.display_name += " #{current_timestamp}"
+    copied_project.display_name += " (copy: #{Time.now.utc.strftime('%Y-%m-%d %H:%M:%S')})"
 
     copied_project.assign_attributes(launch_approved: false, live: false)
     # reset the project's configuration but record the source project id

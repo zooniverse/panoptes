@@ -16,14 +16,9 @@ describe ProjectCopier do
       expect(copied_project.owner).to eq(copyist)
     end
 
-    it 'renames a project when the owner is copying their own project' do
-      new_copy = described_class.new(project.id, project.owner.id).copy
-      expect(new_copy.display_name).to include('(copy)')
-    end
-
-    it 'appends current timestamp to display_name' do
+    it 'appends copy and current timestamp to display_name' do
       allow(Time).to receive(:now).and_return(Time.utc(2024, 5, 17, 12, 0, 0))
-      expect(copied_project.display_name).to eq("#{project.display_name} 2024-05-17 12:00:00")
+      expect(copied_project.display_name).to include("(copy: 2024-05-17 12:00:00)")
     end
 
     it 'resets the live attribute' do
