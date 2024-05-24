@@ -7,7 +7,7 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
   let(:api_resource_attributes) { %w[id created_at updated_at uuid task_id status] }
   let(:api_resource_links) { %w[aggregations.workflow] }
 
-  let(:scopes) { %w[public workflow] }
+  let(:scopes) { %w[project] }
   let(:resource_class) { Aggregation }
 
   describe '#index' do
@@ -54,6 +54,11 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
     end
 
     it_behaves_like 'is creatable'
+
+    it 'saves the project id' do
+      post :create, params: create_params
+      expect(Aggregation.first.project_id).to eq(workflow.project.id)
+    end
 
     it 'makes a request to the aggregation service' do
       post :create, params: create_params

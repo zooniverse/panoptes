@@ -2,7 +2,9 @@
 
 class Aggregation < ApplicationRecord
   belongs_to :workflow
+  belongs_to :project
   belongs_to :user
+  validates :project, presence: true
   validates :workflow, presence: true
   validates :user, presence: true
   validates :user_id, uniqueness: { scope: :workflow_id }
@@ -15,5 +17,4 @@ class Aggregation < ApplicationRecord
     completed: 2,
     failed: 3
   }
-
 end

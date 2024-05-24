@@ -12,6 +12,10 @@ class AggregationPolicy < ApplicationPolicy
     policy_for(Workflow).scope_for(:update)
   end
 
+  def linkable_projects
+    policy_for(Project).scope_for(:update)
+  end
+
   def linkable_users
     policy_for(User).scope_for(:update)
   end

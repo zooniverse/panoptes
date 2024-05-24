@@ -3,7 +3,7 @@ class AggregationSerializer
   include CachedSerializer
 
   attributes :id, :href, :created_at, :updated_at, :uuid, :task_id, :status
-  can_include :workflow, :user
+  can_include :project, :workflow, :user
 
-  can_filter_by :workflow
+  can_filter_by :project, :workflow
 end

@@ -98,10 +98,11 @@ CREATE TABLE public.aggregations (
     workflow_id integer,
     created_at timestamp without time zone,
     updated_at timestamp without time zone,
+    project_id integer,
     user_id integer,
     uuid character varying,
     task_id character varying,
-    status integer
+    status integer DEFAULT 0
 );
 
 
@@ -4207,6 +4208,14 @@ ALTER TABLE ONLY public.workflow_tutorials
 
 ALTER TABLE ONLY public.organization_versions
     ADD CONSTRAINT fk_rails_be858ed31d FOREIGN KEY (organization_id) REFERENCES public.organizations(id);
+
+
+--
+-- Name: aggregations fk_rails_c7d229ada4; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.aggregations
+    ADD CONSTRAINT fk_rails_c7d229ada4 FOREIGN KEY (project_id) REFERENCES public.projects(id) NOT VALID;
 
 
 --

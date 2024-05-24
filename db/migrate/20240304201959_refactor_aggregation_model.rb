@@ -7,6 +7,9 @@ class RefactorAggregationModel < ActiveRecord::Migration[6.1]
     safety_assured { remove_column :aggregations, :aggregation }
 
     # and the new aggregations columns
+    add_column :aggregations, :project_id, :integer
+    add_foreign_key :aggregations, :projects, column: :project_id, validate: false
+
     add_column :aggregations, :user_id, :integer
     add_foreign_key :aggregations, :users, column: :user_id, validate: false
 
@@ -20,6 +23,7 @@ class RefactorAggregationModel < ActiveRecord::Migration[6.1]
     add_column :aggregations, :aggregation, :jsonb
 
     remove_column :aggregations, :user_id
+    remove_column :aggregations, :project_id
     remove_column :aggregations, :uuid
     remove_column :aggregations, :task_id
     remove_column :aggregations, :status

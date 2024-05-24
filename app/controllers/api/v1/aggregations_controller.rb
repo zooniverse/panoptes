@@ -3,14 +3,16 @@
 class Api::V1::AggregationsController < Api::ApiController
   include JsonApiController::PunditPolicy
 
-  require_authentication :index, :show, :update, :create, scopes: [:workflow]
+  require_authentication :index, :show, :update, :create, scopes: [:project]
   resource_actions :index, :show, :create, :update
   schema_type :json_schema
 
   def create
     workflow = Workflow.find(create_params['links']['workflow'])
+    project_id = workflow.project.id
+    create_params['links']['project'] = project_id
     response = AggregationClient.new.send_aggregation_request(
-      workflow.project.id,
+      project_id,
       workflow.id,
       create_params['links']['user']
     )

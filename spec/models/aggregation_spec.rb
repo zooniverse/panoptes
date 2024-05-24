@@ -11,14 +11,16 @@ RSpec.describe Aggregation, :type => :model do
     expect(build(:aggregation, workflow: nil)).not_to be_valid
   end
 
+  it 'is not be valid without a project' do
+    expect(build(:aggregation, project: nil)).not_to be_valid
+  end
+
   it 'is not be valid without a user' do
     expect(build(:aggregation, user: nil)).not_to be_valid
   end
 
   context 'when there is a duplicate user_id workflow_id entry' do
-    before(:each) do
-      aggregation.save
-    end
+    before { aggregation.save }
     let(:duplicate) do
       build(:aggregation, workflow: aggregation.workflow,
                           user: aggregation.user)
