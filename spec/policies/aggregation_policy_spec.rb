@@ -5,6 +5,7 @@ describe AggregationPolicy do
     let(:anonymous_user) { nil }
     let(:logged_in_user) { create(:user) }
     let(:resource_owner) { create(:user) }
+    let(:collaborator) { create(:user) }
 
     let(:project) { build(:project, owner: resource_owner) }
 
@@ -19,7 +20,7 @@ describe AggregationPolicy do
         Pundit.policy!(api_user, Aggregation).scope_for(:index)
       end
 
-      context 'for an anonymous user' do
+      context 'when the user is an anonymous user' do
         let(:api_user) { ApiUser.new(anonymous_user) }
 
         it 'returns nothing' do
@@ -27,7 +28,7 @@ describe AggregationPolicy do
         end
       end
 
-      context 'for a normal user' do
+      context 'when the user is a normal user' do
         let(:api_user) { ApiUser.new(logged_in_user) }
 
         it 'returns nothing' do
@@ -35,19 +36,29 @@ describe AggregationPolicy do
         end
       end
 
-      context 'for the resource owner' do
-        let(:api_user) { ApiUser.new(resource_owner) }
+      context 'when the user is a resource owner' do
+        let(:api_user) { ApiUser.new(collaborator) }
 
-        it 'includes aggregations' do
+        before { create :access_control_list, user_group: collaborator.identity_group, resource: project, roles: ['collaborator'] }
+
+        it 'includes aggregation' do
           expect(resolved_scope).to include(aggregation)
         end
       end
 
-      context 'for an admin' do
+      context 'when the user is a resource collaborators' do
+        let(:api_user) { ApiUser.new(resource_owner) }
+
+        it 'includes the aggregation' do
+          expect(resolved_scope).to include(aggregation)
+        end
+      end
+
+      context 'when the user is an admin' do
         let(:admin_user) { create :user, admin: true }
         let(:api_user) { ApiUser.new(admin_user, admin: true) }
 
-        it 'includes everything' do
+        it 'includes the aggregation' do
           expect(resolved_scope).to include(aggregation)
         end
       end
@@ -58,7 +69,7 @@ describe AggregationPolicy do
         Pundit.policy!(api_user, Aggregation).scope_for(:update)
       end
 
-      context 'for an anonymous user' do
+      context 'when the user is an anonymous user' do
         let(:api_user) { ApiUser.new(anonymous_user) }
 
         it 'returns nothing' do
@@ -66,7 +77,7 @@ describe AggregationPolicy do
         end
       end
 
-      context 'for a normal user' do
+      context 'when the user is a normal user' do
         let(:api_user) { ApiUser.new(logged_in_user) }
 
         it 'returns nothing' do
@@ -74,23 +85,22 @@ describe AggregationPolicy do
         end
       end
 
-      context 'for the resource owner' do
+      context 'when the user is the resource owner' do
         let(:api_user) { ApiUser.new(resource_owner) }
 
-        it 'includes aggregations' do
+        it 'includes the aggregation' do
           expect(resolved_scope).to include(aggregation)
         end
       end
 
-      context 'for an admin' do
+      context 'when the user is an admin' do
         let(:admin_user) { create :user, admin: true }
         let(:api_user) { ApiUser.new(admin_user, admin: true) }
 
-        it 'includes everything' do
+        it 'includes the aggregation' do
           expect(resolved_scope).to include(aggregation)
         end
       end
-
     end
   end
 end
