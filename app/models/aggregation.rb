@@ -9,8 +9,6 @@ class Aggregation < ApplicationRecord
   validates :user, presence: true
   validates :user_id, uniqueness: { scope: :workflow_id }
 
-  self.ignored_columns = %w[subject_id aggregation]
-
   enum status: {
     created: 0,
     pending: 1,
