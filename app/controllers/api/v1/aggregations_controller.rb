@@ -20,6 +20,6 @@ class Api::V1::AggregationsController < Api::ApiController
       agg.update({ task_id: response.body[:task_id], status: 'pending' })
     end
   rescue AggregationClient::ConnectionError
-    json_api_render(:service_unavailable, response.body)
+    json_api_render(:service_unavailable, 'The aggregation service is unavailable or not responding')
   end
 end

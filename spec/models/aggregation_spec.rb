@@ -21,6 +21,7 @@ RSpec.describe Aggregation, :type => :model do
 
   context 'when there is a duplicate user_id workflow_id entry' do
     before { aggregation.save }
+
     let(:duplicate) do
       build(:aggregation, workflow: aggregation.workflow,
                           user: aggregation.user)

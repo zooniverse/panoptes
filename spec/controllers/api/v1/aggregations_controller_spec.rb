@@ -65,6 +65,15 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
       expect(mock_agg).to have_received(:send_aggregation_request)
     end
 
+    context 'when the aggregation service is unavailable' do
+      before { allow(mock_agg).to receive(:send_aggregation_request).and_raise(AggregationClient::ConnectionError) }
+
+      it 'sends back an error response' do
+        post :create, params: create_params
+        expect(response.status).to eq(503)
+      end
+    end
+
     it 'stores the task_id from the client response' do
       post :create, params: create_params
       expect(Aggregation.first.task_id).to eq('asdf-1234-asdf')
