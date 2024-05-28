@@ -50,7 +50,7 @@ class User < ApplicationRecord
   validates :login, presence: true, format: { with: USER_LOGIN_REGEX }
   validates_uniqueness_of :login, case_sensitive: false
   validates :display_name, presence: true
-  validates :unsubscribe_token, presence: true, uniqueness: true
+  validates :unsubscribe_token, presence: true, uniqueness: true, on: :create
   validates_inclusion_of :valid_email, in: [true, false], message: "must be true or false"
 
   validates_with IdentityGroupNameValidator

@@ -30,9 +30,9 @@ module Subjects
     private
 
     def can_be_removed?
-      return false if belongs_to_other_subject_set?
-
       return false if has_been_collected_or_classified?
+
+      return false if belongs_to_other_subject_set?
 
       return false if has_been_talked_about?
 
