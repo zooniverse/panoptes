@@ -63,6 +63,11 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
       expect(mock_agg).to have_received(:send_aggregation_request)
     end
 
+    it 'stores the task_id from the client response' do
+      post :create, params: create_params
+      expect(Aggregation.first.task_id).to eq('asdf-1234-asdf')
+    end
+
     context 'when there is an existing aggregation for that user and workflow' do
       let!(:existing_agg) { create(:aggregation, workflow: workflow, user: authorized_user) }
 
@@ -84,11 +89,6 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
         post :create, params: create_params
         expect(response.status).to eq(503)
       end
-    end
-
-    it 'stores the task_id from the client response' do
-      post :create, params: create_params
-      expect(Aggregation.first.task_id).to eq('asdf-1234-asdf')
     end
   end
 
