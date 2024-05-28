@@ -10,8 +10,11 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
   let(:scopes) { %w[project] }
   let(:resource_class) { Aggregation }
 
+  let(:workflow) { create(:workflow) }
+  let(:authorized_user) { workflow.project.owner }
+  let(:resource) { create(:aggregation, workflow: workflow) }
+
   describe '#index' do
-    let(:workflow) { create(:workflow) }
     let!(:aggregations) { create_list(:aggregation, 2, workflow: workflow) }
     let!(:private_resource) { create(:aggregation) }
     let(:authorized_user) { workflow.project.owner }
@@ -21,15 +24,10 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
   end
 
   describe '#show' do
-    let(:resource) { create(:aggregation) }
-    let(:authorized_user) { resource.workflow.project.owner }
-
     it_behaves_like 'is showable'
   end
 
   describe 'create' do
-    let(:workflow) { create(:workflow) }
-    let(:authorized_user) { workflow.project.owner }
     let(:test_attr) { :workflow_id }
     let(:test_attr_value) { workflow.id }
     let(:fake_response) { double }
@@ -65,6 +63,20 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
       expect(mock_agg).to have_received(:send_aggregation_request)
     end
 
+    context 'when there is an existing aggregation for that user and workflow' do
+      let!(:existing_agg) { create(:aggregation, workflow: workflow, user: authorized_user) }
+
+      before { post :create, params: create_params }
+
+      it 'returns an error' do
+        expect(response).to have_http_status(:bad_request)
+      end
+
+      it 'includes a validation error' do
+        expect(response.body).to include('Validation failed: User has already been taken')
+      end
+    end
+
     context 'when the aggregation service is unavailable' do
       before { allow(mock_agg).to receive(:send_aggregation_request).and_raise(AggregationClient::ConnectionError) }
 
@@ -81,21 +93,22 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
   end
 
   describe '#update' do
-    let(:workflow) { create(:workflow) }
-    let(:authorized_user) { resource.workflow.project.owner }
-    let(:resource) { create(:aggregation, workflow: workflow) }
     let(:test_attr) { :uuid }
-    let(:test_attr_value) { '1234-asdf-1234' }
+    let(:test_attr_value) { '557ebcfa3c29496787336bfbd7c4d856' }
 
     let(:update_params) do
       { aggregations:
           {
-            uuid: '1234-asdf-1234',
+            uuid: '557ebcfa3c29496787336bfbd7c4d856',
             status: 'completed'
           }
       }
     end
 
     it_behaves_like 'is updatable'
+  end
+
+  describe '#destroy' do
+    it_behaves_like 'is destructable'
   end
 end

@@ -3,8 +3,8 @@
 class Api::V1::AggregationsController < Api::ApiController
   include JsonApiController::PunditPolicy
 
-  require_authentication :index, :show, :update, :create, scopes: [:project]
-  resource_actions :index, :show, :create, :update
+  require_authentication :index, :show, :update, :destroy, :create, scopes: [:project]
+  resource_actions :index, :show, :create, :update, :destroy
   schema_type :json_schema
 
   def create
