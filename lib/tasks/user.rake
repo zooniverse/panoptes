@@ -11,6 +11,14 @@ namespace :user do
     end
   end
 
+  desc 'Scrub unsubscribe_token of deactivated users'
+  task scrub_inactive_user_unsubscribe_token: :environment do
+    User.where(activated_state: 'inactive').select(:id).find_in_batches do |users|
+      ids = users.map(&:id)
+      User.where(id: ids).update_all(unsubscribe_token: nil)
+    end
+  end
+
   desc 'Backfill UX testing emails comms field in batches'
   task backfill_ux_testing_email_field: :environment do
     User.select(:id).find_in_batches do |users|

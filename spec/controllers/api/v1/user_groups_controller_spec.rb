@@ -106,7 +106,8 @@ describe Api::V1::UserGroupsController, type: :controller do
     let(:update_params) do
       {
         user_groups: {
-          display_name: 'A-Different-Name'
+          display_name: 'A-Different-Name',
+          private: false
         }
       }
     end
@@ -193,7 +194,7 @@ describe Api::V1::UserGroupsController, type: :controller do
   describe '#create' do
     let(:test_attr) { :name }
     let(:test_attr_value) { 'Zooniverse' }
-    let(:create_params) { { user_groups: { name: 'Zooniverse' } } }
+    let(:create_params) { { user_groups: { name: 'Zooniverse', private: false } } }
 
     it_behaves_like 'is creatable'
 
