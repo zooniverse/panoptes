@@ -34,7 +34,8 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
     let(:mock_agg) { instance_double(AggregationClient) }
 
     let(:create_params) do
-      { aggregations:
+      {
+        aggregations:
           {
             links: {
               user: authorized_user.id.to_s,
