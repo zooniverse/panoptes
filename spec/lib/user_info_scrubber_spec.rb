@@ -33,6 +33,10 @@ describe UserInfoScrubber do
         expect { described_class.scrub_personal_info!(user) }.to change(user, :credited_name).to(nil)
       end
 
+      it 'scrubs the unsubscribe_token' do
+        expect { described_class.scrub_personal_info!(user) }.to change(user, :unsubscribe_token).to(nil)
+      end
+
       it 'scrubs the encrypted_password' do
         expect { described_class.scrub_personal_info!(user) }.to change(user, :encrypted_password)
       end
