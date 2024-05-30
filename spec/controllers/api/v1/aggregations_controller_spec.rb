@@ -15,10 +15,11 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
   let(:resource) { create(:aggregation, workflow: workflow) }
 
   describe '#index' do
-    let!(:aggregations) { create_list(:aggregation, 2, workflow: workflow) }
-    let!(:private_resource) { create(:aggregation) }
+    let(:other_workflow) { create(:workflow) }
+    let!(:aggregations) { create(:aggregation, workflow: workflow) }
+    let!(:private_resource) { create(:aggregation, workflow: other_workflow) }
     let(:authorized_user) { workflow.project.owner }
-    let(:n_visible) { 2 }
+    let(:n_visible) { 1 }
 
     it_behaves_like 'is indexable'
   end
@@ -69,8 +70,8 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
       expect(Aggregation.first.task_id).to eq('asdf-1234-asdf')
     end
 
-    context 'when there is an existing aggregation for that user and workflow' do
-      let!(:existing_agg) { create(:aggregation, workflow: workflow, user: authorized_user) }
+    context 'when there is an existing aggregation for that workflow' do
+      let!(:existing_agg) { create(:aggregation, workflow: workflow) }
 
       before { post :create, params: create_params }
 
@@ -79,7 +80,7 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
       end
 
       it 'includes a validation error' do
-        expect(response.body).to include('Validation failed: User has already been taken')
+        expect(response.body).to include('Validation failed: Workflow has already been taken')
       end
     end
 

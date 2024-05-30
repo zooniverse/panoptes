@@ -4,10 +4,8 @@ class Aggregation < ApplicationRecord
   belongs_to :workflow
   belongs_to :project
   belongs_to :user
-  validates :project, presence: true
-  validates :workflow, presence: true
-  validates :user, presence: true
-  validates :user_id, uniqueness: { scope: :workflow_id }
+  validates :project, :workflow, :user, presence: true
+  validates :workflow, uniqueness: true
 
   enum status: {
     created: 0,
