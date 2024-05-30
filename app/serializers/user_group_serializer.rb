@@ -20,7 +20,7 @@ class UserGroupSerializer
 
   def include_join_token?
     return false unless current_user
-    current_user.admin? || @model.has_admin?(current_user)
+    current_user.is_admin? || @model.has_admin?(current_user)
   end
 
   def current_user
