@@ -8,7 +8,7 @@ class Workflow < ApplicationRecord
   include Translatable
   include Versioning
 
-  self.ignored_columns = ["aggregation"]
+  self.ignored_columns = ['aggregation']
 
   versioned association: :workflow_versions, attributes: %w(tasks first_task strings major_version minor_version)
 
@@ -46,7 +46,7 @@ class Workflow < ApplicationRecord
     'options' => {'count' => 15}
   }.freeze
 
-  JSON_ATTRIBUTES = %w(tasks retirement strings steps).freeze
+  JSON_ATTRIBUTES = %w[tasks retirement strings steps].freeze
 
   SELECTOR_PAGE_SIZE_KEY = 'subject_queue_page_size'.freeze
 
