@@ -1,12 +1,9 @@
 class AggregationPolicy < ApplicationPolicy
   class ReadScope < Scope
-    # Allow access to public aggregations
+    # Short circuiting scopes for private aggrevations before they get removed next PR
     def resolve(action)
-      updatable_parents = policy_for(Workflow).scope_for(:update)
-      updatable_scope = scope.joins(:workflow).merge(updatable_parents)
-
-      public_aggregations = scope.joins(:workflow).where("workflows.aggregation ->> 'public' = 'true'")
-      Aggregation.union(updatable_scope, public_aggregations)
+      parent_scope = policy_for(Workflow).scope_for(action)
+      scope.where(workflow_id: parent_scope.select(:id))
     end
   end
 
