@@ -14,7 +14,7 @@ describe Api::V1::WorkflowsController, type: :controller do
   let(:api_resource_attributes) do
     %w(id display_name tasks classifications_count subjects_count
     created_at updated_at first_task primary_language content_language
-    version grouped prioritized pairwise retirement aggregation
+    version grouped prioritized pairwise retirement
     active mobile_friendly configuration finished_at steps public_gold_standard)
   end
   let(:api_resource_links) do
@@ -98,7 +98,6 @@ describe Api::V1::WorkflowsController, type: :controller do
           display_name: 'A Better Name',
           active: false,
           retirement: { criteria: 'classification_count' },
-          aggregation: {},
           configuration: {},
           public_gold_standard: true,
           tasks: {
@@ -523,7 +522,6 @@ describe Api::V1::WorkflowsController, type: :controller do
           first_task: 'interest',
           active: true,
           retirement: { criteria: 'classification_count' },
-          aggregation: { public: true },
           configuration: { autoplay_subjects: true },
           public_gold_standard: true,
           tasks: create_task_params,

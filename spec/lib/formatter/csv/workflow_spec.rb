@@ -26,7 +26,6 @@ RSpec.describe Formatter::Csv::Workflow do
         workflow.retired_set_member_subjects_count,
         workflow_version.tasks.to_json,
         retirement_json,
-        workflow.aggregation.to_json,
         workflow_version.strings.to_json,
         workflow_version.minor_number
       ]
@@ -34,7 +33,7 @@ RSpec.describe Formatter::Csv::Workflow do
   end
 
   let(:header) do
-    %w(workflow_id display_name version minor_version active classifications_count pairwise grouped prioritized primary_language first_task tutorial_subject_id retired_set_member_subjects_count tasks retirement aggregation strings)
+    %w(workflow_id display_name version minor_version active classifications_count pairwise grouped prioritized primary_language first_task tutorial_subject_id retired_set_member_subjects_count tasks retirement strings)
   end
 
   describe "#headers" do

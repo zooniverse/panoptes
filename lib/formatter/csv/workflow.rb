@@ -3,12 +3,12 @@ module Formatter
     class Workflow
       attr_reader :workflow_version
 
-      JSON_FIELDS = [:tasks, :aggregation, :strings ].freeze
+      JSON_FIELDS = [:tasks, :strings ].freeze
 
       def headers
         %w(workflow_id display_name version active classifications_count pairwise
         grouped prioritized primary_language first_task tutorial_subject_id
-        retired_set_member_subjects_count tasks retirement aggregation strings minor_version)
+        retired_set_member_subjects_count tasks retirement strings minor_version)
       end
 
       def to_rows(workflow_version)
