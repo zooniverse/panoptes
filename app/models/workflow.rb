@@ -8,8 +8,6 @@ class Workflow < ApplicationRecord
   include Translatable
   include Versioning
 
-  self.ignored_columns = ['aggregation']
-
   versioned association: :workflow_versions, attributes: %w(tasks first_task strings major_version minor_version)
 
   belongs_to :project
