@@ -44,7 +44,7 @@ class Workflow < ApplicationRecord
     'options' => {'count' => 15}
   }.freeze
 
-  JSON_ATTRIBUTES = %w(tasks retirement aggregation strings steps).freeze
+  JSON_ATTRIBUTES = %w[tasks retirement strings steps].freeze
 
   SELECTOR_PAGE_SIZE_KEY = 'subject_queue_page_size'.freeze
 

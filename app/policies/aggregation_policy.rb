@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class AggregationPolicy < ApplicationPolicy
   class Scope < Scope
     def resolve(action)

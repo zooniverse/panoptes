@@ -1957,7 +1957,6 @@ CREATE TABLE public.workflows (
     retired_set_member_subjects_count integer DEFAULT 0,
     retirement jsonb DEFAULT '{}'::jsonb,
     active boolean DEFAULT true,
-    aggregation jsonb DEFAULT '{}'::jsonb NOT NULL,
     display_order integer,
     configuration jsonb DEFAULT '{}'::jsonb NOT NULL,
     public_gold_standard boolean DEFAULT false,
@@ -3709,13 +3708,6 @@ CREATE INDEX index_workflows_on_activated_state ON public.workflows USING btree 
 
 
 --
--- Name: index_workflows_on_aggregation; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_workflows_on_aggregation ON public.workflows USING btree (((aggregation ->> 'public'::text)));
-
-
---
 -- Name: index_workflows_on_display_order; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4610,4 +4602,6 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20240216142515'),
 ('20240216171653'),
 ('20240216171937'),
-('20240304201959');
+('20240531184258');
+
+
