@@ -1973,8 +1973,7 @@ CREATE TABLE public.workflows (
     published_version_id integer,
     steps jsonb DEFAULT '[]'::jsonb NOT NULL,
     serialize_with_project boolean DEFAULT true,
-    real_set_member_subjects_count integer DEFAULT 0 NOT NULL,
-    aggregation jsonb
+    real_set_member_subjects_count integer DEFAULT 0 NOT NULL
 );
 
 
@@ -4603,6 +4602,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20240216142515'),
 ('20240216171653'),
 ('20240216171937'),
-('20240304201959');
+('20240304201959'),
+('20240531184258');
 
 
