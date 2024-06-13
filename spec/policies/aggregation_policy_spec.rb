@@ -5,11 +5,14 @@ describe AggregationPolicy do
     let(:anonymous_user) { nil }
     let(:logged_in_user) { create(:user) }
     let(:resource_owner) { create(:user) }
-    let(:project)  { build(:project, owner: resource_owner) }
-    let(:public_aggregation) { build(:aggregation, workflow: build(:workflow, project: project)) }
+    let(:collaborator) { create(:user) }
+
+    let(:project) { build(:project, owner: resource_owner) }
+
+    let(:aggregation) { build(:aggregation, workflow: build(:workflow, project: project)) }
 
     before do
-      public_aggregation.save!
+      aggregation.save!
     end
 
     describe 'index' do
@@ -17,40 +20,46 @@ describe AggregationPolicy do
         Pundit.policy!(api_user, Aggregation).scope_for(:index)
       end
 
-      context 'for an anonymous user' do
+      context 'when the user is an anonymous user' do
         let(:api_user) { ApiUser.new(anonymous_user) }
 
-        it "includes aggregations from public projects" do
-          expect(resolved_scope).to match_array(public_aggregation)
+        it 'returns nothing' do
+          expect(resolved_scope).to be_empty
         end
       end
 
-      context 'for a normal user' do
+      context 'when the user is a normal user' do
         let(:api_user) { ApiUser.new(logged_in_user) }
 
-        it "includes aggregations from public projects" do
-          expect(resolved_scope).to match_array(public_aggregation)
+        it 'returns nothing' do
+          expect(resolved_scope).to be_empty
         end
       end
 
-      context 'for the resource owner' do
+      context 'when the user is a resource owner' do
+        let(:api_user) { ApiUser.new(collaborator) }
+
+        before { create :access_control_list, user_group: collaborator.identity_group, resource: project, roles: ['collaborator'] }
+
+        it 'includes aggregation' do
+          expect(resolved_scope).to include(aggregation)
+        end
+      end
+
+      context 'when the user is a resource collaborators' do
         let(:api_user) { ApiUser.new(resource_owner) }
 
-        it "includes aggregations from public projects" do
-          expect(resolved_scope).to include(public_aggregation)
-        end
-
-        xit 'includes aggregations from owned private projects' do
-          expect(resolved_scope).to include(private_aggregation)
+        it 'includes the aggregation' do
+          expect(resolved_scope).to include(aggregation)
         end
       end
 
-      context 'for an admin' do
+      context 'when the user is an admin' do
         let(:admin_user) { create :user, admin: true }
         let(:api_user) { ApiUser.new(admin_user, admin: true) }
 
-        it 'includes everything' do
-          expect(resolved_scope).to include(public_aggregation)
+        it 'includes the aggregation' do
+          expect(resolved_scope).to include(aggregation)
         end
       end
     end
@@ -60,36 +69,36 @@ describe AggregationPolicy do
         Pundit.policy!(api_user, Aggregation).scope_for(:update)
       end
 
-      context 'for an anonymous user' do
+      context 'when the user is an anonymous user' do
         let(:api_user) { ApiUser.new(anonymous_user) }
 
-        it "returns nothing" do
+        it 'returns nothing' do
           expect(resolved_scope).to be_empty
         end
       end
 
-      context 'for a normal user' do
+      context 'when the user is a normal user' do
         let(:api_user) { ApiUser.new(logged_in_user) }
 
-        it "returns nothing" do
+        it 'returns nothing' do
           expect(resolved_scope).to be_empty
         end
       end
 
-      context 'for the resource owner' do
+      context 'when the user is the resource owner' do
         let(:api_user) { ApiUser.new(resource_owner) }
 
-        it "includes aggregations from public projects" do
-          expect(resolved_scope).to include(public_aggregation)
+        it 'includes the aggregation' do
+          expect(resolved_scope).to include(aggregation)
         end
       end
 
-      context 'for an admin' do
+      context 'when the user is an admin' do
         let(:admin_user) { create :user, admin: true }
         let(:api_user) { ApiUser.new(admin_user, admin: true) }
 
-        it 'includes everything' do
-          expect(resolved_scope).to include(public_aggregation)
+        it 'includes the aggregation' do
+          expect(resolved_scope).to include(aggregation)
         end
       end
     end

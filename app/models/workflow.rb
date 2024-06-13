@@ -24,7 +24,7 @@ class Workflow < ApplicationRecord
   has_many :user_seen_subjects, dependent: :destroy
   has_many :workflow_tutorials, dependent: :destroy
   has_many :tutorials, through: :workflow_tutorials
-  has_many :aggregations, dependent: :destroy
+  has_one :aggregation, dependent: :destroy
   has_many :attached_images, -> { where(type: "workflow_attached_image") }, class_name: "Medium",
     as: :linked
   has_one :classifications_export, -> { where(type: "workflow_classifications_export").order(created_at: :desc) },

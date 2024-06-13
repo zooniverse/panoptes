@@ -1,58 +1,44 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
-RSpec.describe Aggregation, :type => :model do
+RSpec.describe Aggregation, type: :model do
   let(:aggregation) { build(:aggregation) }
 
-  it 'should have a valid factory' do
+  it 'has a valid factory' do
     expect(aggregation).to be_valid
   end
 
-  it 'should not be valid without an aggregation hash' do
-    expect(build(:aggregation, aggregation: nil)).to_not be_valid
+  it 'is not be valid without a workflow' do
+    expect(build(:aggregation, workflow: nil)).not_to be_valid
   end
 
-  it 'should not be valid without a workflow' do
-    expect(build(:aggregation, workflow: nil)).to_not be_valid
+  it 'is not be valid without a project' do
+    expect(build(:aggregation, project: nil)).not_to be_valid
   end
 
-  it 'should not be valid without a subject' do
-    expect(build(:aggregation, subject: nil)).to_not be_valid
+  it 'is not be valid without a user' do
+    expect(build(:aggregation, user: nil)).not_to be_valid
   end
 
-  context "when missing the workflow_version aggregation metadata" do
-    let(:no_workflow_version) { build(:aggregation, aggregation: { test: 1}) }
+  context 'when there is a duplicate workflow_id' do
+    before { aggregation.save }
 
-    it 'should not be valid' do
-      expect(no_workflow_version).to_not be_valid
-    end
-
-    it 'should not have the correct error message' do
-      no_workflow_version.valid?
-      error_message = "must have workflow_version metadata"
-      expect(no_workflow_version.errors[:aggregation]).to include(error_message)
-    end
-  end
-
-  context "when there is a duplicate subject_id workflow_id entry" do
-    before(:each) do
-      aggregation.save
-    end
     let(:duplicate) do
-      build(:aggregation, workflow: aggregation.workflow,
-                          subject: aggregation.subject)
+      build(:aggregation, workflow: aggregation.workflow, user: aggregation.user)
     end
 
-    it "should not be valid" do
-      expect(duplicate).to_not be_valid
+    it 'is not be valid' do
+      expect(duplicate).not_to be_valid
     end
 
-    it "should have the correct error message on subject_id" do
+    it 'has the correct error message' do
       duplicate.valid?
-      expect(duplicate.errors[:subject_id]).to include("has already been taken")
+      expect(duplicate.errors.full_messages.first).to include('has already been taken')
     end
 
-    it "should raise a uniq index db error" do
-      expect{duplicate.save(validate: false)}.to raise_error(ActiveRecord::RecordNotUnique)
+    it 'raises a uniq index db error' do
+      expect { duplicate.save! }.to raise_error(ActiveRecord::RecordInvalid)
     end
   end
 end

@@ -1,12 +1,25 @@
+# frozen_string_literal: true
+
 class Api::V1::AggregationsController < Api::ApiController
-  # include JsonApiController::PunditPolicy
+  include JsonApiController::PunditPolicy
 
-  # THIS FUNCTIONALITY IS BEING DEPRECATED EFFECTIVE IMMEDIATELY
-  # A REPLACEMENT IS FORTHCOMING.
+  require_authentication :index, :show, :update, :destroy, :create, scopes: [:project]
+  resource_actions :index, :show, :create, :update, :destroy
+  schema_type :json_schema
 
-  # require_authentication :create, :update, scopes: [:project]
-  # resource_actions :create, :update, :show, :index
-  # schema_type :json_schema
-  # before_action :filter_by_subject_set, only: :index
-
+  def create
+    workflow = Workflow.find(create_params['links']['workflow'])
+    project_id = workflow.project.id
+    create_params['links']['project'] = project_id
+    response = AggregationClient.new.send_aggregation_request(
+      project_id,
+      workflow.id,
+      create_params['links']['user']
+    )
+    super do |agg|
+      agg.update({ task_id: response.body[:task_id], status: 'pending' })
+    end
+  rescue AggregationClient::ConnectionError
+    json_api_render(:service_unavailable, 'The aggregation service is unavailable or not responding')
+  end
 end
