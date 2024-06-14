@@ -5,16 +5,15 @@ class AggregationClient
   class ResourceNotFound < ConnectionError; end
   class ServerError < ConnectionError; end
 
-  attr_reader :connection
+  attr_reader :connection, :host
 
   def initialize(adapter=Faraday.default_adapter)
+    @host = ENV.fetch('AGGREGATION_HOST', 'https://aggregation-staging.zooniverse.org')
     @connection = connect!(adapter)
-    @host ||= ENV.fetch('AGGREGATION_HOST', 'http://test.example.com')
   end
 
   def connect!(adapter)
-    Faraday.new(@host, ssl: { verify: false }) do |faraday|
-      faraday.request :json
+    Faraday.new(host) do |faraday|
       faraday.response :json, content_type: /\bjson$/
       faraday.adapter(*adapter)
     end
