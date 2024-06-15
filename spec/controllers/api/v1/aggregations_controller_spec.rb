@@ -31,7 +31,7 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
   describe 'create' do
     let(:test_attr) { :workflow_id }
     let(:test_attr_value) { workflow.id }
-    let(:fake_response) { { 'task_id': 'asdf-1234-asdf' } }
+    let(:fake_response) { { 'task_id' => 'asdf-1234-asdf' } }
     let(:mock_agg) { instance_double(AggregationClient) }
 
     let(:create_params) do

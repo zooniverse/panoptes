@@ -17,7 +17,7 @@ class Api::V1::AggregationsController < Api::ApiController
       create_params['links']['user']
     )
     super do |agg|
-      agg.update({ task_id: response[:task_id], status: 'pending' })
+      agg.update({ task_id: response['task_id'], status: 'pending' })
     end
   rescue AggregationClient::ConnectionError
     json_api_render(:service_unavailable, 'The aggregation service is unavailable or not responding')
