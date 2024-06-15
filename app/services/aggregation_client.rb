@@ -8,8 +8,8 @@ class AggregationClient
   attr_reader :connection
 
   def initialize(adapter=Faraday.default_adapter)
+    @host = ENV.fetch('AGGREGATION_HOST', 'https://aggregation-staging.zooniverse.org')
     @connection = connect!(adapter)
-    @host ||= ENV.fetch('AGGREGATION_HOST', 'http://test.example.com')
   end
 
   def connect!(adapter)
@@ -24,7 +24,7 @@ class AggregationClient
     params = { project_id: project_id, workflow_id: workflow_id, user_id: user_id }
 
     request(:post, '/run_aggregation') do |req|
-      req.body = params.to_json
+      req.body = params
     end
   end
 
