@@ -1,0 +1,34 @@
+Hello,
+
+Your workflow aggregation has finished processing.
+
+<% if @success %>
+The workflow was aggregated successfully.
+
+Click here to download a zip file containing the following:
+  * Workflow classifications export
+  * Workflow export
+  * Extracts (one file per task)
+  * Reductions
+
+<%= @zip_url %>
+
+Click here to download the reductions file by itself:
+
+<%= @reductions_url %>
+
+<% else %>
+The workflow failed to aggregate. Please contact us or try again.
+<% end %>
+
+If you have questions or if there were any issues with your aggregation, please email contact@zooniverse.org.
+
+Cheers,
+The Zooniverse Team
+
+This is an automated email, please do not respond.
+
+To manage your Zooniverse email subscription preferences visit https://zooniverse.org/settings
+
+To unsubscribe to all Zooniverse messages please visit https://zooniverse.org/unsubscribe
+Please be aware that the above link will unsubscribe you from ALL Zooniverse emails.
