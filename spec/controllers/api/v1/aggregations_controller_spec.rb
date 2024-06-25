@@ -107,6 +107,26 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
     end
 
     it_behaves_like 'is updatable'
+
+    context 'with the mailer worker' do
+      before do
+        default_request scopes: scopes, user_id: authorized_user.id
+        allow(AggregationCompletedMailerWorker).to receive(:perform_async).with(resource.id)
+      end
+
+      let(:params) { update_params.merge(id: resource.id) }
+
+      it 'calls the mailer worker' do
+        put :update, params: params
+        expect(AggregationCompletedMailerWorker).to have_received(:perform_async).with(resource.id)
+      end
+
+      it 'does not call the mailer if status is not an updated param' do
+        params[:aggregations].delete(:status)
+        put :update, params: params
+        expect(AggregationCompletedMailerWorker).not_to have_received(:perform_async)
+      end
+    end
   end
 
   describe '#destroy' do
