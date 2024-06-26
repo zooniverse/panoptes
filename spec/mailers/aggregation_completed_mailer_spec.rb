@@ -4,6 +4,7 @@ require 'spec_helper'
 
 RSpec.describe AggregationCompletedMailer, type: :mailer do
   let(:base_url) { 'https://example.com' }
+
   before do
     allow(ENV).to receive(:fetch).with('AGGREGATION_STORAGE_BASE_URL', '').and_return(base_url)
   end
