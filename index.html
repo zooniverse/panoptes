@@ -259,6 +259,26 @@
             <a href="#headers" class="toc-h1 toc-link" data-title="Headers">Headers</a>
           </li>
           <li>
+            <a href="#aggregations" class="toc-h1 toc-link" data-title="Aggregations">Aggregations</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#list-aggregations" class="toc-h2 toc-link" data-title="Aggregations">List aggregations</a>
+                  </li>
+                  <li>
+                    <a href="#retrieve-a-single-aggregation" class="toc-h2 toc-link" data-title="Aggregations">Retrieve a single Aggregation</a>
+                  </li>
+                  <li>
+                    <a href="#create-an-aggregation-post" class="toc-h2 toc-link" data-title="Aggregations">Create an Aggregation [POST]</a>
+                  </li>
+                  <li>
+                    <a href="#edit-a-single-aggregation-put" class="toc-h2 toc-link" data-title="Aggregations">Edit a single Aggregation [PUT]</a>
+                  </li>
+                  <li>
+                    <a href="#destroy-a-single-aggregation-delete" class="toc-h2 toc-link" data-title="Aggregations">Destroy a single Aggregation [DELETE]</a>
+                  </li>
+              </ul>
+          </li>
+          <li>
             <a href="#classifications" class="toc-h1 toc-link" data-title="Classifications">Classifications</a>
               <ul class="toc-list-h2">
                   <li>
@@ -642,7 +662,7 @@
           </li>
       </div>
         <ul class="toc-footer">
-            <li><a href='https://github.com/zooniverse/caesar/tree/master/docs/source/'>Modify documentation</a></li>
+            <li><a href='https://github.com/zooniverse/panoptes/tree/master/docs/source/'>Modify documentation</a></li>
             <li><a href='https://github.com/tripit/slate'>Documentation Powered by Slate</a></li>
         </ul>
     </div>
@@ -849,6 +869,155 @@ automatically navigate these paginated results.</p>
 <p>All PUT and POST requests should set <code>Content-Type: application/vnd.api+json; version=1</code> or <code>Content-Type: application/json</code>. You will receive a <code>415 Unsupported Media Type</code> without one of those two headers.</p>
 
 <p>All PUT and DELETE requests should set the <code>If-Match</code> header to the value of the <code>ETag</code> header of the request where the resource was originally retrieved. You will receive a <code>428 Precondition Required</code> without the header and a <code>412 Precondition Failed</code> if the etags do not match.</p>
+<h1 id='aggregations'>Aggregations</h1><div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"aggregations"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/aggregations/1"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2024-05-22T22:52:59.173Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2024-05-22T22:52:59.181Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"uuid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"557ebcfa3c29496787336bfbd7c4d856"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"task_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"9c963646-e7cd-4c5a-8749-c97086d416bd"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"completed"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"workflow"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"user"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2"</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">],</span><span class="w">
+  </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"aggregations.workflow"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/workflows/{aggregations.workflow}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"workflows"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"aggregations.user"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/users/{aggregations.user}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"users"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p>A single Aggregation resource object. This represents the automated aggregation by the external service by a <em>user</em> of a single <em>workflow</em> via the online Aggregation service.</p>
+
+<p>An Aggregation has the following attributes:</p>
+
+<table><thead>
+<tr>
+<th>Attribute</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>id</td>
+<td>integer</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>workflow_id</td>
+<td>integer</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>project_id</td>
+<td>integer</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>string</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>updated_at</td>
+<td>string</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>user_id</td>
+<td>integer</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>uuid</td>
+<td>string</td>
+<td>The unique identifier of the aggregation run, used in the URLs of output files</td>
+</tr>
+<tr>
+<td>task_id</td>
+<td>string</td>
+<td>The Celery task ID, used to query the status of the backgrounded task on the aggregation service</td>
+</tr>
+<tr>
+<td>status</td>
+<td>integer</td>
+<td>created, pending, completed, failed</td>
+</tr>
+</tbody></table>
+<h2 id='list-aggregations'>List aggregations</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/aggregations</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div>
+<p>Only lists aggregations where the active user has has edit permissions on the related project.</p>
+
+<p>Any of the scopes may be further filtered using the <em>project_id</em>, <em>workflow_id</em>
+and <em>user_id</em> parameters.</p>
+<h3 id='parameters'>Parameters</h3>
+<ul>
+<li>page (optional, integer) ... index of the page to retrieve, 1 is default</li>
+<li>page_size (optional, integer) ... number of items on a page. 20 is default</li>
+<li>sort (optional, string) ... fields to sort by. updated_at is default</li>
+<li>project_id (optional, integer) ... only retrieve aggregations for a specific project</li>
+<li>workflow_id (optional, integer) ... only retrieve aggregations for a specific workflow</li>
+<li>user_id (optional, integer) ... only retrieve aggregations for a specific user</li>
+<li>include (optional, string) ... comma separated list of linked resources to return in the response</li>
+</ul>
+<h2 id='retrieve-a-single-aggregation'>Retrieve a single Aggregation</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/aggregations/123</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div>
+<p>A User may only retrieve Aggregations they have permission to access.</p>
+<h3 id='parameters-2'>Parameters</h3>
+<ul>
+<li><code>id</code> (required, integer) ... integer id of the resource to retrieve</li>
+</ul>
+<h2 id='create-an-aggregation-post'>Create an Aggregation [POST]</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/aggregations</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+    </span><span class="s2">"aggregations"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"user"</span><span class="p">:</span><span class="w"> </span><span class="s2">"3"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"workflow"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p>Creating a new Aggregation will initiate a new batch aggregation run.
+A call out to the Aggregation Service is made and the newly created Aggregation resource
+is updated with the Aggregation Service&#39;s Celery background task ID so that its status can be checked.</p>
+<h2 id='edit-a-single-aggregation-put'>Edit a single Aggregation [PUT]</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">PUT</span> <span class="nn">/api/aggregations/123</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+    </span><span class="s2">"aggregations"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"uuid"</span><span class="p">:</span><span class="w"> </span><span class="s2">"557ebcfa3c29496787336bfbd7c4d856"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"status"</span><span class="p">:</span><span class="w"> </span><span class="s2">"completed"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p>Aggregations are updated by the Aggregation Service when a run has succeeded or failed. A successful run
+will send a request to this endpoint and update the UUID generated by that run. This UUID is a 32-character
+lowercase hexadecimal string and can be used to construct the URL to download that run&#39;s output data.</p>
+
+<p>The status can also be updated via this route (see the <em>aggregations</em> model) and can be the only attribute included.</p>
+<h2 id='destroy-a-single-aggregation-delete'>Destroy a single Aggregation [DELETE]</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">DELETE</span> <span class="nn">/api/Aggregations/123</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div>
+<p>A user may destroy an Aggregation by ID if they have destroy permissions for the parent project.</p>
 <h1 id='classifications'>Classifications</h1><div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"classifications"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w">
         </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">1001</span><span class="p">,</span><span class="w">
