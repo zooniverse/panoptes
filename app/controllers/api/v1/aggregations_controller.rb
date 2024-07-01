@@ -22,4 +22,10 @@ class Api::V1::AggregationsController < Api::ApiController
   rescue AggregationClient::ConnectionError
     json_api_render(:service_unavailable, 'The aggregation service is unavailable or not responding')
   end
+
+  def update
+    super do |agg|
+      AggregationCompletedMailerWorker.perform_async(agg.id) if update_params[:status]
+    end
+  end
 end
