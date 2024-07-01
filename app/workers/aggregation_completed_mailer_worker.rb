@@ -7,6 +7,6 @@ class AggregationCompletedMailerWorker
 
   def perform(agg_id)
     aggregation = Aggregation.find(agg_id)
-    AggregationCompletedMailer.aggregation_complete(aggregation).deliver
+    AggregationCompletedMailer.aggregation_complete(aggregation).deliver_now
   end
 end
