@@ -6,7 +6,7 @@ RSpec.describe AggregationCompletedMailerWorker do
   let(:aggregation) { create(:aggregation) }
 
   it 'delivers the mail' do
-    expect { described_class.new.perform(aggregation.id) }.to change { ActionMailer::Base.deliveries.count }.by(1)
+    expect { described_class.new.perform(aggregation.id.to_s) }.to change { ActionMailer::Base.deliveries.count }.by(1)
   end
 
   context 'with missing attributes' do
