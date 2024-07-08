@@ -24,8 +24,7 @@ class Api::V1::AggregationsController < Api::ApiController
   end
 
   def update
-    super do |agg|
-      AggregationCompletedMailerWorker.perform_async(agg.id) if update_params[:status]
-    end
+    super
+    AggregationCompletedMailerWorker.perform_async(params['id']) if update_params[:status]
   end
 end
