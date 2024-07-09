@@ -227,6 +227,15 @@ describe Api::V1::SubjectSetsController, type: :controller do
           expect(response).to have_http_status(:ok)
         end
       end
+
+      context 'when a linking resource has been soft deleted' do
+        it 'returns a 422 with a missing subject' do
+          last_subject = subjects.last
+          last_subject.update(activated_state: 'inactive')
+          run_update_links
+          expect(response).to have_http_status(:unprocessable_entity)
+        end
+      end
     end
 
     context 'with illegal link properties' do
