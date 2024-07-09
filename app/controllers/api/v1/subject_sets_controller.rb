@@ -112,7 +112,7 @@ class Api::V1::SubjectSetsController < Api::ApiController
     if relation == :subjects && value.is_a?(Array)
       #ids is returning duplicates even though the AR Relations were uniq
       subject_ids_to_link = new_items(resource, relation, value).distinct.ids
-      unless Subject.where(id: subject_ids_to_link).count == value.count
+      unless Subject.where(id: subject_ids_to_link, activated_state: 'active').count == value.count
         raise BadLinkParams.new("Error: check the subject set and all the subjects exist.")
       end
       new_sms_values = subject_ids_to_link.map do |subject_id|
