@@ -13,7 +13,7 @@ class Api::V1::SubjectsController < Api::ApiController
   before_action :check_subject_limit, only: :create
 
   def index
-    params[:sort] = 'id' unless params[:sort].present?
+    params[:sort] = 'id' if params[:sort].blank?
 
     case params[:sort]
     when 'queued'
