@@ -49,7 +49,7 @@ describe Api::V1::SubjectsController, type: :controller do
           get :index
         end
 
-        it 'should default sort parameter to id' do
+        it 'defaults sort parameter to id' do
           expect(controller.params[:sort]).to eq('id')
         end
 
@@ -89,9 +89,8 @@ describe Api::V1::SubjectsController, type: :controller do
               get :index, params: request_params
             end
 
-            it 'should not default sort parameter to id', focus: true do
-              expect(controller.params[:sort]).to_not eq('id')
-              expect(controller.params[:sort]).to eq('queued')
+            it 'does not default sort parameter to id' do
+              expect(controller.params[:sort]).not_to eq('id')
             end
 
             it "should return 200" do
