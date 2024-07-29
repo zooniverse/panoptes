@@ -6,6 +6,7 @@ describe WorkflowCopier do
   let(:workflow) do
     create(:workflow, classifications_count: 100, retired_set_member_subjects_count: 10, real_set_member_subjects_count: 10, finished_at: Time.now.utc, completeness: 100.0, &:publish!)
   end
+  let(:media) { create(:medium, type: 'workflow_attached_image', linked: workflow) }
   let(:target_project) { create(:project) }
   let(:copier) { target_project.user }
   let(:copied_workflow) { described_class.copy(workflow, target_project.id) }
@@ -36,6 +37,10 @@ describe WorkflowCopier do
       %i[tasks primary_language pairwise grouped prioritized first_task retirement subject_selection_strategy mobile_friendly strings steps].each do |attribute|
         expect(copied_workflow.send(attribute)).to eq(workflow.send(attribute))
       end
+    end
+
+    it 'copies the attached_images' do
+      expect(copied_workflow.attached_images).to eq(workflow.attached_images)
     end
 
     it 'sets the workflow to inactive to avoid releasing these on live projects' do
