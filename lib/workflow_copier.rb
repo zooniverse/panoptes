@@ -10,13 +10,17 @@ class WorkflowCopier
     finished_at
   ].freeze
 
+  INCLUDE_ASSOCIATIONS = [
+    :attached_images
+  ].freeze
+
   def self.copy_by_id(workflow_id, target_project_id)
     source_workflow = Workflow.find(workflow_id)
     copy(source_workflow, target_project_id)
   end
 
   def self.copy(source_workflow, target_project_id)
-    copied_workflow = source_workflow.deep_clone(except: EXCLUDE_ATTRIBUTES)
+    copied_workflow = source_workflow.deep_clone(except: EXCLUDE_ATTRIBUTES, include: INCLUDE_ASSOCIATIONS)
     copied_workflow.project_id = target_project_id
     copied_workflow.active = false
     copied_workflow.display_name = "#{copied_workflow.display_name} (copy: #{Time.now.utc})"
