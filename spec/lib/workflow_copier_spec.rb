@@ -41,6 +41,7 @@ describe WorkflowCopier do
     it 'copies the attached_images' do
       create(:medium, type: 'workflow_attached_image', linked: workflow)
       expect(copied_workflow.attached_images.count).to eq(workflow.attached_images.count)
+      expect(copied_workflow.attached_images[0]).to be_valid
     end
 
     it 'sets the workflow to inactive to avoid releasing these on live projects' do
