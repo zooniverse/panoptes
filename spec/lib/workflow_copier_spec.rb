@@ -38,7 +38,7 @@ describe WorkflowCopier do
       end
     end
 
-    it 'copies the attached_images', focus: true do
+    it 'copies the attached_images' do
       create(:medium, type: 'workflow_attached_image', linked: workflow)
       expect(copied_workflow.attached_images.count).to eq(workflow.attached_images.count)
     end
