@@ -483,25 +483,6 @@ describe Project, type: :model do
           end
         end
       end
-
-      context "when launch_requested changed" do
-        let(:field) { "launch_requested" }
-
-        context "when true" do
-          let(:value) { true }
-          it 'should queue the worker' do
-            expect(ProjectRequestEmailWorker).to receive(:perform_async).with("launch", project.id)
-          end
-        end
-
-        context "when false" do
-          let(:value) { false }
-
-          it 'should not queue the worker' do
-            expect(ProjectRequestEmailWorker).not_to receive(:perform_async)
-          end
-        end
-      end
     end
   end
 

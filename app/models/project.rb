@@ -118,8 +118,6 @@ class Project < ApplicationRecord
     if Panoptes.project_request.recipients
       request_type = if saved_change_to_beta_requested? && beta_requested
                        "beta"
-                     elsif saved_change_to_launch_requested? && launch_requested
-                       "launch"
                      end
       ProjectRequestEmailWorker.perform_async(request_type, id) if request_type
     end
