@@ -47,17 +47,11 @@ class Api::V1::UsersController < Api::ApiController
   end
 
   def update
-    [].tap do |update_email_user_ids|
-
-      super do |user|
-        if user.email_changed?
-          update_email_user_ids << user.id
-          user.update_attribute(:valid_email, true)
-        end
-      end
-
-      update_email_user_ids.each do |user_id|
-        UserInfoChangedMailerWorker.perform_async(user_id, "email")
+    prev_email = user.email
+    super do |user|
+      if user.email_changed?
+        user.update_attribute(:valid_email, true)
+        UserInfoChangedMailerWorker.perform_async(user.id, "email", prev_email)
       end
     end
   end
