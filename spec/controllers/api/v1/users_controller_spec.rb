@@ -473,13 +473,13 @@ describe Api::V1::UsersController, type: :controller do
 
     context "when changing email" do
       let(:put_operations) { {users: {email: "test@example.com"}} }
-      let!(:user_email){ user.email }
+      let!(:user_email) { user.email }
 
       after(:each) do
         update_request
       end
 
-      it "sends an email to the new address if user is valid", focus: true do
+      it "sends an email to the new address if user is valid" do
         expect(UserInfoChangedMailerWorker).to receive(:perform_async).with(user.id, "email", user_email)
       end
 

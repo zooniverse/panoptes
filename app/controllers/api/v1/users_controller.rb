@@ -50,8 +50,8 @@ class Api::V1::UsersController < Api::ApiController
     prev_email = user.email
     super do |user|
       if user.email_changed?
-        user.update_attribute(:valid_email, true)
-        UserInfoChangedMailerWorker.perform_async(user.id, "email", prev_email)
+        user.update(valid_email: true)
+        UserInfoChangedMailerWorker.perform_async(user.id, 'email', prev_email)
       end
     end
   end
