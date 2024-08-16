@@ -15,6 +15,6 @@ class UserInfoChangedMailer < ApplicationMailer
       template = "password_changed"
     end
 
-    mail(to: @recipient_emails, subject: subject, template_name: template )
+    mail(to: @recipient_emails, subject: subject, template_name: template)
   end
 end

@@ -57,7 +57,6 @@ class Api::V1::UsersController < Api::ApiController
       user.update(valid_email: true)
       UserInfoChangedMailerWorker.perform_async(user.id, 'email', prev_email)
     end
-
   end
 
   def destroy

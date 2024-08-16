@@ -479,7 +479,7 @@ describe Api::V1::UsersController, type: :controller do
         update_request
       end
 
-      it "sends an email to the new address if user is valid" do
+      it "sends an email to the new and old address if user is valid" do
         expect(UserInfoChangedMailerWorker).to receive(:perform_async).with(user.id, "email", user_email)
       end
 
