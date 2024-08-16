@@ -4,12 +4,12 @@ class UserInfoChangedMailer < ApplicationMailer
   def user_info_changed(user, info, previous_email=nil)
     @user = user
     @recipient_emails = [user.email]
-    @recipient_emails << previous_email if previous_email.present? && info == 'email'
 
     case info
     when "email"
       subject = "Your Zooniverse email address has been changed"
       template = "email_changed"
+      @recipient_emails << previous_email if previous_email
     when "password"
       subject = "Your Zooniverse password has been changed"
       template = "password_changed"

@@ -48,12 +48,16 @@ class Api::V1::UsersController < Api::ApiController
 
   def update
     prev_email = user.email
+    email_changed = false
     super do |user|
-      if user.email_changed?
-        user.update(valid_email: true)
-        UserInfoChangedMailerWorker.perform_async(user.id, 'email', prev_email)
-      end
+      email_changed = user.email_changed?
     end
+
+    if email_changed
+      user.update(valid_email: true)
+      UserInfoChangedMailerWorker.perform_async(user.id, 'email', prev_email)
+    end
+
   end
 
   def destroy
