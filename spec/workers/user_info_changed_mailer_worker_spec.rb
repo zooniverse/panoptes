@@ -5,13 +5,13 @@ RSpec.describe UserInfoChangedMailerWorker do
   let(:user) { create(:user) }
 
   context 'email delivery' do
-    it 'should deliver the mail' do
-      expect{ subject.perform(user.id, "password") }.to change{ ActionMailer::Base.deliveries.count }.by(1)
+    it 'delivers the mail' do
+      expect { subject.perform(user.id, 'password') }.to change { ActionMailer::Base.deliveries.count }.by(1)
     end
 
-    it 'should deliver to the right recipients' do
-      prev_pass = 'oldpassword@example.com'
-      subject.perform(user.id, "email", prev_pass)
+    it 'delivers to the right recipients' do
+      let(:prev_pass) { 'oldpassword@example.com' }
+      subject.perform(user.id, 'email', prev_pass)
       mail = ActionMailer::Base.deliveries.last
       expect(mail.to).to eq([user.email, prev_pass])
     end
