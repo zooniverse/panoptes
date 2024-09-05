@@ -37,7 +37,7 @@ describe Memberships::Create do
     it 'disallows you to add yourself to an inactive group' do
       inactive_user_group = create(:user_group, activated_state: :inactive)
       expect do
-        operation.run links: {user: you.id, user_group: inactive_user_group.id}, join_token: inactive_user_group.join_token
+        operation.run links: { user: you.id, user_group: inactive_user_group.id }, join_token: inactive_user_group.join_token
       end.to raise_error(Operation::Unauthorized)
     end
 

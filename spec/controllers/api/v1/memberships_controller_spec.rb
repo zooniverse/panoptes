@@ -93,7 +93,8 @@ describe Api::V1::MembershipsController, type: :controller do
           }
         }
       end
-      before(:each) do
+
+      before do
         default_request scopes: scopes, user_id: authorized_user.id
         post :create, params: params
       end
