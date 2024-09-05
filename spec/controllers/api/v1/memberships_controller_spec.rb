@@ -103,6 +103,11 @@ describe Api::V1::MembershipsController, type: :controller do
         expect(response).to have_http_status(:unprocessable_entity)
       end
 
+      it 'responds with group is inactive error message' do
+        response_body = JSON.parse(response.body)
+        expect(response_body['errors'][0]['message']).to eq('Group is inactive')
+      end
+
       it 'disallows membership re-activation' do
         membership = create(:membership, user_id: authorized_user.id, user_group_id: inactive_user_group.id, state: :inactive)
         expect(response).to have_http_status(:unprocessable_entity)
