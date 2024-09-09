@@ -3,9 +3,18 @@ require 'spec_helper'
 RSpec.describe UserInfoChangedMailerWorker do
   let(:project) { create(:project) }
   let(:user) { create(:user) }
+  let(:prev_email) { 'oldemaild@example.com' }
 
-  it 'should deliver the mail' do
-    expect{ subject.perform(user.id, "password") }.to change{ ActionMailer::Base.deliveries.count }.by(1)
+  context 'when delivering an email' do
+    it 'delivers the mail' do
+      expect { subject.perform(user.id, 'password') }.to change { ActionMailer::Base.deliveries.count }.by(1)
+    end
+
+    it 'delivers to the right recipients' do
+      subject.perform(user.id, 'email', prev_email)
+      mail = ActionMailer::Base.deliveries.last
+      expect(mail.to).to eq([user.email, prev_email])
+    end
   end
 
   context "without a user" do

@@ -21,9 +21,15 @@ RSpec.describe UserInfoChangedMailer, :type => :mailer do
     end
 
     context "email address was changed" do
-      let(:mail) { UserInfoChangedMailer.user_info_changed(user, "email")}
+      prev_email = 'prev@example.com'
+      let(:mail) { UserInfoChangedMailer.user_info_changed(user, 'email', prev_email)}
+
       it 'should have the correct subject' do
         expect(mail.subject).to eq("Your Zooniverse email address has been changed")
+      end
+
+      it 'notifies the previous mail' do
+        expect(mail.to).to include(prev_email)
       end
     end
   end
