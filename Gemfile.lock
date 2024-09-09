@@ -115,7 +115,7 @@ GEM
       activesupport
     coderay (1.1.3)
     colorize (0.8.1)
-    concurrent-ruby (1.2.3)
+    concurrent-ruby (1.3.4)
     congestion (0.1.0)
       connection_pool (>= 2.0)
       redis (>= 3.1)
@@ -225,7 +225,7 @@ GEM
     httparty (0.21.0)
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
-    i18n (1.14.1)
+    i18n (1.14.5)
       concurrent-ruby (~> 1.0)
     jmespath (1.6.1)
     jquery-rails (4.5.1)
@@ -278,7 +278,7 @@ GEM
     mini_portile2 (2.8.4)
     mini_racer (0.6.3)
       libv8-node (~> 16.10.0.0)
-    minitest (5.19.0)
+    minitest (5.25.1)
     mock_redis (0.36.0)
       ruby2_keywords
     multi_json (1.15.0)
@@ -344,7 +344,7 @@ GEM
     public_suffix (4.0.7)
     puma (6.4.2)
       nio4r (~> 2.0)
-    pundit (2.3.0)
+    pundit (2.4.0)
       activesupport (>= 3.0.0)
     raabro (1.4.0)
     racc (1.7.1)
@@ -516,7 +516,7 @@ GEM
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
     yard (0.9.36)
-    zeitwerk (2.6.10)
+    zeitwerk (2.6.18)
     zoo_stream (1.0.1)
       aws-sdk
 
@@ -566,7 +566,7 @@ DEPENDENCIES
   pg_search
   pry
   puma (~> 6.4.2)
-  pundit (~> 2.3.0)
+  pundit (~> 2.4.0)
   rack-cors (~> 1.0)
   rails (~> 6.1)
   ranked-model (~> 0.4.8)
