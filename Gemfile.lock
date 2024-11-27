@@ -124,7 +124,12 @@ GEM
       rexml
     crass (1.0.6)
     dalli (3.2.5)
-    database_cleaner (1.99.0)
+    database_cleaner (2.1.0)
+      database_cleaner-active_record (>= 2, < 3)
+    database_cleaner-active_record (2.2.0)
+      activerecord (>= 5.a)
+      database_cleaner-core (~> 2.0.0)
+    database_cleaner-core (2.0.1)
     date (3.3.3)
     deep_cloneable (3.2.0)
       activerecord (>= 3.1.0, < 8)
@@ -529,7 +534,7 @@ DEPENDENCIES
   aws-sdk (~> 2.10)
   azure-storage-blob
   dalli
-  database_cleaner (~> 1.99.0)
+  database_cleaner (~> 2.1.0)
   deep_cloneable (~> 3.2.0)
   devise (~> 4.9)
   doorkeeper (~> 4.4)
