@@ -78,7 +78,7 @@ group :development, :test do
 end
 
 group :test do
-  gem 'database_cleaner', '~> 1.99.0'
+  gem 'database_cleaner', '~> 2.1.0'
   gem 'guard-rspec', require: false
   gem 'listen', '~> 3.8'
   gem 'mock_redis'
