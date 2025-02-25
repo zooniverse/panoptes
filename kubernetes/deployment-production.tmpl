@@ -356,66 +356,6 @@ spec:
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: panoptes-production-sidekiq-alt
-  labels:
-    app: panoptes-production-sidekiq-alt
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      app: panoptes-production-sidekiq-alt
-  template:
-    metadata:
-      labels:
-        app: panoptes-production-sidekiq-alt
-    spec:
-      containers:
-        - name: panoptes-production-sidekiq
-          image: ghcr.io/zooniverse/panoptes:__IMAGE_TAG__
-          resources:
-            requests:
-              memory: "1000Mi"
-              cpu: "500m"
-            limits:
-              memory: "4000Mi"
-              cpu: "2000m"
-          livenessProbe:
-            exec:
-              command:
-                - /rails_app/scripts/docker/sidekiq_status
-            initialDelaySeconds: 20
-          args: ["/rails_app/scripts/docker/start-sidekiq.sh"]
-          env:
-          - name: SIDEKIQ_ARGS
-            value: '-q default -q data_medium -q data_low'
-          - name: NEW_RELIC_APPLICATION_LOGGING_ENABLED
-            value: 'false'
-          envFrom:
-          - secretRef:
-              name: panoptes-common-env-vars
-          - secretRef:
-              name: panoptes-production-env-vars
-          - configMapRef:
-              name: panoptes-production-shared
-          volumeMounts:
-          - mountPath: /tmp
-            name: panoptes-production-dumpworker-data
-          - name: jwt-production
-            mountPath: "/rails_app/config/keys"
-            readOnly: true
-      volumes:
-        - name: panoptes-production-dumpworker-data
-          hostPath:
-            # directory location on host node temp disk
-            path: /mnt/panoptes-production-dumpworker-data
-            type: DirectoryOrCreate
-        - name: jwt-production
-          secret:
-            secretName: panoptes-doorkeeper-jwt-production
----
-apiVersion: apps/v1
-kind: Deployment
-metadata:
   name: panoptes-production-sidekiq
   labels:
     app: panoptes-production-sidekiq
@@ -479,7 +419,7 @@ spec:
     apiVersion: apps/v1
     kind: Deployment
     name: panoptes-production-sidekiq
-  minReplicas: 5
+  minReplicas: 2
   maxReplicas: 16
   targetCPUUtilizationPercentage: 95
 ---
