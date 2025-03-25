@@ -1,8 +1,10 @@
-class Project < ActiveRecord::Base
+# frozen_string_literal: true
+
+class Project < ApplicationRecord
   include RoleControl::Owned
   include Activatable
   include ExtendedCacheKey
-  include PgSearch
+  include PgSearch::Model
   include RankedModel
   include SluggedName
   include Translatable
@@ -13,6 +15,7 @@ class Project < ActiveRecord::Base
   has_many :tutorials
   has_many :field_guides, dependent: :destroy
   belongs_to :organization
+  has_many :user_project_preference, dependent: :destroy
   # uses the activated_state enum on the workflow
   has_many :workflows,
     -> { where(serialize_with_project: true).active},
@@ -46,7 +49,7 @@ class Project < ActiveRecord::Base
 
   has_many :project_versions, dependent: :destroy
 
-  versioned association: :project_versions, attributes: %w(private live beta_requested beta_approved launch_requested launch_approved display_name description workflow_description introduction url_labels researcher_quote)
+  versioned association: :project_versions, attributes: %w[private live beta_requested beta_approved launch_requested launch_approved display_name description workflow_description introduction url_labels researcher_quote]
 
   enum state: [:paused, :finished]
 
@@ -59,9 +62,6 @@ class Project < ActiveRecord::Base
 
   after_save :save_version
   after_update :send_notifications
-
-  # Still needed for HttpCacheable
-  scope :private_scope, -> { where(private: true) }
 
   scope :launched, -> { where("launch_approved IS TRUE") }
   scope :featured, -> { where(featured: true) }
@@ -83,7 +83,7 @@ class Project < ActiveRecord::Base
   ranks :beta_row_order
 
   def self.translatable_attributes
-    %i(display_name title description workflow_description introduction researcher_quote url_labels)
+    %i[display_name title description workflow_description introduction researcher_quote url_labels]
   end
 
   def available_languages
@@ -103,7 +103,7 @@ class Project < ActiveRecord::Base
   end
 
   def owners_and_collaborators
-    users_with_project_roles(%w(owner collaborator)).select(:id)
+    users_with_project_roles(%w[owner collaborator]).select(:id)
   end
 
   def create_talk_admin(client)
@@ -116,10 +116,8 @@ class Project < ActiveRecord::Base
 
   def send_notifications
     if Panoptes.project_request.recipients
-      request_type = if beta_requested_changed? && beta_requested
+      request_type = if saved_change_to_beta_requested? && beta_requested
                        "beta"
-                     elsif launch_requested_changed? && launch_requested
-                       "launch"
                      end
       ProjectRequestEmailWorker.perform_async(request_type, id) if request_type
     end
@@ -167,6 +165,6 @@ class Project < ActiveRecord::Base
   end
 
   def communication_emails
-    users_with_project_roles(%w(owner communications)).pluck(:email)
+    users_with_project_roles(%w[owner collaborator communications]).pluck(:email)
   end
 end

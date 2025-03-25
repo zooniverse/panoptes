@@ -1,4 +1,6 @@
-require "spec_helper"
+# frozen_string_literal: true
+
+require 'spec_helper'
 
 RSpec.describe Formatter::Csv::Workflow do
   let(:workflow) { create(:workflow) }
@@ -26,7 +28,6 @@ RSpec.describe Formatter::Csv::Workflow do
         workflow.retired_set_member_subjects_count,
         workflow_version.tasks.to_json,
         retirement_json,
-        workflow.aggregation.to_json,
         workflow_version.strings.to_json,
         workflow_version.minor_number
       ]
@@ -34,22 +35,24 @@ RSpec.describe Formatter::Csv::Workflow do
   end
 
   let(:header) do
-    %w(workflow_id display_name version minor_version active classifications_count pairwise grouped prioritized primary_language first_task tutorial_subject_id retired_set_member_subjects_count tasks retirement aggregation strings)
+    %w[workflow_id display_name version minor_version active classifications_count pairwise grouped
+       prioritized primary_language first_task tutorial_subject_id retired_set_member_subjects_count
+       tasks retirement strings]
   end
 
-  describe "#headers" do
-    it 'should contain the required headers' do
+  describe '#headers' do
+    it 'contains the required headers' do
       expect(described_class.new.headers).to match_array(header)
     end
   end
 
-  describe "#to_rows" do
+  describe '#to_rows' do
     subject { described_class.new.to_rows(workflow_version) }
 
     it { is_expected.to match_array(rows) }
   end
 
-  context "with a versioned workflow" do
+  context 'with a versioned workflow' do
     let(:q_workflow) { build(:workflow, :question_task) }
     let(:tasks) { q_workflow.tasks }
 
@@ -58,16 +61,16 @@ RSpec.describe Formatter::Csv::Workflow do
         tasks: tasks, pairwise: !workflow.pairwise,
         grouped: !workflow.grouped, prioritized: !workflow.prioritized
       }
-      workflow.update_attributes(updates)
+      workflow.update(updates)
     end
 
-    describe "#to_rows on the latest version" do
+    describe '#to_rows on the latest version' do
       subject { described_class.new.to_rows(workflow_version) }
 
       it { is_expected.to match_array(rows) }
     end
 
-    describe "#to_rows on the previous version" do
+    describe '#to_rows on the previous version' do
       let(:workflow_version) { workflow.workflow_versions.order(:created_at).first }
 
       subject { described_class.new.to_rows(workflow_version) }

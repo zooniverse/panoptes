@@ -1,5 +1,8 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
+# rubocop:disable RSpec/NamedSubject
 describe Subject, :type => :model do
   let(:subject) { build(:subject) }
   let(:locked_factory) { :subject }
@@ -153,3 +156,4 @@ describe Subject, :type => :model do
     end
   end
 end
+# rubocop:enable RSpec/NamedSubject

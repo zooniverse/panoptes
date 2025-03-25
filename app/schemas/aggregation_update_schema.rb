@@ -1,27 +1,19 @@
 class AggregationUpdateSchema < JsonSchema
   schema do
-    type "object"
-    description "An Aggregation for a subject"
-    required "aggregation", "links"
+    type 'object'
+    description 'An Aggregation for a workflow'
     additional_properties false
 
-    property "aggregation" do
-      type "object"
+    property 'uuid' do
+      type 'string'
     end
 
-    property "links" do
-      type "object"
-      additional_properties false
+    property 'task_id' do
+      type 'string'
+    end
 
-      required "subject", "workflow"
-
-      property "subject" do
-        type "integer", "string"
-      end
-
-      property "workflow" do
-        type "integer", "string"
-      end
+    property 'status' do
+      type 'string'
     end
   end
 end

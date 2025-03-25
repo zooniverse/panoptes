@@ -16,16 +16,16 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
   let(:resource) { upps.first }
   let(:resource_class) { UserProjectPreference }
 
-  describe "#index" do
+  describe '#index' do
     let!(:private_resource) { create(:user_project_preference) }
     let(:n_visible) { 2 }
 
-    it_behaves_like "is indexable"
+    it_behaves_like 'is indexable'
 
-    describe "include projects" do
+    describe 'include projects' do
       before(:each) do
         default_request scopes: scopes, user_id: authorized_user.id
-        get :index, include: "project"
+        get :index, params: { include: 'project' }
       end
 
       it 'should be able to include linked projects' do
@@ -38,25 +38,32 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
     end
   end
 
-  describe "#show" do
-
-    it_behaves_like "is showable"
+  describe '#show' do
+    it_behaves_like 'is showable'
   end
 
-  describe "#update" do
+  describe '#update' do
     let(:unauthorized_user) { resource.project.owner }
     let(:test_attr) { :email_communication }
     let(:test_attr_value) { false }
     let(:update_params) do
-      { project_preferences: { email_communication: false, settings: { workflow_id: 1234 } } }
+      {
+        project_preferences: {
+          email_communication: false,
+          settings: {
+            workflow_id: 1234,
+            hidden: true
+          }
+        }
+      }
     end
 
-    it_behaves_like "is updatable"
+    it_behaves_like 'is updatable'
   end
 
-  describe "#create" do
+  describe '#create' do
     let(:test_attr) { :preferences }
-    let(:test_attr_value) { { "tutorial" => true } }
+    let(:test_attr_value) { { 'tutorial' => true } }
     let(:create_params) do
       {
         project_preferences: {
@@ -68,10 +75,10 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
       }
     end
 
-    it_behaves_like "is creatable"
+    it_behaves_like 'is creatable'
   end
 
-  describe "#update_settings" do
+  describe '#update_settings' do
     let!(:project) { create(:project, owner: authorized_user) }
     let!(:upp) { create(:user_project_preference, project: project) }
     let(:settings_params) do
@@ -79,22 +86,25 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
         project_preferences: {
           user_id: upp.user_id,
           project_id: project.id,
-          settings: { workflow_id: 1234, designator: {subject_set_weights: {1 => 100, 2 => 1000}} }
+          settings: {
+            workflow_id: '1234',
+            designator: { subject_set_weights: { 1 => 100, 2 => 1000 } }
+          }
         }
       }
     end
-    let(:run_update) { post :update_settings, settings_params }
+    let(:run_update) { post :update_settings, params: settings_params }
 
     before(:each) do
       default_request user_id: authorized_user.id, scopes: scopes
     end
 
-    it "responds with a 200" do
+    it 'responds with a 200' do
       run_update
       expect(response.status).to eq(200)
     end
 
-    it "responds with the updated resource" do
+    it 'responds with the updated resource' do
       run_update
       updated_upp = json_response[api_resource_name].first
       expect(updated_upp).not_to be_empty
@@ -103,18 +113,18 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
       expect(response_dt).to be_within(1.second).of(modified_dt)
     end
 
-    it "updates the UPP settings attribute" do
+    it 'updates the UPP settings attribute' do
       run_update
       found = UserProjectPreference.where(project: project, user: upp.user).first
-      expect(found.settings["workflow_id"]).to eq(settings_params[:project_preferences][:settings][:workflow_id].to_s)
+      expect(found.settings['workflow_id']).to eq(settings_params[:project_preferences][:settings][:workflow_id].to_s)
     end
 
-    it "allows collaborators to update UPP" do
+    it 'allows collaborators to update UPP' do
       collab = create(:user)
       create(:access_control_list,
              resource: project,
              user_group: collab.identity_group,
-             roles: ["collaborator"])
+             roles: ['collaborator'])
       default_request user_id: collab.id, scopes: scopes
       run_update
       expect(response.status).to eq(200)
@@ -131,7 +141,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
         }
       end
 
-      it "cannot update preferences" do
+      it 'cannot update preferences' do
         run_update
         expect(response.status).to eq(422)
       end
@@ -152,9 +162,20 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
         }
       end
 
-      it "only updates settings of owned project" do
+      it 'only updates settings of owned project' do
         run_update
         expect(response.status).to eq(403)
+      end
+    end
+
+    describe 'updating a project as an admin' do
+      let(:admin_user) { create(:admin_user) }
+
+      it 'lets the admin update UPP settings' do
+        default_request user_id: admin_user.id, scopes: scopes
+        settings_params[:admin] = true
+        run_update
+        expect(response.status).to eq(200)
       end
     end
 
@@ -170,9 +191,71 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
         }
       end
 
-      it "responds with a 404 if UPP not found" do
+      it 'responds with a 404 if UPP not found' do
         run_update
         expect(response.status).to eq(404)
+      end
+    end
+  end
+
+  describe '#read_settings' do
+    let!(:second_authorized_user) { create(:user) }
+    let!(:project) { create(:project, owner: authorized_user) }
+    let!(:first_upp) { create(:user_project_preference, project: project, user_id: authorized_user.id) }
+    let!(:second_upp) { create(:user_project_preference, project: project, user_id: second_authorized_user.id) }
+    let(:run_generic_read) { get :read_settings, params: { project_id: project.id, format: :json } }
+    let(:run_invalid_project) { get :read_settings, params: { project_id: 500, format: :json } }
+    let(:unauthorised_user) { create(:user) }
+
+    describe 'generic preferences' do
+      before do
+        default_request user_id: authorized_user.id, scopes: scopes
+        run_generic_read
+      end
+
+      it 'responds with a 200' do
+        expect(response.status).to eq(200)
+      end
+
+      it 'returns the correct response data' do
+        json_response = JSON.parse(response.body)
+        expect(json_response['project_preferences'].count).to eq(2)
+      end
+
+      # relevant attributes are id, href and settings from UPP
+      it 'returns the correct serialized attributes' do
+        json_response = JSON.parse(response.body)
+        first_response = json_response['project_preferences'].first
+
+        expect(first_response).to have_key 'settings'
+        expect(first_response).to_not have_key 'activity_count_by_workflow'
+        expect(first_response).to_not have_key 'email_communication'
+      end
+    end
+
+    describe 'invalid project' do
+      before do
+        default_request user_id: authorized_user.id, scopes: scopes
+        run_invalid_project
+      end
+
+      it 'responds with a 404' do
+        expect(response.status).to eq(404)
+      end
+    end
+
+    describe 'user specific preferences' do
+      it 'only fetches settings of owned project' do
+        default_request user_id: unauthorised_user.id, scopes: scopes
+        get :read_settings, params: { project_id: project.id, user_id: unauthorised_user.id, format: :json }
+        expect(response.status).to eq(403)
+      end
+
+      it 'only fetches settings of the specified user' do
+        default_request user_id: authorized_user.id, scopes: scopes
+        get :read_settings, params: { project_id: project.id, user_id: authorized_user.id, format: :json }
+        json_response = JSON.parse(response.body)
+        expect(json_response['project_preferences'].count).to eq(1)
       end
     end
   end

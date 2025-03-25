@@ -27,7 +27,7 @@ RSpec.describe Api::V1::TagsController, type: :controller do
       let(:index_options) { {search: resource.name} }
 
       it "should respond with the relevant item", :aggregate_failures do
-        get :index, index_options
+        get :index, params: index_options
         expect(json_response[api_resource_name].length).to eq(1)
         tag = json_response[api_resource_name][0]['name']
         expect(tag).to eq(resource.name)

@@ -18,7 +18,7 @@ module Validators
 
       return unless owner_has_existing_fav_for_project
 
-      record.errors[:favorite] = 'An owner can only have one favorite collection per project'
+      record.errors.add(:favorite, 'An owner can only have one favorite collection per project')
     end
   end
 end

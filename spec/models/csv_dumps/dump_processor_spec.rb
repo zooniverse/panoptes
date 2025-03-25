@@ -3,7 +3,7 @@ require 'spec_helper'
 RSpec.describe CsvDumps::DumpProcessor do
   let(:formatter) { double("Formatter", headers: false).tap { |f| allow(f).to receive(:to_rows) { |model| [model] } } }
   let(:scope) { [] }
-  let(:medium) { double("Medium", put_file: true, metadata: {}, save!: true) }
+  let(:medium) { instance_double('Medium', put_file_with_retry: true, metadata: {}, save!: true) }
   let(:csv_dump) { double(CsvDump, cleanup!: true, gzip!: true) }
   let(:processor) { described_class.new(formatter, scope, medium, csv_dump) }
 
@@ -29,14 +29,15 @@ RSpec.describe CsvDumps::DumpProcessor do
     processor.execute
   end
 
-  it "push the file to s3" do
+  it 'push the file to an object store' do
     path = double
     allow(csv_dump).to receive(:gzip!).and_return(path)
-    expect(medium).to receive(:put_file).with(path, compressed: true).once
+    allow(medium).to receive(:put_file_with_retry)
     processor.execute
+    expect(medium).to have_received(:put_file_with_retry).with(path, compressed: true).once
   end
 
-  it "should clean up the file after sending to s3" do
+  it 'cleans up the file after sending to object store' do
     expect(csv_dump).to receive(:cleanup!).once
     processor.execute
   end

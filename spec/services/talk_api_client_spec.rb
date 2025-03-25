@@ -73,6 +73,20 @@ RSpec.describe TalkApiClient do
       it 'should raise an error on failure' do
         expect{subject.request('get', '/error')}.to raise_error(Faraday::ResourceNotFound)
       end
+
+      it 'adds the X-Forwarded-Proto header on http URLs' do
+        subject.request('get', '/') do |req|
+          expect(req.headers['X-Forwarded-Proto']).to eq('https')
+        end
+      end
+
+      it 'does not add the X-Forwarded-Proto header on https URLs' do
+        subject.host = 'https://test.example.com'
+        subject.create_connection([:test, stubs])
+        subject.request('get', '/') do |req|
+          expect(req.headers['X-Forwarded-Proto']).to be_nil
+        end
+      end
     end
 
     describe "#method_missing" do

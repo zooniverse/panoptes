@@ -1,4 +1,6 @@
-class AccessControlList < ActiveRecord::Base
+# frozen_string_literal: true
+
+class AccessControlList < ApplicationRecord
   belongs_to :user_group
   belongs_to :resource, polymorphic: true
 

@@ -5,7 +5,7 @@ RSpec.shared_examples 'admin only option' do |option, value|
     ps[:admin] = true
     ps[:projects][option] = value
     default_request scopes: scopes, user_id: authorized_user.id
-    post :create, ps
+    post :create, params: ps
   end
 
   context "when the user is an admin" do

@@ -11,18 +11,9 @@ RSpec.describe CellectClient do
   end
 
   describe '::host' do
-    it 'uses the default host' do
-      expect(described_class.host).to eq('https://cellect-staging.zooniverse.org')
-    end
-
-    it 'uses the correct host in prod' do
-      allow(Rails.env).to receive(:production?).and_return(true)
-      expect(described_class.host).to eq('https://cellect.zooniverse.org')
-    end
-
-    it 'uses the ENV var if supplied' do
-      host = 'https://cellect.org'
-      allow(ENV).to receive(:fetch).and_return(host)
+    it 'configures the host through ENV var' do
+      host = 'http://cellect.org'
+      allow(ENV).to receive(:fetch).with('CELLECT_HOST').and_return(host)
       expect(described_class.host).to eq(host)
     end
   end
@@ -77,6 +68,10 @@ end
 RSpec.describe CellectClient::Request do
   let(:host) { 'test.example.com' }
   let(:url) { "https://#{host}" }
+
+  before do
+    allow(CellectClient).to receive(:host).and_return(url)
+  end
 
   describe '#request' do
     let(:headers) do

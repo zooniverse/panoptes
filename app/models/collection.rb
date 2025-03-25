@@ -1,7 +1,9 @@
-class Collection < ActiveRecord::Base
+# frozen_string_literal: true
+
+class Collection < ApplicationRecord
   include RoleControl::Owned
   include Activatable
-  include PgSearch
+  include PgSearch::Model
   include SluggedName
 
   has_and_belongs_to_many :projects

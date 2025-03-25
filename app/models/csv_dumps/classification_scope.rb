@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 module CsvDumps
   class ClassificationScope < DumpScope
     attr_reader :cache
@@ -9,11 +11,23 @@ module CsvDumps
 
     def each
       read_from_database do
-        completed_resource_classifications.find_in_batches do |batch|
-          subject_ids = setup_subjects_cache(batch)
-          setup_retirement_cache(batch, subject_ids)
-          batch.each do |classification|
-            yield classification
+        # turn of intermediate query objects caching
+        # this is for large exports that are using lots of memory
+        # and may results in a performance regression for small exports
+        #
+        # Longer term if it proves useful it could be moved to
+        # the CsvDumps::DumpProcessor.perform_dump method for all exports
+        # https://api.rubyonrails.org/classes/ActiveRecord/QueryCache/ClassMethods.html#method-i-uncached
+        ActiveRecord::Base.uncached do
+          # note: find in batches does already ingore the query cache
+          # https://github.com/rails/rails/issues/31175#issuecomment-345259529
+          # however any query in the block
+          completed_resource_classifications.find_in_batches do |batch|
+            subject_ids = setup_subjects_cache(batch)
+            setup_retirement_cache(batch, subject_ids)
+            batch.each do |classification|
+              yield classification
+            end
           end
         end
       end
@@ -32,9 +46,11 @@ module CsvDumps
     end
 
     def completed_resource_classifications
-      resource.classifications
+      resource
+        .classifications
         .complete
-        .joins(:workflow).where(workflows: {activated_state: "active"})
+        .joins(:workflow)
+        .where(workflows: { activated_state: 'active' })
         .includes(:user, :workflow)
     end
 

@@ -2,15 +2,15 @@ module Flipper
   RSpec.configure do |config|
     config.before(:each) do |example|
       allow(Panoptes).to receive(:flipper).and_return(Flipper.new(Flipper::Adapters::Memory.new))
-      Panoptes.flipper["cellect"].enable
-      Panoptes.flipper["designator"].enable
-      Panoptes.flipper[:remove_complete_subjects].enable
-      Panoptes.flipper[:dump_worker_exports].enable
-      Panoptes.flipper[:subject_uploading].enable
-      Panoptes.flipper[:classification_lifecycle_in_background].enable
-      Panoptes.flipper["http_caching"].enable
-      Panoptes.flipper["classification_counters"].enable
-      Panoptes.flipper["cached_serializer"].enable
+      Flipper.enable(:cellect)
+      Flipper.enable(:designator)
+      Flipper.enable(:remove_complete_subjects)
+      Flipper.enable(:dump_worker_exports)
+      Flipper.enable(:subject_uploading)
+      Flipper.enable(:classification_lifecycle_in_background)
+      Flipper.enable(:http_caching)
+      Flipper.enable(:classification_counters)
+      Flipper.enable(:cached_serializer)
     end
   end
 end

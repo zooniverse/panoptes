@@ -12,8 +12,14 @@ RSpec.describe RetireSubjectWorker do
   let(:subject_ids) { [sms.subject_id, sms2.subject_id] }
 
   describe "#perform" do
-    it 'should handle an unknow workflow' do
+    it 'ignores an unknown workflow' do
       expect { worker.perform(-1, subject.id) }.not_to raise_error
+    end
+
+    it 'ignores an unknown subject' do
+      allow(RetirementWorker).to receive(:perform_async)
+      worker.perform(workflow.id, [-1, subject.id])
+      expect(RetirementWorker).to have_received(:perform_async).once
     end
 
     it 'should call the retirement worker with the subject workflow status resource' do
@@ -40,22 +46,6 @@ RSpec.describe RetireSubjectWorker do
       expect(worker).not_to receive(:subject_workflow_status)
       expect(RetirementWorker).not_to receive(:perform_async)
       worker.perform(-1, subject.id)
-    end
-
-    describe "creating the sws resource" do
-      it 'should raise if there is a problem with the workflow' do
-        allow(worker).to receive(:workflow_exists?).and_return(true)
-        expect {
-          worker.perform(-1, subject.id)
-        }.to raise_error(ActiveRecord::RecordInvalid)
-      end
-
-      it 'should raise if there is a problem with the subject' do
-        allow(worker).to receive(:workflow_exists?).and_return(true)
-        expect {
-          worker.perform(workflow.id, -1)
-        }.to raise_error(ActiveRecord::RecordInvalid)
-      end
     end
   end
 end

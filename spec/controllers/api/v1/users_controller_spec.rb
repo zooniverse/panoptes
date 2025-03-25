@@ -50,7 +50,7 @@ describe Api::V1::UsersController, type: :controller do
 
       before(:each) do
         default_request(scopes: scopes, user_id: user.id)
-        get :index, index_options
+        get :index, params: index_options
       end
 
       it_behaves_like "filter by display_name"
@@ -225,9 +225,9 @@ describe Api::V1::UsersController, type: :controller do
           let(:index_options){ { search: '@some&@!_(   )user' } }
 
           it 'should strip the invalid characters' do
-            expect_any_instance_of(User::ActiveRecord_Relation)
+            expect_any_instance_of(User.const_get('ActiveRecord_Relation'))
               .to receive(:full_search_login).with('some_user').and_call_original
-            get :index, index_options
+            get :index, params: index_options
           end
         end
 
@@ -235,10 +235,10 @@ describe Api::V1::UsersController, type: :controller do
           let(:index_options){ { search: 'me' } }
 
           it 'should abort the query', :aggregate_failures do
-            expect_any_instance_of(User::ActiveRecord_Relation)
+            expect_any_instance_of(User.const_get('ActiveRecord_Relation'))
               .to_not receive(:full_search_login)
             expect(User).to receive(:none).and_call_original
-            get :index, index_options
+            get :index, params: index_options
           end
 
           context 'when a user has that login' do
@@ -259,7 +259,7 @@ describe Api::V1::UsersController, type: :controller do
 
       before(:each) do
         create(:classification, user: user)
-        get :index, { login: user.login }
+        get :index, params: { login: user.login }
       end
       it "should respond with the no model links" do
         expect(json_response[api_resource_name][0]['links']).to eq({})
@@ -273,7 +273,7 @@ describe Api::V1::UsersController, type: :controller do
 
       before(:each) do
         default_request(scopes: scopes, user_id: users.first.id)
-        get :show, id: users.first.id
+        get :show, params: { id: users.first.id }
       end
 
       it "should return 200" do
@@ -308,7 +308,7 @@ describe Api::V1::UsersController, type: :controller do
       before(:each) do
         allow_any_instance_of(User).to receive(:admin).and_return(true)
         default_request(scopes: scopes, user_id: requesting_user_id)
-        get :show, id: show_id
+        get :show, params: { id: show_id }
       end
 
       context "when showing the a different user to the requesting user" do
@@ -334,6 +334,7 @@ describe Api::V1::UsersController, type: :controller do
     let(:user_response) { created_instance(api_resource_name) }
 
     before(:each) do
+      user.save
       default_request(scopes: scopes, user_id: user.id)
       get :me
     end
@@ -391,6 +392,12 @@ describe Api::V1::UsersController, type: :controller do
       expect(result).to eq(user.upload_whitelist)
     end
 
+    it "should have the confirmed_at for the user" do
+      result = user_response["confirmed_at"]
+      # Dates are JSON serialized via iso8601 and .to_json adds quotes
+      expect(result).to eq(user.confirmed_at.iso8601(3))
+    end
+
     it_behaves_like "an api response"
   end
 
@@ -402,7 +409,7 @@ describe Api::V1::UsersController, type: :controller do
       default_request(scopes: scopes, user_id: user.id)
       params = put_operations || Hash.new
       params[:id] = user_id
-      put :update, params
+      put :update, params: params
     end
 
     shared_examples 'admin only attribute' do |attribute, value|
@@ -466,13 +473,21 @@ describe Api::V1::UsersController, type: :controller do
 
     context "when changing email" do
       let(:put_operations) { {users: {email: "test@example.com"}} }
+      let!(:user_email) { user.email }
 
       after(:each) do
         update_request
       end
 
-      it "sends an email to the new address if user is valid" do
-        expect(UserInfoChangedMailerWorker).to receive(:perform_async).with(user.id, "email")
+      it "sends an email to the new and old address if user is valid" do
+        expect(UserInfoChangedMailerWorker).to receive(:perform_async).with(user.id, "email", user_email)
+      end
+
+      it "sets valid_email parameter to true" do
+        # updating the valid email to false before the request as it is set at true by default
+        user.update(valid_email: false)
+        update_request
+        expect(user.reload.valid_email).to be_truthy
       end
 
       describe "with an email that already exists" do
@@ -560,7 +575,7 @@ describe Api::V1::UsersController, type: :controller do
       it_behaves_like "an api response"
     end
 
-    context "with a an invalid put operation" do
+    context 'with an invalid put operation' do
       before(:each) { update_request }
       let(:put_operations) { {} }
 
@@ -568,9 +583,11 @@ describe Api::V1::UsersController, type: :controller do
         expect(response.status).to eq(422)
       end
 
-      it "should return a specific error message in the response body" do
-        error_message = json_error_message("param is missing or the value is empty: users")
-        expect(response.body).to eq(error_message)
+      it 'returns a specific error message in the response body' do
+        error_message = 'param is missing or the value is empty: users'
+        errors = JSON.parse(response.body)['errors']
+        expect(errors).not_to be_empty
+        expect(errors[0]['message']).to include(error_message)
       end
 
       it "should not updated the resource attribute" do
@@ -589,8 +606,7 @@ describe Api::V1::UsersController, type: :controller do
       end
 
       it "should return a specific error message in the response body" do
-        error_message = json_error_message("found unpermitted parameter: project_id")
-        expect(response.body).to eq(error_message)
+        expect(response.body).to include('errors', 'found unpermitted parameter:', 'project_id')
       end
 
       it "should not updated the resource attribute" do
@@ -629,11 +645,11 @@ describe Api::V1::UsersController, type: :controller do
 
     it "should call the UserInfoScrubber with the user" do
       expect(UserInfoScrubber).to receive(:scrub_personal_info!).with(user)
-      delete :destroy, id: user_id
+      delete :destroy, params: { id: user_id }
     end
 
     it "should revoke the request doorkeeper token" do
-      delete :destroy, id: user_id
+      delete :destroy, params: { id: user_id }
       expect(access_token.reload.revoked?).to eq(true)
     end
 

@@ -5,8 +5,7 @@ describe WorkflowSerializer do
   let(:serializer) do
     serializer = WorkflowSerializer.new
     serializer.instance_variable_set(:@model, workflow)
-    serializer.instance_variable_set(:@context,
-                                     {languages: ['en']})
+    serializer.instance_variable_set(:@context, {})
     serializer
   end
 
@@ -36,7 +35,7 @@ describe WorkflowSerializer do
       workflow.strings["interest.question"] = "Draw a round thing"
       workflow.save!
 
-      serializer.instance_variable_set(:@context, {languages: ['en'], published: true})
+      serializer.instance_variable_set(:@context, { published: true })
       expect(serializer.tasks['interest']['question']).to eq('Draw a circle')
     end
   end

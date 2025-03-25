@@ -16,4 +16,18 @@ describe SubjectSetSerializer do
       create(:subject_set, workflows: subject_set.workflows)
     end
   end
+
+  describe 'serialized attributes' do
+    let(:expected_attributes) do
+      %i[id display_name set_member_subjects_count metadata created_at updated_at href completeness]
+    end
+    let(:serialized_attributes_no_links) do
+      result = described_class.single({}, SubjectSet.where(id: subject_set.id), {})
+      result.except(:links).keys
+    end
+
+    it 'serializes the correct attributes' do
+      expect(serialized_attributes_no_links).to match_array(expected_attributes)
+    end
+  end
 end

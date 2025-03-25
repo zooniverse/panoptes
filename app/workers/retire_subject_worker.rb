@@ -10,6 +10,9 @@ class RetireSubjectWorker
       Array.wrap(subject_ids).each do |subject_id|
         count = subject_workflow_status(subject_id)
         RetirementWorker.perform_async(count.id, true, reason)
+      rescue ActiveRecord::RecordInvalid
+        # need to rescue the error when folks pass in a subject id that doesn't exist
+        # but we still keep processing the whole list of subjects we have
       end
     end
   end

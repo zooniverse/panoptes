@@ -261,6 +261,62 @@ namespace :migrate do
     end
   end
 
+  namespace :media do
+    # Media resources id 1 - 457799 are all subjects for project Snapshot Supernova.
+    # They currently exist outside of our media folder organizational structure.
+    # All files have already been copied over to /subject_location, this task must be run
+    # to update the media record src (which points to where the file is located)
+    desc 'Update src to subject_locations for Snapshot Supernova media'
+    task rewrite_supernova_file_locations: :environment do
+      # this will return match data that will give us just the file name,
+      # which is the part of the string following the old path
+      OLD_PATH_REGEX = /\A(panoptes-uploads.zooniverse.org\/1\/0\/)?(.+)\z/.freeze
+
+      puts 'starting supernova src location rewrite'
+      Medium.where('id <= 457799').find_each.with_index do |medium, index|
+        matches = OLD_PATH_REGEX.match(medium.src)
+        # array index 1 will be nil if src does not start with panoptes-uploads.../0/
+        if matches[1]
+          # array index 2 is the second capture group (anything after panoptes-uploads.../0/)
+          file_name = matches[2]
+          new_path = 'subject_location/' + file_name
+          medium.update_column(:src, new_path)
+        end
+        puts "progress: #{index} records processed" if (index % 1000).zero?
+      end
+      puts 'finished supernova src location rewrite'
+    end
+
+    # Task to resolve issue where requesting a data export that has an existing export saved
+    # under the AWS path will save the newly generated export to the folder
+    # 'panoptes-uploads.zooniverse.org/{environment}/{media_type}/' rather than to
+    # the folder '{media_type}/' where it should be.
+    desc 'Update src to reflect Azure Blob Storage location for export resources'
+    task rewrite_export_src_attributes: :environment do
+      OLD_PATH_REGEX = /\A(panoptes-uploads.zooniverse.org\/#{Rails.env}\/)?(.+)\z/.freeze
+      export_media_types = %w[
+        project_aggregations_export
+        project_classifications_export
+        project_subjects_export
+        project_workflow_contents_export
+        project_workflows_export
+        workflow_classifications_export
+      ]
+
+      puts 'starting export media src rewrite'
+      Medium.where(private: true, type: export_media_types).find_each.with_index do |medium, index|
+        matches = OLD_PATH_REGEX.match(medium.src)
+        # array index 1 will be nil if src does not start with panoptes-uploads.../production/
+        if matches[1]
+          # array index 2 is the second capture group (anything after panoptes-uploads.../production/)
+          medium.update_column(:src, matches[2])
+        end
+        puts "progress: #{index} records processed" if (index % 1000).zero?
+      end
+      puts 'finished export media src rewrite'
+    end
+  end
+
   namespace :subject_workflow_status do
     desc "Create SubjectWorklfowStatus records for the internal PG subject selector"
     task :create_records_for_pg_selector => :environment do

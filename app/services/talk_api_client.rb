@@ -78,6 +78,8 @@ class TalkApiClient
 
   def request(method, path, *args)
     connection.send(method, path, *args) do |req|
+      # simulate the terminated HTTPS cluster traffic if the we're using HTTP URL
+      req.headers['X-Forwarded-Proto'] = 'https' if connection.scheme == 'http'
       req.headers["Accept"] = "application/vnd.api+json"
       req.headers["Content-Type"] = "application/json"
       req.headers["Authorization"] = "Bearer #{token.token}"

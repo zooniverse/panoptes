@@ -16,7 +16,7 @@ module Types
       blogs and social media accounts."
 
     field :private, Boolean, null: false
-    field :configuration, JsonType, null: true
+    field :configuration, GraphQL::Types::JSON, null: true
     field :live, Boolean, null: false
     field :migrated, Boolean, null: false
     field :slug, String, null: false

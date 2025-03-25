@@ -34,7 +34,7 @@ module CsvDumps
 
     def upload_dump
       gzip_file_path = csv_dump.gzip!
-      write_to_s3(gzip_file_path)
+      write_to_object_store(gzip_file_path)
       set_ready_state
     end
 
@@ -49,8 +49,8 @@ module CsvDumps
       medium.save!
     end
 
-    def write_to_s3(gzip_file_path)
-      medium.put_file(gzip_file_path, compressed: true)
+    def write_to_object_store(gzip_file_path)
+      medium.put_file_with_retry(gzip_file_path, compressed: true)
     end
   end
 end

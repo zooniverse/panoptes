@@ -1,10 +1,11 @@
+# frozen_string_literal: true
+
 module CsvDumps
-  # TODO: use zoo wide email export media resources once bucket paths
-  # can be set per medium, https://github.com/zooniverse/Panoptes/issues/2140
-  # At that point normal Medium objects should be used instead of this.
-  # providing it can check the encrypted state of the destination bucket
+  # Custom 'Medium' duck type class to interface directly to
+  # a custom location (bucket, paths) on s3 to securely host export files
   class DirectToS3
     attr_reader :export_type
+
     class UnencryptedBucket < StandardError; end
 
     def initialize(export_type)
@@ -29,10 +30,22 @@ module CsvDumps
       )
     end
 
-    def storage_adapter
+    def put_file_with_retry(gzip_file_path, opts={}, num_retries=5)
+      attempts ||= 1
+      put_file(gzip_file_path, opts)
+    rescue UnencryptedBucket => e # do not retry this error
+      raise e
+    rescue => e # rubocop:disable Style/RescueStandardError
+      retry if (attempts += 1) <= num_retries
+
+      # ensure we raise unexpected errors once we've exhausted
+      # the number of retries to continute to surface these errors
+      raise e
+    end
+
+    def storage_adapter(adapter='aws')
       return @storage_adapter if @storage_adapter
-      storage_config = Panoptes::StorageAdapter.configuration
-      adapter = storage_config[:adapter]
+
       storage_opts = {
         bucket: ENV.fetch("EMAIL_EXPORT_S3_BUCKET", 'zooniverse-exports'),
         prefix: ENV.fetch("EMAIL_EXPORT_S3_PREFIX", "#{Rails.env}/")

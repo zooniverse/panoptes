@@ -12,7 +12,9 @@ describe UserGroup, :type => :model do
   it_behaves_like "optimistically locked"
 
   it_behaves_like "activatable"
-  it_behaves_like "is an owner"
+  it_behaves_like 'is an owner' do
+    before { owned.save }
+  end
 
   it "should have a valid factory" do
     expect(build(:user_group)).to be_valid
@@ -66,6 +68,32 @@ describe UserGroup, :type => :model do
       dup_user_group = build(:user_group, name: user_group.name.upcase)
       dup_user_group.valid?
       expect(dup_user_group.errors[:name]).to include("has already been taken")
+    end
+  end
+
+  describe '#stats_visibility' do
+    it 'validates that it is one of the STATS_VISIBILITY levels' do
+      ug = build(:user_group, name: 'abc')
+      ug.stats_visibility = 'public_agg_only'
+      expect(ug).to be_valid
+    end
+
+    it 'allows stats_visibility to be integer corresponding to STATS_VISIBILITY level' do
+      ug = build(:user_group, name: 'abc')
+      ug.stats_visibility = 4
+      expect(ug).to be_valid
+    end
+
+    it 'does not allow stats_visibility to be outside STATS_VISIBILITY levels' do
+      ug = build(:user_group, name: 'abc')
+      ug.stats_visibility = 'fake_stats_level'
+      expect(ug).not_to be_valid
+    end
+
+    it 'does not allow stats_visibility to be outside STATS_VISIBILITY range' do
+      ug = build(:user_group, name: 'abc')
+      ug.stats_visibility = 9
+      expect(ug).not_to be_valid
     end
   end
 

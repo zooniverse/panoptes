@@ -7,7 +7,7 @@ shared_context "indexable by tag" do
     let(:tag) { tags.first }
 
     before do
-      get :index, index_options
+      get :index, params: index_options
     end
 
     describe "fuzzy filter by tag name" do
@@ -60,7 +60,7 @@ shared_context "has updatable tags" do
   describe "updates tags" do
     def tag_update
       default_request scopes: scopes, user_id: authorized_user.id
-      put :update, tag_params
+      put :update, params: tag_params
     end
 
     it 'should remove all previous tags' do
@@ -85,7 +85,7 @@ shared_context "has updatable tags" do
     it "error response is returned if tag is invalid" do
       borked_params = { organizations: { tags: "bork" }, id: resource.id }
       default_request scopes: scopes, user_id: authorized_user.id
-      put :update, borked_params
+      put :update, params: borked_params
       expect(response.status).to eq(422)
     end
   end

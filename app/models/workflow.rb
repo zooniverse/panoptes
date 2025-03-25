@@ -1,4 +1,6 @@
-class Workflow < ActiveRecord::Base
+# frozen_string_literal: true
+
+class Workflow < ApplicationRecord
   include Activatable
   include ExtendedCacheKey
   include RankedModel
@@ -22,7 +24,7 @@ class Workflow < ActiveRecord::Base
   has_many :user_seen_subjects, dependent: :destroy
   has_many :workflow_tutorials, dependent: :destroy
   has_many :tutorials, through: :workflow_tutorials
-  has_many :aggregations, dependent: :destroy
+  has_one :aggregation, dependent: :destroy
   has_many :attached_images, -> { where(type: "workflow_attached_image") }, class_name: "Medium",
     as: :linked
   has_one :classifications_export, -> { where(type: "workflow_classifications_export").order(created_at: :desc) },
@@ -42,12 +44,9 @@ class Workflow < ActiveRecord::Base
     'options' => {'count' => 15}
   }.freeze
 
-  JSON_ATTRIBUTES = %w(tasks retirement aggregation strings steps).freeze
+  JSON_ATTRIBUTES = %w[tasks retirement strings steps].freeze
 
   SELECTOR_PAGE_SIZE_KEY = 'subject_queue_page_size'.freeze
-
-  # Used by HttpCacheable
-  scope :private_scope, -> { where(project_id: Project.private_scope) }
 
   validates_presence_of :project, :display_name
 

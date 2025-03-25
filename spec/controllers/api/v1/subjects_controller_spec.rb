@@ -20,17 +20,6 @@ describe Api::V1::SubjectsController, type: :controller do
 
   describe "#index" do
     context "logged out user" do
-
-      it_behaves_like "an indexable unauthenticated http cacheable response" do
-        let(:action) { :index }
-        let(:private_resource) do
-          project = create(:project, private: true) do |p|
-            p.owner = user
-          end
-          create(:subject, project: project)
-        end
-      end
-
       describe "filtering" do
         let(:expected_filtered_ids) { formated_string_ids(filterable_resources) }
 
@@ -58,6 +47,10 @@ describe Api::V1::SubjectsController, type: :controller do
       context "without any sort" do
         before(:each) do
           get :index
+        end
+
+        it 'defaults sort parameter to id' do
+          expect(controller.params[:sort]).to eq('id')
         end
 
         it_behaves_like "an api response"
@@ -91,15 +84,13 @@ describe Api::V1::SubjectsController, type: :controller do
         let(:api_resource_links) { [] }
 
         context "with queued subjects" do
-
-          it_behaves_like "is not a http cacheable response" do
-            let(:action) { :queued }
-            let(:params) { { workflow_id: workflow.id } }
-          end
-
           context "when firing the request before the test" do
             before(:each) do
-              get :index, request_params
+              get :index, params: request_params
+            end
+
+            it 'does not default sort parameter to id' do
+              expect(controller.params[:sort]).not_to eq('id')
             end
 
             it "should return 200" do
@@ -135,7 +126,7 @@ describe Api::V1::SubjectsController, type: :controller do
             end
 
             it 'should return an error message', :aggregate_failures do
-              get :index, request_params
+              get :index, params: request_params
               expect(response.status).to eq(404)
               error_body = "No data available for selection"
               expect(response.body).to eq(json_error_message(error_body))
@@ -148,16 +139,6 @@ describe Api::V1::SubjectsController, type: :controller do
     context "logged in user" do
       before(:each) do
         default_request user_id: user.id, scopes: scopes
-      end
-
-      it_behaves_like "an indexable authenticated http cacheable response" do
-        let(:action) { :index }
-        let(:private_resource) do
-          project = create(:project, private: true) do |p|
-            p.owner = user
-          end
-          create(:subject, project: project)
-        end
       end
 
       context "without any sort" do
@@ -191,40 +172,40 @@ describe Api::V1::SubjectsController, type: :controller do
           expect(SubjectSelectorSerializer)
             .to receive(:page)
             .with(anything, anything, formatted_context)
-          get :index, request_params
+          get :index, params: request_params
         end
 
         context "with subjects" do
           it "should return 200" do
-            get :index, request_params
+            get :index, params: request_params
             expect(response.status).to eq(200)
           end
 
           it 'should return a page of 2 objects' do
-            get :index, request_params
+            get :index, params: request_params
             expect(json_response[api_resource_name].length).to eq(2)
           end
 
           it 'should return already_seen as false' do
-            get :index, request_params
+            get :index, params: request_params
             already_seen = json_response["subjects"].map{ |s| s['already_seen']}
             expect(already_seen).to all( be false )
           end
 
           it 'should return finished_workflow as false' do
-            get :index, request_params
+            get :index, params: request_params
             seen_all = json_response["subjects"].map{ |s| s['finished_workflow']}
             expect(seen_all).to all( be false )
           end
 
           it 'should return retired as false' do
-            get :index, request_params
+            get :index, params: request_params
             retired = json_response["subjects"].map{ |s| s['retired']}
             expect(retired).to all( be false )
           end
 
           it_behaves_like "an api response" do
-            before { get :index, request_params }
+            before { get :index, params: request_params }
           end
         end
 
@@ -238,19 +219,19 @@ describe Api::V1::SubjectsController, type: :controller do
           end
 
           it 'should return already_seen true for each subject' do
-            get :index, request_params
+            get :index, params: request_params
             already_seen = json_response["subjects"].map{ |s| s['already_seen']}
             expect(already_seen).to all( be true )
           end
 
           it 'should return finished_workflow as false' do
-            get :index, request_params
+            get :index, params: request_params
             seen_all = json_response["subjects"].map{ |s| s['finished_workflow']}
             expect(seen_all).to all( be false )
           end
 
           it 'should return user_has_finished_workflow as true for each subject' do
-            get :index, request_params
+            get :index, params: request_params
             seen_all = json_response["subjects"].map{ |s| s['user_has_finished_workflow']}
             expect(seen_all).to all be(true)
           end
@@ -265,7 +246,7 @@ describe Api::V1::SubjectsController, type: :controller do
             workflow.subjects.map do |subject|
               create(:subject_workflow_status, workflow: workflow, subject: subject, retired_at: Time.zone.now)
             end
-            get :index, request_params
+            get :index, params: request_params
           end
 
           it 'should return finished_workflow as true for each subject' do
@@ -286,7 +267,7 @@ describe Api::V1::SubjectsController, type: :controller do
 
         context "without a workflow id" do
           before(:each) do
-            get :index, request_params
+            get :index, params: request_params
           end
 
           let(:request_params) do
@@ -303,7 +284,7 @@ describe Api::V1::SubjectsController, type: :controller do
         let(:request_params) { { subject_set_id: subject_set.id.to_s } }
 
         before(:each) do
-          get :index, request_params
+          get :index, params: request_params
         end
 
         it "should return 200" do
@@ -311,7 +292,7 @@ describe Api::V1::SubjectsController, type: :controller do
         end
 
         it 'should return a page of 2 objects' do
-          get :index, request_params
+          get :index, params: request_params
           expect(json_response[api_resource_name].length).to eq(2)
         end
 
@@ -331,7 +312,7 @@ describe Api::V1::SubjectsController, type: :controller do
         context "with queued subjects" do
           context "when firing the request before the test" do
             before(:each) do
-              get :queued, request_params
+              get :queued, params: request_params
             end
 
             it "should return 200" do
@@ -367,7 +348,7 @@ describe Api::V1::SubjectsController, type: :controller do
             end
 
             it 'should return an error message', :aggregate_failures do
-              get :queued, request_params
+              get :queued, params: request_params
               expect(response.status).to eq(404)
               error_body = "No data available for selection"
               expect(response.body).to eq(json_error_message(error_body))
@@ -383,7 +364,7 @@ describe Api::V1::SubjectsController, type: :controller do
                 :get_subject_ids
               ).and_return(ordered_subject_ids)
 
-              get :queued, request_params
+              get :queued, params: request_params
 
               selected_subject_ids = created_instance_ids(api_resource_name)
               expect(selected_subject_ids).to eq(ordered_subject_ids)
@@ -396,7 +377,7 @@ describe Api::V1::SubjectsController, type: :controller do
                 :get_subject_ids
               ).and_return([])
 
-              get :queued, request_params
+              get :queued, params: request_params
               expect(json_response[api_resource_name].length).to eq(0)
             end
           end
@@ -409,7 +390,7 @@ describe Api::V1::SubjectsController, type: :controller do
             end
 
             it "should return no subjects" do
-              get :queued, request_params
+              get :queued, params: request_params
               expect(json_response[api_resource_name].length).to eq(0)
             end
           end
@@ -428,35 +409,35 @@ describe Api::V1::SubjectsController, type: :controller do
 
         context "with subjects" do
           it "should return 200" do
-            get :queued, request_params
+            get :queued, params: request_params
             expect(response.status).to eq(200)
           end
 
           it 'should return a page of 2 objects' do
-            get :queued, request_params
+            get :queued, params: request_params
             expect(json_response[api_resource_name].length).to eq(2)
           end
 
           it 'should return already_seen as false' do
-            get :queued, request_params
+            get :queued, params: request_params
             already_seen = json_response["subjects"].map{ |s| s['already_seen']}
             expect(already_seen).to all( be false )
           end
 
           it 'should return finished_workflow as false' do
-            get :queued, request_params
+            get :queued, params: request_params
             seen_all = json_response["subjects"].map{ |s| s['finished_workflow']}
             expect(seen_all).to all( be false )
           end
 
           it 'should return retired as false' do
-            get :queued, request_params
+            get :queued, params: request_params
             retired = json_response["subjects"].map{ |s| s['retired']}
             expect(retired).to all( be false )
           end
 
           it_behaves_like "an api response" do
-            before { get :queued, request_params }
+            before { get :queued, params: request_params }
           end
         end
 
@@ -470,19 +451,19 @@ describe Api::V1::SubjectsController, type: :controller do
           end
 
           it 'should return already_seen true for each subject' do
-            get :queued, request_params
+            get :queued, params: request_params
             already_seen = json_response["subjects"].map{ |s| s['already_seen']}
             expect(already_seen).to all( be true )
           end
 
           it 'should return finished_workflow as false' do
-            get :queued, request_params
+            get :queued, params: request_params
             seen_all = json_response["subjects"].map{ |s| s['finished_workflow']}
             expect(seen_all).to all( be false )
           end
 
           it 'should return user_has_finished_workflow as true' do
-            get :queued, request_params
+            get :queued, params: request_params
             seen_all = json_response["subjects"].map{ |s| s['user_has_finished_workflow']}
             expect(seen_all).to all( be true )
           end
@@ -497,7 +478,7 @@ describe Api::V1::SubjectsController, type: :controller do
             workflow.subjects.map do |subject|
               create(:subject_workflow_status, workflow: workflow, subject: subject, retired_at: Time.zone.now)
             end
-            get :queued, request_params
+            get :queued, params: request_params
           end
 
           it 'should return user finished_workflow as true for each subject' do
@@ -513,7 +494,7 @@ describe Api::V1::SubjectsController, type: :controller do
 
         context "without a workflow id" do
           before(:each) do
-            get :queued, request_params
+            get :queued, params: request_params
           end
 
           let(:request_params) do
@@ -528,25 +509,151 @@ describe Api::V1::SubjectsController, type: :controller do
     end
   end
 
+  describe '#grouped' do
+    let(:workflow) do
+      create(:workflow_with_subject_sets, configuration: { subject_group: { num_rows: 1, num_columns: 2 } })
+    end
+    let(:api_resource_links) { [] }
+    let(:sms) { create_list(:set_member_subject, 2, subject_set: subject_set) }
+    let(:request_params) { { workflow_id: workflow.id.to_s, num_columns: 2, num_rows: 1, http_cache: 'true' } }
+    let(:flipper_feature) { Flipper.enable(:subject_group_selection) }
+
+    before do
+      ENV['SUBJECT_GROUP_UPLOADER_ID'] = workflow.owner.id.to_s
+      sms
+      flipper_feature
+      get :grouped, params: request_params
+    end
+
+    it 'returns 200' do
+      expect(response.status).to eq(200)
+    end
+
+    it 'returns a page with only 1 resource' do
+      expect(json_response[api_resource_name].length).to eq(1)
+    end
+
+    it_behaves_like 'an api response'
+
+    context 'without num_rows and num_columns params' do
+      let(:request_params) { { workflow_id: workflow.id.to_s } }
+
+      it 'errors with 422' do
+        expect(response.status).to eq(422)
+      end
+
+      it 'has a useful error message' do
+        expect(response.body).to include('Num rows is required, Num columns is required')
+      end
+    end
+
+    context 'with num_columns non integer param' do
+      let(:request_params) { { workflow_id: workflow.id.to_s, num_columns: 'hmm', num_rows: 1 } }
+
+      it 'errors with 422' do
+        expect(response.status).to eq(422)
+      end
+
+      it 'has a useful error message' do
+        expect(response.body).to include('Num columns is not a valid integer')
+      end
+    end
+
+    context 'with num_rows array param' do
+      let(:request_params) { { workflow_id: workflow.id.to_s, num_columns: 1, num_rows: [1] } }
+
+      it 'errors with 422' do
+        expect(response.status).to eq(422)
+      end
+
+      it 'has a useful error message' do
+        expect(response.body).to include('found unpermitted parameter:', 'num_rows')
+      end
+    end
+
+    context 'with admin param' do
+      let(:request_params) do
+        { workflow_id: workflow.id.to_s, num_columns: 2, num_rows: 1, admin: true }
+      end
+
+      it 'responds with 200' do
+        expect(response.status).to eq(200)
+      end
+    end
+
+    context 'when the feature flag is disabled for this end point' do
+      let(:flipper_feature) { Flipper.disable(:subject_group_selection) }
+
+      it 'errors with 503' do
+        expect(response.status).to eq(503)
+      end
+
+      it 'has a useful error message' do
+        expect(response.body).to include('Feature has been temporarily disabled')
+      end
+    end
+  end
+
+  describe '#selection' do
+    let(:workflow) { create(:workflow_with_subject_sets) }
+    let(:api_resource_links) { [] }
+    let(:sms) { create_list(:set_member_subject, 1, subject_set: subject_set) }
+    let(:subject_ids) { sms.map(&:subject_id) }
+    let(:request_params) do
+      { workflow_id: workflow.id.to_s, ids: subject_ids.join(','), http_cache: 'true' }
+    end
+    let(:flipper_feature) { Flipper.enable(:subject_selection_by_ids) }
+
+    before do
+      subject_ids
+      flipper_feature
+      allow(SubjectSelectorSerializer).to receive(:page).and_call_original
+      get :selection, params: request_params
+    end
+
+    it 'returns 200' do
+      expect(response.status).to eq(200)
+    end
+
+    it 'returns a page with only 1 resource' do
+      expect(json_response[api_resource_name].length).to eq(1)
+    end
+
+    it 'uses the SubjectSelectorSerializer class' do
+      expect(SubjectSelectorSerializer).to have_received(:page)
+    end
+
+    it_behaves_like 'an api response'
+
+    context 'without subject ids params' do
+      let(:request_params) { { workflow_id: workflow.id.to_s } }
+
+      it 'errors with 422' do
+        expect(response.status).to eq(422)
+      end
+
+      it 'has a useful error message' do
+        expect(response.body).to include('Ids is required')
+      end
+    end
+
+    context 'when the feature flag is disabled for this end point' do
+      let(:flipper_feature) { Flipper.disable(:subject_selection_by_ids) }
+
+      it 'errors with 503' do
+        expect(response.status).to eq(503)
+      end
+
+      it 'has a useful error message' do
+        expect(response.body).to include('Feature has been temporarily disabled')
+      end
+    end
+  end
+
   describe "#show" do
     let(:resource) { create(:subject) }
 
     it_behaves_like "is showable"
-
-    describe "http caching" do
-      let(:action) { :show }
-      let(:private_resource) do
-        project = create(:project, private: true) do |p|
-          p.owner = user
-        end
-        create(:subject, project: project)
-      end
-      let(:private_resource_id) { private_resource.id }
-      let(:public_resource_id) { resource.id }
-
-      it_behaves_like "a showable unauthenticated http cacheable response"
-      it_behaves_like "a showable authenticated http cacheable response"
-    end
   end
 
   describe "#update" do
@@ -556,20 +663,22 @@ describe Api::V1::SubjectsController, type: :controller do
     let(:test_attr) { :metadata }
     let(:test_attr_value) do
       {
-       "interesting_data" => "Tested Collection",
-       "an_interesting_array" => ["1", "2", "asdf", "99.99"]
+        '#priority' => '1',
+        'interesting_data' => 'Tested Collection',
+        'an_interesting_array' => %w[1 2 asdf 99.99]
       }
     end
     let(:locations) { [ "image/jpeg" ] }
     let(:update_params) do
       {
-       subjects: {
-                  metadata: {
-                             interesting_data: "Tested Collection",
-                             an_interesting_array: ["1", "2", "asdf", "99.99"]
-                            },
-                  locations: locations
-                 }
+        subjects: {
+          metadata: {
+            '#PRIOritY' => '1',
+            interesting_data: 'Tested Collection',
+            an_interesting_array: %w[1 2 asdf 99.99]
+          },
+          locations: locations
+        }
       }
     end
 
@@ -578,6 +687,14 @@ describe Api::V1::SubjectsController, type: :controller do
     context "with an authorized user" do
       before do
         default_request user_id: authorized_user.id, scopes: scopes
+      end
+
+      it 'updates without errors without metadata params' do
+        no_metadata_update_params = {
+          id: resource.id,
+          subjects: { locations: locations }
+        }
+        expect { put :update, params: no_metadata_update_params }.not_to raise_error
       end
 
       describe "using external urls" do
@@ -593,7 +710,7 @@ describe Api::V1::SubjectsController, type: :controller do
 
         it 'should create externally linked media resources' do
           update_params[:subjects][:locations] = external_locs
-          put :update, update_params.merge(id: resource.id)
+          put :update, params: update_params.merge(id: resource.id)
           locations = Subject.find(created_instance_id("subjects")).locations
           aggregate_failures "external srcs" do
             expect(locations.map(&:external_link)).to all( be true )
@@ -607,7 +724,7 @@ describe Api::V1::SubjectsController, type: :controller do
 
         it "should not overwrite existing locations" do
           loc_ids = resource.locations.map(&:id)
-          put :update, update_params.merge(id: resource.id)
+          put :update, params: update_params.merge(id: resource.id)
           expect(loc_ids).to match_array(resource.reload.locations.map(&:id))
         end
       end
@@ -617,27 +734,25 @@ describe Api::V1::SubjectsController, type: :controller do
   describe "#create" do
     let(:test_attr) { :metadata }
     let(:test_attr_value) do
-      { "cool_factor" => "11" }
+      { 'cool_factor' => '11', '#priority' => '1' }
     end
 
     let(:create_params) do
       {
-       subjects: {
-                  metadata: { cool_factor: "11" },
-                  locations: ["image/jpeg", "image/jpeg", "image/png"],
-                  links: {
-                          project: project.id
-                         }
-                 }
+        subjects: {
+          metadata: { cool_factor: '11', '#PRIOritY' => '1' },
+          locations: ['image/jpeg', 'image/jpeg', 'image/png'],
+          links: { project: project.id }
+        }
       }
     end
 
     context "Uploading is disabled" do
-      before { Panoptes.flipper[:subject_uploading].disable }
+      before { Flipper.disable(:subject_uploading) }
 
       it "raises an error when uploading is disabled" do
         default_request user_id: authorized_user.id, scopes: scopes
-        post :create, create_params
+        post :create, params: create_params
         expect(response.status).to be(503)
       end
     end
@@ -645,12 +760,12 @@ describe Api::V1::SubjectsController, type: :controller do
     it "should incremement the user's subjects_count cache and touch the user" do
       expect_any_instance_of(User).to receive(:increment_subjects_count_cache)
       default_request user_id: authorized_user.id, scopes: scopes
-      post :create, create_params
+      post :create, params: create_params
     end
 
     it "should return locations in the order they were submitted" do
       default_request user_id: authorized_user.id, scopes: scopes
-      post :create, create_params
+      post :create, params: create_params
       locations = json_response[api_resource_name][0]["locations"].flat_map(&:keys)
       expect(locations).to eq(["image/jpeg", "image/jpeg", "image/png"])
     end
@@ -658,9 +773,16 @@ describe Api::V1::SubjectsController, type: :controller do
     it "should replace non-standard mimetypes" do
       create_params[:subjects][:locations] = ["audio/mp3", "audio/x-wav"]
       default_request user_id: authorized_user.id, scopes: scopes
-      post :create, create_params
+      post :create, params: create_params
       locations = json_response[api_resource_name][0]["locations"].flat_map(&:keys)
       expect(locations).to eq(["audio/mpeg", "audio/mpeg"])
+    end
+
+    it 'downcases the reserved metadata keyword fields' do
+      default_request user_id: authorized_user.id, scopes: scopes
+      post :create, params: create_params
+      metadata = json_response[api_resource_name][0]['metadata'].keys
+      expect(metadata).to match_array(['cool_factor', '#priority'])
     end
 
     it 'should create externally linked media resources' do
@@ -668,7 +790,7 @@ describe Api::V1::SubjectsController, type: :controller do
       external_locs = [{"image/jpeg" => "http://example.com/1.jpg"}, {"image/jpeg" => "http://example.com/2.jpg"}]
       external_src_urls = external_locs.map { |loc| loc.to_a.flatten[1] }
       create_params[:subjects][:locations] = external_locs
-      post :create, create_params
+      post :create, params: create_params
       locations = Subject.find(created_instance_id("subjects")).locations
       aggregate_failures "external srcs" do
         expect(locations.map(&:external_link)).to all( be true )
@@ -681,7 +803,7 @@ describe Api::V1::SubjectsController, type: :controller do
 
       let(:upload_subjects) do
         default_request scopes: scopes, user_id: unauthorised_user.id
-        post :create, create_params
+        post :create, params: create_params
       end
 
       it 'should return unprocessable entity' do
@@ -717,7 +839,7 @@ describe Api::V1::SubjectsController, type: :controller do
     context "when the user has exceeded the allowed number of subjects" do
       let(:upload_subjects) do
         default_request scopes: scopes, user_id: authorized_user.id
-        post :create, create_params
+        post :create, params: create_params
       end
 
       before(:each) do
@@ -775,14 +897,14 @@ describe Api::V1::SubjectsController, type: :controller do
       stub_token(scopes: scopes, user_id: authorized_user.id)
       set_preconditions
       expect(SubjectRemovalWorker).to receive(:perform_async).with(resource.id)
-      delete :destroy, id: resource.id
+      delete :destroy, params: { id: resource.id }
     end
 
     it "should handle redis timeout error" do
       stub_token(scopes: scopes, user_id: authorized_user.id)
       set_preconditions
       expect(SubjectRemovalWorker).to receive(:perform_async).and_raise(Timeout::Error)
-      delete :destroy, id: resource.id
+      delete :destroy, params: { id: resource.id }
     end
   end
 end

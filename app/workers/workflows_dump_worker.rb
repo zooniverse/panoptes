@@ -4,12 +4,12 @@ class WorkflowsDumpWorker
   include Sidekiq::Worker
   include RateLimitDumpWorker
 
-  sidekiq_options queue: :data_high
+  sidekiq_options queue: ENV.fetch('DUMP_WORKER_SIDEKIQ_QUEUE', 'data_high').to_sym
 
   attr_reader :resource, :medium, :scope, :processor
 
   def perform(resource_id, resource_type, medium_id=nil, requester_id=nil, *args)
-    raise ApiErrors::FeatureDisabled unless Panoptes.flipper[:dump_worker_exports].enabled?
+    raise ApiErrors::FeatureDisabled unless Flipper.enabled?(:dump_worker_exports)
 
     if @resource = CsvDumps::FindsDumpResource.find(resource_type, resource_id)
       @medium = CsvDumps::FindsMedium.new(medium_id, @resource, dump_target).medium

@@ -8,15 +8,31 @@ language_tabs: # must be one of https://git.io/vQNgJ
   - ruby
 
 toc_footers:
-  - <a href='https://github.com/zooniverse/caesar/tree/master/docs/source/'>Modify documentation</a>
+  - <a href='https://github.com/zooniverse/panoptes/tree/master/docs/source/'>Modify documentation</a>
   - <a href='https://github.com/tripit/slate'>Documentation Powered by Slate</a>
 
 includes:
   - authentication
   - json_api
+  - headers
+  - aggregations
+  - classifications
+  - collection_preferences
+  - collection_roles
+  - collections
+  - memberships
+  - organizations
+  - project_preferences
+  - project_roles
   - projects
   - subject_set_imports
+  - set_member_subjects
+  - subject_sets
+  - subject_workflow_statuses
+  - subjects
+  - user_groups
   - users
+  - workflows
 
 search: true
 ---

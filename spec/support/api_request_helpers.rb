@@ -8,12 +8,12 @@ module APIRequestHelpers
     end
 
     def post(path, body, custom_headers = {})
-      spec.post(path, body.to_json, headers_with(custom_headers))
+      spec.post(path, params: body.to_json, headers: headers_with(custom_headers))
     end
 
     def put(path, body, custom_headers = {})
       custom_headers["If-Match"] = get_resource_etag(path)
-      spec.put(path, body.to_json, headers_with(custom_headers))
+      spec.put(path, params: body.to_json, headers: headers_with(custom_headers))
     end
 
     private
@@ -28,7 +28,7 @@ module APIRequestHelpers
     end
 
     def get_resource_etag(path)
-      spec.get(path, {}, headers_with({}))
+      spec.get(path, headers: headers_with({}))
       spec.response.headers["ETag"]
     end
   end
@@ -45,10 +45,6 @@ module APIRequestHelpers
 
   def set_content_type
     request.env["CONTENT_TYPE"] = "application/json"
-  end
-
-  def set_accept_language
-    request.env['HTTP_ACCEPT_LANGUAGE'] = 'en, zh;q=0.9, zh-tw;q=0.8, fr-fr;q=0.6'
   end
 
   def set_patch_content_type
@@ -89,7 +85,6 @@ module APIRequestHelpers
   def default_request(scopes: ["public"], user_id: nil)
     set_accept
     set_content_type
-    set_accept_language
     set_preconditions
     stub_content_filter
     stub_token(scopes: scopes, user_id: user_id)
@@ -97,7 +92,6 @@ module APIRequestHelpers
 
   def unauthenticated_request
     set_accept
-    set_accept_language
     set_preconditions
     stub_content_filter
     stub_token

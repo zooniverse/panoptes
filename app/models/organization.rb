@@ -1,12 +1,11 @@
-class Organization < ActiveRecord::Base
+# frozen_string_literal: true
+
+class Organization < ApplicationRecord
   include RoleControl::Owned
   include Activatable
   include SluggedName
   include Translatable
   include Versioning
-
-  # Still needed for HttpCacheable
-  scope :private_scope, -> { where(listed: false) }
 
   has_many :projects
   has_many :acls, class_name: "AccessControlList", as: :resource, dependent: :destroy

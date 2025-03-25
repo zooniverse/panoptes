@@ -1,8 +1,8 @@
-require "user_unsubscribe_message_verifier"
+# frozen_string_literal: true
 
-class User < ActiveRecord::Base
+class User < ApplicationRecord
   include Activatable
-  include PgSearch
+  include PgSearch::Model
   include ExtendedCacheKey
 
   ALLOWED_LOGIN_CHARACTERS = '[\w\-\.]'
@@ -13,7 +13,7 @@ class User < ActiveRecord::Base
   attr_accessor :minor_age
 
   devise :database_authenticatable, :registerable,
-    :recoverable, :rememberable, :trackable, :validatable
+    :recoverable, :rememberable, :trackable, :validatable, :confirmable,
 
   has_many :classifications, dependent: :restrict_with_exception
   has_many :collection_preferences, class_name: "UserCollectionPreference", dependent: :destroy
@@ -48,20 +48,18 @@ class User < ActiveRecord::Base
   validates :login, presence: true, format: { with: USER_LOGIN_REGEX }
   validates_uniqueness_of :login, case_sensitive: false
   validates :display_name, presence: true
-  validates :unsubscribe_token, presence: true, uniqueness: true
+  validates :unsubscribe_token, presence: true, uniqueness: true, on: :create
   validates_inclusion_of :valid_email, in: [true, false], message: "must be true or false"
 
   validates_with IdentityGroupNameValidator
 
   after_create :set_zooniverse_id
-  after_create :send_welcome_email, unless: :migrated
   before_create :set_ouroboros_api_key
 
   delegate :projects, to: :identity_group
   delegate :collections, to: :identity_group
   delegate :subjects, to: :identity_group
   delegate :owns?, to: :identity_group
-
 
   pg_search_scope :search_name,
     against: [:login],
@@ -188,6 +186,10 @@ class User < ActiveRecord::Base
     find_by("lower(login) = ?", login.downcase)
   end
 
+  def after_confirmation
+    send_welcome_email
+  end
+
   def subject_limit
     super || Panoptes.max_subjects
   end
@@ -220,7 +222,7 @@ class User < ActiveRecord::Base
   def active_for_authentication?
     return false if disabled?
     update_ouroboros_created
-    ok_for_auth = changed? ? save : true
+    ok_for_auth = saved_changes? ? save : true
     ok_for_auth && super
   end
 
@@ -292,9 +294,7 @@ class User < ActiveRecord::Base
 
   def set_zooniverse_id
     self.zooniverse_id ||= panoptes_zoo_id
-    if zooniverse_id_changed?
-      self.update_column(:zooniverse_id, self.zooniverse_id)
-    end
+    self.update_column(:zooniverse_id, self.zooniverse_id) if saved_change_to_zooniverse_id?
   end
 
   def setup_unsubscribe_token
@@ -331,7 +331,9 @@ class User < ActiveRecord::Base
 
   def uploaded_subjects_count
     count = Rails.cache.fetch(subjects_count_cache_key, expires_in: subject_count_cache_expiry) do
-      Subject.where(upload_user_id: id).count
+      DatabaseReplica.read('read_user_uploaded_subjects_counts_from_replica') do
+        Subject.where(upload_user_id: id).count
+      end
     end
     count.to_i
   end

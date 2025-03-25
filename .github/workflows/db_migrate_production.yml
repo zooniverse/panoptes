@@ -1,0 +1,32 @@
+name: Migrate Production Database
+
+on:
+  push:
+    tags:
+      - production-migrate
+  workflow_dispatch:
+
+jobs:
+  db_migration_production:
+    name: Production DB Migration
+    uses: zooniverse/ci-cd/.github/workflows/db_migration.yaml@main
+    with:
+      app_name: panoptes
+      environment: production
+      commit_id: ${{ github.sha }}
+    secrets:
+      creds: ${{ secrets.AZURE_AKS }}
+
+  slack_notification:
+    name: Slack notification
+    uses: zooniverse/ci-cd/.github/workflows/slack_notification.yaml@main
+    needs: db_migration_production
+    if: always()
+    with:
+      commit_id: ${{ github.sha }}
+      job_name: Migrate Production Database / db_migration_production
+      status: ${{ needs.db_migration_production.result }}
+      title: "Panoptes production database migration complete"
+      title_link: "https://panoptes.zooniverse.org"
+    secrets:
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}

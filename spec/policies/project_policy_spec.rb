@@ -36,6 +36,7 @@ describe ProjectPolicy do
       its(:create_workflows_export) { is_expected.to be_empty }
       its(:create_workflow_contents_export) { is_expected.to be_empty }
       its(:retire_subjects) { is_expected.to be_empty }
+      its(:unretire_subjects) { is_expected.to be_empty }
       its(:translate) { is_expected.to be_empty }
     end
 
@@ -55,6 +56,7 @@ describe ProjectPolicy do
       its(:create_workflows_export) { is_expected.to be_empty }
       its(:create_workflow_contents_export) { is_expected.to be_empty }
       its(:retire_subjects) { is_expected.to be_empty }
+      its(:unretire_subjects) { is_expected.to be_empty }
       its(:translate) { is_expected.to be_empty }
     end
 
@@ -79,6 +81,7 @@ describe ProjectPolicy do
       its(:create_workflows_export) { is_expected.to be_empty }
       its(:create_workflow_contents_export) { is_expected.to be_empty }
       its(:retire_subjects) { is_expected.to be_empty }
+      its(:unretire_subjects) { is_expected.to be_empty }
       its(:translate) { is_expected.to be_empty }
     end
 
@@ -103,6 +106,7 @@ describe ProjectPolicy do
       its(:create_workflows_export) { is_expected.to be_empty }
       its(:create_workflow_contents_export) { is_expected.to be_empty }
       its(:retire_subjects) { is_expected.to be_empty }
+      its(:unretire_subjects) { is_expected.to be_empty }
       its(:translate) { is_expected.to match_array([public_project, private_project]) }
     end
 
@@ -127,6 +131,7 @@ describe ProjectPolicy do
       its(:create_workflows_export) { is_expected.to be_empty }
       its(:create_workflow_contents_export) { is_expected.to be_empty }
       its(:retire_subjects) { is_expected.to be_empty }
+      its(:unretire_subjects) { is_expected.to be_empty }
       its(:translate) { is_expected.to be_empty }
     end
 
@@ -151,6 +156,7 @@ describe ProjectPolicy do
       its(:create_workflows_export) { is_expected.to be_empty }
       its(:create_workflow_contents_export) { is_expected.to be_empty }
       its(:retire_subjects) { is_expected.to be_empty }
+      its(:unretire_subjects) { is_expected.to be_empty }
       its(:translate) { is_expected.to be_empty }
     end
 
@@ -175,6 +181,7 @@ describe ProjectPolicy do
       its(:create_workflows_export) { is_expected.to match_array([public_project, private_project]) }
       its(:create_workflow_contents_export) { is_expected.to match_array([public_project, private_project]) }
       its(:retire_subjects) { is_expected.to match_array([public_project, private_project]) }
+      its(:unretire_subjects) { is_expected.to match_array([public_project, private_project]) }
       its(:translate) { is_expected.to match_array([public_project, private_project]) }
     end
 
@@ -194,6 +201,7 @@ describe ProjectPolicy do
       its(:create_workflows_export) { is_expected.to match_array([public_project, private_project]) }
       its(:create_workflow_contents_export) { is_expected.to match_array([public_project, private_project]) }
       its(:retire_subjects) { is_expected.to match_array([public_project, private_project]) }
+      its(:unretire_subjects) { is_expected.to match_array([public_project, private_project]) }
       its(:translate) { is_expected.to match_array([public_project, private_project]) }
     end
   end

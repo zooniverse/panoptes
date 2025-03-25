@@ -59,6 +59,17 @@ RSpec.describe DesignatorClient do
         expect(subject_ids).to eq([1,2,3,4])
       end
 
+      it 'respects the sujbject_set (group) id' do
+        stubs = Faraday::Adapter::Test::Stubs.new do |stub|
+          stub.get('/api/workflows/338?limit=5&subject_set_id=10', headers) do |_env|
+            [200, { 'Content-Type' => 'application/json' }, [1, 2].to_json]
+          end
+        end
+
+        subject_ids = described_class.new([:test, stubs]).get_subjects(338, nil, 10, 5)
+        expect(subject_ids).to eq([1, 2])
+      end
+
       it_behaves_like "handles server errors" do
         let(:method) { :get_subjects }
         let(:params) { [ 338, 1, nil, 5 ] }

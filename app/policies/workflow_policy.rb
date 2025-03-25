@@ -7,7 +7,7 @@ class WorkflowPolicy < ApplicationPolicy
   end
 
   scope :index, :show, :update, :destroy, :update_links, :destroy_links,
-        :translate, :versions, :version, :retire_subjects, :create_classifications_export,
+        :translate, :versions, :version, :retire_subjects, :create_classifications_export, :unretire_subjects,
         with: Scope
 
   def linkable_subject_sets

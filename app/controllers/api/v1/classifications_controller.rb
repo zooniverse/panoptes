@@ -6,7 +6,7 @@ class Api::V1::ClassificationsController < Api::ApiController
   class MissingParameter < StandardError; end
 
 
-  skip_before_filter :require_login, only: :create
+  skip_before_action :require_login, only: :create
   require_authentication :show, :index, :destroy, :update, :incomplete, :project,
     scopes: [:classification]
 
@@ -36,11 +36,12 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def gold_standard
+    # load the api_user out of the replica read only block
+    skip_policy_scope
+    gold_standard_policy = Pundit.policy!(api_user, GoldStandardAnnotation)
     DatabaseReplica.read('classification_serializer_data_from_replica') do
-      skip_policy_scope
-      resources = Pundit.policy!(api_user, GoldStandardAnnotation).scope_for(:index)
+      resources = gold_standard_policy.scope_for(:index)
       resources = resources.where(workflow_id: params[:workflow_id]) if params[:workflow_id]
-
       resources = resources.where(id: resource_ids) if resource_ids.present?
 
       gold_standard_page = GoldStandardAnnotationSerializer.page(
@@ -102,7 +103,7 @@ class Api::V1::ClassificationsController < Api::ApiController
   end
 
   def lifecycle(action, classification)
-    if Panoptes.flipper[:classification_lifecycle_in_background].enabled?
+    if Flipper.enabled?(:classification_lifecycle_in_background)
       ClassificationLifecycle.queue(classification, action)
     else
       ClassificationLifecycle.perform(classification, action.to_s)

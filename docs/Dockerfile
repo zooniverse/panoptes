@@ -1,17 +1,19 @@
-FROM ruby:2.5
+FROM ruby:2.7-slim
 
 EXPOSE 4567
 WORKDIR /usr/src/docs
 
-RUN apt-get update && \
-    apt-get install -y nodejs git curl && \
+RUN apt-get update && apt-get -y upgrade && \
+    apt-get install --no-install-recommends -y \
+    build-essential \
+    nodejs \
+    git \
+    curl && \
     apt-get clean && rm -fr /var/lib/apt/lists/*
 
-RUN echo "Host *" >> /etc/ssh/ssh_config &&\
-    echo "StrictHostKeyChecking no" >> /etc/ssh/ssh_config
+ADD ./Gemfile .
+ADD ./Gemfile.lock .
 
-ADD ./Gemfile /usr/src/docs
-ADD ./Gemfile.lock /usr/src/docs
 RUN bundle install
 
-ADD . /usr/src/docs
+ADD . .

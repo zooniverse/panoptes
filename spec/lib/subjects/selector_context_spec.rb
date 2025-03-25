@@ -31,7 +31,7 @@ RSpec.describe Subjects::SelectorContext do
   subject { described_class.new(selector, subject_ids, selected_at) }
 
   it 'should return an empty object if skip flag is set' do
-    Panoptes.flipper[:skip_subject_selection_context].enable
+    Flipper.enable(:skip_subject_selection_context)
     expect(subject.format).to eq({})
   end
 

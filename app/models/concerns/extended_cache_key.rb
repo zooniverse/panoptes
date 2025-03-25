@@ -32,7 +32,8 @@ module ExtendedCacheKey
     cache_key = super
     associations_cache_key = compound_association_cache_keys.join("+")
     methods_cache_key = compound_method_cache_keys.join("")
-    create_append_cache_key(cache_key, methods_cache_key, associations_cache_key)
+    # dup the frozen string https://ruby-doc.org/core-2.6/String.html#method-i-2B-40
+    create_append_cache_key(+cache_key, methods_cache_key, associations_cache_key)
   end
 
   private

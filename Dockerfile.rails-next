@@ -1,0 +1,38 @@
+FROM ruby:2.7-slim-buster
+
+WORKDIR /rails_app
+
+RUN apt-get update && apt-get -y upgrade && \
+    apt-get install --no-install-recommends -y \
+    build-essential \
+    git \
+    libpq-dev \
+    postgresql-client-11 \
+    tmpreaper \
+    && \
+    apt-get clean
+
+# set MRI memory allocator to mimic jemalloc memory savings
+ENV MALLOC_ARENA_MAX=2
+
+# set a default RAILS_ENV for the build scripts
+# this is required for the `rake assets:precompile` script
+# to write assets to target dir set in `config.assets.prefix`
+ARG RAILS_ENV=production
+ENV RAILS_ENV=$RAILS_ENV
+
+ADD ./Gemfile.next /rails_app/
+ADD ./Gemfile.next.lock /rails_app/
+
+# ensure we use the rails-next gemfile setup to ensure we boot the upgraded libaries
+ENV BUNDLE_GEMFILE=Gemfile.next
+
+RUN bundle config --global jobs `cat /proc/cpuinfo | grep processor | wc -l | xargs -I % expr % - 1` && \
+    bundle install
+
+ADD ./ /rails_app
+
+RUN (cd /rails_app && mkdir -p tmp/pids && rm -f tmp/pids/*.pid)
+RUN (cd /rails_app && SECRET_KEY_BASE=1a bundle exec rake assets:precompile)
+
+CMD ["/rails_app/scripts/docker/start.sh"]

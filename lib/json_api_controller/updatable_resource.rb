@@ -10,7 +10,7 @@ module JsonApiController
 
     def update
       @updated_resources = resource_class.transaction(requires_new: true) do
-        resources_with_updates = controlled_resources.zip(Array.wrap(update_params))
+        resources_with_updates = controlled_resources.zip(Array.wrap(update_params.to_h))
         resources_with_updates.map do |resource, update_hash|
           resource.assign_attributes(build_update_hash(update_hash, resource))
 
@@ -29,6 +29,9 @@ module JsonApiController
       resource = controlled_resources.first
       resource_class.transaction(requires_new: true) do
         add_relation(resource, relation, params[relation])
+        # as this resource may not have changed but the linked resources may have
+        # ensure we modify the upated_at timestamp to cache bust this resource
+        resource.updated_at = Time.zone.now
         resource.save!
       end
 
@@ -41,6 +44,10 @@ module JsonApiController
       resource = controlled_resources.first
       resource_class.transaction do
         destroy_relation(resource, relation, params[:link_ids])
+        # as this resource may not have changed but the linked resources may have
+        # ensure we modify the updated_at timestamp to cache bust this resource
+        resource.updated_at = Time.zone.now
+        resource.save!
       end
 
       yield resource if block_given?

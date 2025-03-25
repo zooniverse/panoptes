@@ -56,7 +56,7 @@ describe Api::ApiController, type: :controller do
       end
 
       it "should return 401" do
-        get :index, access_token: token.token
+        get :index, params: { access_token: token.token }
         expect(response.status).to eq(401)
       end
     end
@@ -69,7 +69,7 @@ describe Api::ApiController, type: :controller do
       end
 
       it "should return 401" do
-        get :index, access_token: token.token
+        get :index, params: { access_token: token.token }
         expect(response.status).to eq(401)
       end
     end
@@ -85,32 +85,6 @@ describe Api::ApiController, type: :controller do
         get :index
         expect(response.status).to eq(403)
       end
-    end
-  end
-
-  describe "#current_language" do
-    controller do
-      def index
-        render json_api: current_languages
-      end
-    end
-
-    before(:each) do
-      user = create(:user, :languages)
-      default_request(user_id: user.id)
-      get :index, language: 'es'
-    end
-
-    it 'should include langauge param as the first language' do
-      expect(json_response.first).to eq('es')
-    end
-
-    it 'should include the user\'s default languages after the lang param' do
-      expect(json_response[1..-1]).to include('en', 'fr-ca')
-    end
-
-    it 'should include Accept-Language(s) after the user languages' do
-      expect(json_response[-3..-1]).to include('zh', 'zh-tw', 'fr-fr')
     end
   end
 

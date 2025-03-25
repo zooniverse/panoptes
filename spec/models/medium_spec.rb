@@ -19,9 +19,9 @@ RSpec.describe Medium, :type => :model do
       expect(m).to_not be_valid
     end
 
-    context "non-export medium types" do
-      it 'should be valid with all content_types' do
-        aggregate_failures "content types" do
+    context 'when non-export medium types' do
+      it 'is valid with allowed content_types' do
+        aggregate_failures 'content types' do
           limited_list_of_allowed_mime_types = %w(
             image/jpeg
             image/png
@@ -32,12 +32,29 @@ RSpec.describe Medium, :type => :model do
             audio/mp4
             audio/x-m4a
             text/plain
-            text/html
+            text/csv
             video/mp4
+            application/pdf
+            application/json
           )
           limited_list_of_allowed_mime_types.each do |content_type|
             m = build(:medium, content_type: content_type)
             expect(m).to be_valid
+          end
+        end
+      end
+
+      it 'does not allow invalid non-allowlisted content_types' do
+        aggregate_failures 'content types' do
+          limited_list_of_unallowed_mime_types = %w[
+            text/html
+            text/css
+            application/javascript
+            test/html-json
+          ]
+          limited_list_of_unallowed_mime_types.each do |content_type|
+            m = build(:medium, content_type: content_type)
+            expect(m).not_to be_valid
           end
         end
       end
@@ -177,6 +194,40 @@ RSpec.describe Medium, :type => :model do
           medium.put_file(file_path)
         }.to raise_error(Medium::MissingPutFilePath, "Must specify a file_path to store")
       end
+    end
+  end
+
+  describe '#put_file_with_retry' do
+    let(:file_path) { Rails.root.join('/tmp/project_x_dump.csv') }
+    let(:media_storage_put_file_params) do
+      [medium.src, file_path, medium.attributes]
+    end
+
+    it 'calls MediaStorage put_file with the src and other attributes' do
+      allow(MediaStorage).to receive(:put_file)
+      medium.put_file_with_retry(file_path)
+      expect(MediaStorage).to have_received(:put_file).with(*media_storage_put_file_params)
+    end
+
+    it 'retries the correct number of times' do
+      allow(MediaStorage).to receive(:put_file).and_raise(Faraday::ConnectionFailed, 'Connection reset by peer')
+      medium.put_file_with_retry(file_path)
+    rescue Faraday::ConnectionFailed
+      expect(MediaStorage).to have_received(:put_file).with(*media_storage_put_file_params).exactly(5).times
+    end
+
+    it 'allows the retry number to be modified at runtime' do
+      allow(MediaStorage).to receive(:put_file).and_raise(Faraday::ConnectionFailed, 'Connection reset by peer')
+      medium.put_file_with_retry(file_path, {}, 2)
+    rescue Faraday::ConnectionFailed
+      expect(MediaStorage).to have_received(:put_file).with(*media_storage_put_file_params).twice
+    end
+
+    it 'does not retry if put_file raises MissingPutFilePath' do
+      allow(medium).to receive(:put_file).and_call_original
+      medium.put_file_with_retry('')
+    rescue Medium::MissingPutFilePath
+      expect(medium).to have_received(:put_file).once
     end
   end
 

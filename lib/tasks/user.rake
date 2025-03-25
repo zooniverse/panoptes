@@ -11,6 +11,14 @@ namespace :user do
     end
   end
 
+  desc 'Scrub unsubscribe_token of deactivated users'
+  task scrub_inactive_user_unsubscribe_token: :environment do
+    User.where(activated_state: 'inactive').select(:id).find_in_batches do |users|
+      ids = users.map(&:id)
+      User.where(id: ids).update_all(unsubscribe_token: nil)
+    end
+  end
+
   desc 'Backfill UX testing emails comms field in batches'
   task backfill_ux_testing_email_field: :environment do
     User.select(:id).find_in_batches do |users|
@@ -45,6 +53,18 @@ namespace :user do
         intervention_notifications: nil
       )
       non_backfilled_users.update_all(intervention_notifications: true)
+    end
+  end
+
+  desc 'Backfill confirmed_at in batches (restartable)'
+  task backfill_confirmed_at: :environment do
+    mass_confirmed_at = Time.current.to_s(:db)
+    User.select(:id).find_in_batches do |users|
+      null_confirmed_at_user_scope = User.where(
+        id: users.map(&:id),
+        confirmed_at: nil
+      )
+      null_confirmed_at_user_scope.update_all(confirmed_at: mass_confirmed_at)
     end
   end
 

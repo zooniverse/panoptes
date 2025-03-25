@@ -1,0 +1,28 @@
+Hello,
+
+Your iNaturalist subject import has finished processing.
+
+<% if @no_errors %>
+The iNaturalist observations have been imported successfully.
+<% else %>
+Some observations could not be imported.
+Observations with the following iNaturalist IDs are not included in your subject set:
+
+<%= @failed_ids.join(', ') %>
+<% end %>
+
+<%= @imported_count %> subjects were imported into subject set '<%= @subject_set_name %>'.
+
+To view them, visit: <%= @subject_set_lab_url %>
+
+If you have questions or if there were any issues with your import, please email contact@zooniverse.org.
+
+Cheers,
+The Zooniverse Team
+
+This is an automated email, please do not respond.
+
+To manage your Zooniverse email subscription preferences visit https://zooniverse.org/settings
+
+To unsubscribe to all Zooniverse messages please visit https://zooniverse.org/unsubscribe
+Please be aware that the above link will unsubscribe you from ALL Zooniverse emails.

@@ -5,16 +5,8 @@ module CellectClient
   class ResourceNotFound < StandardError; end
   class ServerError < StandardError; end
 
-  def self.default_host
-    if Rails.env.production?
-      'https://cellect.zooniverse.org'
-    else
-      'https://cellect-staging.zooniverse.org'
-    end
-  end
-
   def self.host
-    ENV.fetch('CELLECT_HOST', default_host)
+    @host ||= ENV.fetch('CELLECT_HOST')
   end
 
   def self.add_seen(workflow_id, user_id, subject_id)
@@ -29,7 +21,7 @@ module CellectClient
   end
 
   def self.reload_workflow(workflow_id)
-    return unless Panoptes.flipper.enabled? 'cellect'
+    return unless Flipper.enabled?(:cellect)
 
     path = "/workflows/#{workflow_id}/reload"
     Request.new.request(:post, path)

@@ -40,12 +40,10 @@ describe Subjects::SetMemberSubjectSelector do
     let(:selector) { selector_class.new(workflow, nil) }
 
     context 'when the workflow is not finished' do
-      it 'should select from the non retired remaining subjects' do
-        expect(SetMemberSubject)
-          .to receive(:non_retired_for_workflow)
-          .with(workflow)
-          .and_call_original
+      it 'selects from the non retired remaining subjects' do
+        allow(SetMemberSubject).to receive(:non_retired_for_workflow).and_call_original
         selector.set_member_subjects
+        expect(SetMemberSubject).to have_received(:non_retired_for_workflow).with(workflow.id)
       end
     end
 

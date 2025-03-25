@@ -12,11 +12,11 @@ describe HomeController, type: :controller do
       end
 
       it "should be successful" do
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it "should default to html" do
-        expect(response.content_type).to eq("text/html")
+        expect(response.media_type).to eq('text/html')
       end
     end
 
@@ -26,11 +26,11 @@ describe HomeController, type: :controller do
       end
 
       it "returns success" do
-        expect(response).to be_success
+        expect(response).to be_successful
       end
 
       it "returns the expected json header" do
-        expect(response.content_type).to eq("application/json")
+        expect(response.media_type).to eq('application/json')
       end
 
       it "should respond with a json response for the root" do

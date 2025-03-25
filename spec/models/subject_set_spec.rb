@@ -83,4 +83,43 @@ describe SubjectSet, :type => :model do
       expect(subject_set.belongs_to_project?(subject_set.project_id)).to eq(true)
     end
   end
+
+  describe '#subject_set_imports' do
+    let(:subject_set_import) do
+      create(:subject_set_import, subject_set: subject_set)
+    end
+
+    it 'removes all subject_set_imports on destroy' do
+      subject_set_import
+      subject_set.destroy
+      expect { subject_set_import.reload }.to raise_error(ActiveRecord::RecordNotFound)
+    end
+  end
+
+  describe '#classification_export' do
+    it 'has the association' do
+      export = subject_set.build_classifications_export(src: 'test', content_type: 'text/csv')
+      expect(subject_set.classifications_export).to eq(export)
+    end
+  end
+
+  describe '#classifications' do
+    let(:subject_set) { create(:subject_set_with_subjects, num_subjects: 1) }
+    let(:workflow) { subject_set.workflows.first }
+    let(:project) { subject_set.project }
+    let(:subject) { subject_set.subjects.first }
+    let(:classification) do
+      create(:classification, project: project, workflow: workflow, subjects: [subject])
+    end
+
+    it 'returns the correct active record scope' do
+      expect(subject_set.classifications).to include(classification)
+    end
+
+    it 'does not include classifications for subjects across project workflows' do
+      other_project_workflow = create(:workflow, project: project, activated_state: 'inactive')
+      other_workflow_classification = create(:classification, project: project, workflow: other_project_workflow, subjects: [subject])
+      expect(subject_set.classifications).not_to include(other_workflow_classification)
+    end
+  end
 end

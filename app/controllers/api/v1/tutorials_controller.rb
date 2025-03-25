@@ -8,7 +8,7 @@ class Api::V1::TutorialsController < Api::ApiController
 
   schema_type :json_schema
 
-  before_filter :set_language_if_missing, only: [:index]
+  before_action :set_language_if_missing, only: [:index]
 
   protected
 

@@ -31,13 +31,16 @@ module Subjects
       @available_count ||= available.except(:select).count
     end
 
-    # ensure the order runs outside the subselect here
-    # otherwise it attemps to sort the whole available complex joinsed scope
+    # ensure the order does not run on the available query
+    # use a CTE with the available subquery
+    # to resolve the ordering to be applied to the joined result set
+    # otherwise it attemps to sort the whole available query scope which can be large
     def focus_window_random_sample
       SetMemberSubject
-      .where(id: available)
-      .order(random: %i(asc desc).sample)
-      .limit(focus_set_window_size)
+        .with(available_ids: available)
+        .joins('INNER JOIN available_ids ON available_ids.id = set_member_subjects.id')
+        .order(random: %i[asc desc].sample)
+        .limit(focus_set_window_size)
     end
 
     def focus_set_window_size

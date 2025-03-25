@@ -51,9 +51,9 @@ class DesignatorClient
     end
   end
 
-  def get_subjects(workflow_id, user_id, _group_id, limit)
+  def get_subjects(workflow_id, user_id, subject_set_id, limit)
     url = "/api/workflows/#{workflow_id}"
-    params = { user_id: user_id, limit: limit }
+    params = { user_id: user_id, subject_set_id: subject_set_id, limit: limit }.compact
     request(:get, [ url, params ])
   end
 

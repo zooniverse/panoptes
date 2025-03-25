@@ -20,7 +20,7 @@ RSpec.describe WorkflowsDumpWorker do
         tasks: tasks, pairwise: !workflow.pairwise,
         grouped: !workflow.grouped, prioritized: !workflow.prioritized
       }
-      workflow.update_attributes(updates)
+      workflow.update(updates)
     end
 
     it "should append all previous versions to the csv file" do

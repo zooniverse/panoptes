@@ -27,6 +27,11 @@ describe SubjectSetPolicy do
       it "includes subject sets from public projects" do
         expect(resolved_scope).to match_array(public_subject_set)
       end
+
+      it 'correctly resolves the create_classifications_export scope' do
+        scope = PunditScopeTester.new(SubjectSet, api_user)
+        expect(scope.create_classifications_export).to be_empty
+      end
     end
 
     context 'for a normal user' do
@@ -34,6 +39,11 @@ describe SubjectSetPolicy do
 
       it "includes subject sets from public projects" do
         expect(resolved_scope).to match_array(public_subject_set)
+      end
+
+      it 'correctly resolves the create_classifications_export scope' do
+        scope = PunditScopeTester.new(SubjectSet, api_user)
+        expect(scope.create_classifications_export).to be_empty
       end
     end
 
@@ -47,6 +57,11 @@ describe SubjectSetPolicy do
       it 'includes subject sets from owned private projects' do
         expect(resolved_scope).to include(private_subject_set)
       end
+
+      it 'correctly resolves the create_classifications_export scope' do
+        scope = PunditScopeTester.new(SubjectSet, api_user)
+        expect(scope.create_classifications_export).to match_array([public_subject_set, private_subject_set])
+      end
     end
 
     context 'for an admin' do
@@ -55,6 +70,11 @@ describe SubjectSetPolicy do
 
       it 'includes everything' do
         expect(resolved_scope).to include(public_subject_set, private_subject_set)
+      end
+
+      it 'correctly resolves the create_classifications_export scope' do
+        scope = PunditScopeTester.new(SubjectSet, api_user)
+        expect(scope.create_classifications_export).to match_array([public_subject_set, private_subject_set])
       end
     end
   end

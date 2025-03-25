@@ -9,6 +9,8 @@ class SubjectSerializer
 
   preload :locations, :project, :collections, :subject_sets
 
+  can_sort_by :id
+
   def locations
     @model.ordered_locations.map do |loc|
       {

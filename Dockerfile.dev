@@ -1,26 +1,30 @@
-FROM ruby:2.5
+FROM ruby:2.7-slim-buster
 
 WORKDIR /rails_app
 
-RUN echo $(grep "VERSION=" /etc/os-release | cut -d "(" -f2 | cut -d ")" -f1) | \
-    xargs -i echo "deb http://apt.postgresql.org/pub/repos/apt/ {}-pgdg main" > /etc/apt/sources.list.d/postgresql.list && \
-    wget --quiet -O - https://www.postgresql.org/media/keys/ACCC4CF8.asc | apt-key add -
-
 RUN apt-get update && apt-get -y upgrade && \
     apt-get install --no-install-recommends -y \
-    git \
-    curl \
-    libpq-dev \
-    postgresql-client-9.5 \
-    tmpreaper \
-    && \
-    apt-get clean
+      build-essential \
+      # git is required for installing gems from git repos
+      git \
+      libpq-dev \
+      # debian buster and comes with pg client v11 by default
+      postgresql-client-11 \
+      tmpreaper
+
+# set MRI memory allocator to mimic jemalloc memory savings
+ENV MALLOC_ARENA_MAX=2
 
 ADD ./Gemfile /rails_app/
 ADD ./Gemfile.lock /rails_app/
 
-RUN bundle config --global jobs `cat /proc/cpuinfo | grep processor | wc -l | xargs -I % expr % - 1` && \
-    bundle install
+RUN bundle config --global jobs `cat /proc/cpuinfo | grep processor | wc -l | xargs -I % expr % - 1`
+
+# run `gem update system` so installation of mini_racer does not fail
+# See troubleshooting for mini_racer and supported ruby versions: https://github.com/rubyjs/mini_racer?tab=readme-ov-file#supported-ruby-versions--troubleshooting
+# pinning gem update to 3.4.22 since anything higher requires updating Ruby version to 3+
+RUN gem i "rubygems-update:~>3.4.22" --no-document && update_rubygems
+RUN bundle install
 
 ADD ./ /rails_app
 

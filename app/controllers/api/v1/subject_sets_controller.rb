@@ -1,10 +1,12 @@
 class Api::V1::SubjectSetsController < Api::ApiController
   include JsonApiController::PunditPolicy
   include FilterByMetadata
+  include ExportMediumResponse
 
-  require_authentication :create, :update, :destroy, scopes: [:project]
+  require_authentication :create, :update, :destroy, :create_classifications_export, scopes: [:project]
   resource_actions :default
   schema_type :json_schema
+  prepend_before_action :require_login, only: %i[create update destroy create_classifications_export]
 
   IMPORT_COLUMNS = %w(subject_set_id subject_id random).freeze
 
@@ -27,8 +29,10 @@ class Api::V1::SubjectSetsController < Api::ApiController
       notify_subject_selector(subject_set)
       reset_subject_counts(subject_set.id)
 
-      subject_set.subject_sets_workflows.pluck(:workflow_id).each do |workflow_id|
+      subject_set.workflow_ids.each do |workflow_id|
         UnfinishWorkflowWorker.perform_async(workflow_id)
+        # recalculate the set's completeness values if we've added new subjects
+        SubjectSetCompletenessWorker.perform_async(subject_set.id, workflow_id) if params.key?(:subjects)
         duration = params[:subjects].length * 4 # Pad times to prevent backlogs
         params[:subjects].each do |subject_id|
           SubjectWorkflowStatusCreateWorker.perform_in(duration.seconds*rand, subject_id, workflow_id)
@@ -56,7 +60,7 @@ class Api::V1::SubjectSetsController < Api::ApiController
 
     reset_workflow_retired_counts(affected_workflow_ids)
     subject_ids.each_with_index do |subject_id, index|
-      SubjectRemovalWorker.perform_in(index.seconds, subject_id)
+      SubjectRemovalWorker.perform_in(index.seconds, subject_id, controlled_resource.id)
     end
 
     deleted_resource_response
@@ -67,7 +71,19 @@ class Api::V1::SubjectSetsController < Api::ApiController
       notify_subject_selector(subject_set)
       reset_subject_counts(subject_set.id)
       reset_workflow_retired_counts(subject_set.workflow_ids)
+
+      if params['link_relation'] == 'subjects'
+        # recalculate the set's completeness values if # we're removing subjects
+        subject_set.workflow_ids.each do |workflow_id|
+          SubjectSetCompletenessWorker.perform_async(subject_set.id, workflow_id)
+        end
+      end
     end
+  end
+
+  def create_classifications_export
+    medium = CreateClassificationsExport.with(api_user: api_user, object: controlled_resource).run!(params)
+    export_medium_response(medium)
   end
 
   protected
@@ -96,14 +112,19 @@ class Api::V1::SubjectSetsController < Api::ApiController
     if relation == :subjects && value.is_a?(Array)
       #ids is returning duplicates even though the AR Relations were uniq
       subject_ids_to_link = new_items(resource, relation, value).distinct.ids
-      unless Subject.where(id: subject_ids_to_link).count == value.count
+      unless Subject.where(id: subject_ids_to_link, activated_state: 'active').count == value.count
         raise BadLinkParams.new("Error: check the subject set and all the subjects exist.")
       end
       new_sms_values = subject_ids_to_link.map do |subject_id|
         [ resource.id, subject_id, rand ]
       end
-
-      result = SetMemberSubject.import IMPORT_COLUMNS, new_sms_values, validate: false
+      # bulk import via SQL inserts - https://github.com/zdennis/activerecord-import#columns-and-arrays
+      result = SetMemberSubject.import(
+        IMPORT_COLUMNS, # columns to import
+        new_sms_values, # values that match columns in array form
+        validate: false, # ignore AR model validations
+        on_duplicate_key_ignore: true # ignore duplicate records, e.g. skip uniq index errors, https://github.com/zdennis/activerecord-import#duplicate-key-ignore
+      )
       SubjectMetadataWorker.perform_async(result.ids)
       result
     else

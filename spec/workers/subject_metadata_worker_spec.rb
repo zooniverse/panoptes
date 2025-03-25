@@ -31,24 +31,10 @@ RSpec.describe SubjectMetadataWorker do
 
   describe "#perform" do
     it 'skips any work when the feature flag is on' do
-      Panoptes.flipper[:skip_subject_metadata_worker].enable
+      allow(Flipper).to receive(:enabled?).with(:skip_subject_metadata_worker).and_return(true)
       allow(ActiveRecord::Base).to receive(:connection)
       worker.perform(subject_set.id)
       expect(ActiveRecord::Base).not_to have_received(:connection)
-    end
-
-    # TODO: Rails 5 combine the tests to one
-    # to test behaviour not AR calling interface
-    it 'calls the correct RAILS 5 AR methods' do
-      stub_const("ActiveRecord::VERSION::MAJOR", 5)
-      expect(ActiveRecord::Base.connection)
-        .to receive(:exec_update)
-        .with(
-          instance_of(String),
-          'SQL',
-          [[nil, set_member_subject_ids]]
-        )
-      worker.perform(set_member_subject_ids)
     end
 
     it 'copies priority from metadata to SMS attribute' do

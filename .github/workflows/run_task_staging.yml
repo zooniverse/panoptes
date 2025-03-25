@@ -1,0 +1,34 @@
+name: Run Staging Task
+
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: Task to run
+        required: true
+        default: 'routes'
+
+jobs:
+  run_staging_task:
+    name: Run Staging Task
+    uses: zooniverse/ci-cd/.github/workflows/run_task.yaml@main
+    with:
+      app_name: panoptes
+      task_name: ${{ github.event.inputs.task }}
+      environment: staging
+    secrets:
+      creds: ${{ secrets.AZURE_AKS }}
+
+  slack_notification:
+    name: Slack notification
+    uses: zooniverse/ci-cd/.github/workflows/slack_notification.yaml@main
+    needs: run_staging_task
+    if: always()
+    with:
+      commit_id: ${{ github.sha }}
+      job_name: Run Staging Task / run_staging_task
+      status: ${{ needs.run_staging_task.result }}
+      title: "Panoptes Staging task complete"
+      title_link: "https://github.com/zooniverse/panoptes/actions/${{ github.run_id }}"
+    secrets:
+      slack_webhook_url: ${{ secrets.SLACK_WEBHOOK_URL }}

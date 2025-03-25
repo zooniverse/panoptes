@@ -81,7 +81,7 @@ describe Project, type: :model do
 
   describe "#live" do
     before(:each) do
-      project.update_attributes(live: nil)
+      project.update(live: nil)
     end
 
     it "should not accept nil values" do
@@ -337,14 +337,13 @@ describe Project, type: :model do
   end
 
   describe "#retired_subjects_count" do
-    it "should use the association values when loaded" do
+    it "uses the association values when loaded" do
       full_project.active_workflows.update_all(retired_set_member_subjects_count: 1)
-      # i had to call inspect to actually get the association to stay loaded..wtf?!
-      full_project.active_workflows.inspect
+      #update_all sends an update directly to the database - it won't update the report models you have in memory, so we need to reload models
+      full_project.active_workflows.map(&:reload)
       expect(full_project.active_workflows)
-        .to receive(:inject)
-        .and_call_original
-
+      .to receive(:inject)
+      .and_call_original
       expect(full_project.retired_subjects_count).to eq(1)
     end
 
@@ -484,49 +483,57 @@ describe Project, type: :model do
           end
         end
       end
-
-      context "when launch_requested changed" do
-        let(:field) { "launch_requested" }
-
-        context "when true" do
-          let(:value) { true }
-          it 'should queue the worker' do
-            expect(ProjectRequestEmailWorker).to receive(:perform_async).with("launch", project.id)
-          end
-        end
-
-        context "when false" do
-          let(:value) { false }
-
-          it 'should not queue the worker' do
-            expect(ProjectRequestEmailWorker).not_to receive(:perform_async)
-          end
-        end
-      end
     end
   end
 
-  describe "#communication_emails" do
+  describe '#communication_emails' do
     let(:project) { create(:project) }
     let(:owner_email) { project.owner.email }
 
-    it 'should return the owner by default' do
+    it 'return the owner email by default' do
       expect(project.communication_emails).to match_array([owner_email])
     end
 
-    context "with communication project roles" do
+    context 'with non-owner communication project roles' do
       let(:comms_user) { create(:user) }
+      let(:collaborator) { create(:user) }
+
       before do
         create(
           :access_control_list,
           user_group: comms_user.identity_group,
           resource: project,
-          roles: ["communications"]
+          roles: ['communications']
         )
       end
 
-      it 'should return the owner and comms roles emails' do
+      it 'returns the owner and comms roles emails' do
         expect(project.communication_emails).to match_array([owner_email, comms_user.email])
+      end
+
+      it 'returns emails of owner, collaborator, and comms roles' do
+        create(
+          :access_control_list,
+          user_group: collaborator.identity_group,
+          resource: project,
+          roles: ['collaborator']
+        )
+        expect(project.communication_emails).to match_array([owner_email, comms_user.email, collaborator.email])
+      end
+
+      it 'does not include email of user that is not associated with project' do
+        expect(project.communication_emails).not_to include(collaborator.email)
+      end
+
+      it 'does not include email of user with non-communications type role' do
+        translator = create(:user)
+        create(
+          :access_control_list,
+          user_group: translator.identity_group,
+          resource: project,
+          roles: ['translator']
+        )
+        expect(project.communication_emails).not_to include(translator.email)
       end
     end
   end

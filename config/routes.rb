@@ -2,15 +2,13 @@ ActionDispatch::Routing::Mapper.send :include, Routes::JsonApiRoutes
 
 # require 'sidekiq/web' via
 require 'sidekiq_unique_jobs/web'
+require 'sidekiq/cron/web'
 
 Rails.application.routes.draw do
 
   authenticate :user, lambda { |u| u.admin? } do
     mount Sidekiq::Web => '/sidekiq'
-    flipper_block = lambda {
-      Panoptes.flipper
-    }
-    mount Flipper::UI.app(flipper_block) => '/flipper'
+    mount Flipper::UI.app(Flipper) => '/flipper'
   end
 
   post '/graphql', to: 'graphql#execute'
@@ -23,7 +21,7 @@ Rails.application.routes.draw do
   end
 
   devise_for :users,
-    controllers: { passwords: 'passwords' },
+    controllers: { confirmations: 'confirmations', passwords: 'passwords' },
     skip: [ :sessions, :registrations ]
 
   as :user do
@@ -41,10 +39,6 @@ Rails.application.routes.draw do
   get "unsubscribe", to: "emails#unsubscribe_via_token"
   post "unsubscribe", to: "emails#unsubscribe_via_email"
 
-  namespace :api, constraints: { format: 'json' } do
-    post "/events" => "events#create"
-  end
-
   namespace :api do
     api_version(module: "V1", header: {name: "Accept", value: "application/vnd.api+json; version=1"}) do
       get "/me", to: 'users#me', format: false
@@ -61,6 +55,7 @@ Rails.application.routes.draw do
       json_api_resources :project_preferences do
         collection do
           post :update_settings
+          get :read_settings
         end
       end
 
@@ -76,7 +71,9 @@ Rails.application.routes.draw do
 
       json_api_resources :subjects do
         collection do
-          get :queued
+          get :queued # Subject selection end point
+          get :grouped # SubjectGroup selection end point
+          get :selection # Subject selection by subject ids end point
         end
       end
 
@@ -116,15 +113,21 @@ Rails.application.routes.draw do
         media_resources :attached_images, classifications_export: { except: [:create] }
 
         post "/retired_subjects", to: "workflows#retire_subjects"
+        post '/unretire_subjects', to: 'workflows#unretire_subjects'
         post "/classifications_export", to: "workflows#create_classifications_export", format: false
         post '/publish', to: 'workflows#publish'
       end
 
       json_api_resources :workflow_versions, links: [:workflow]
 
-      json_api_resources :subject_sets, links: [:subjects]
+      json_api_resources :subject_sets, links: [:subjects] do
+        media_resources classifications_export: { except: %i[create update] }
+        post '/classifications_export', to: 'subject_sets#create_classifications_export', format: false
+      end
 
       json_api_resources :subject_set_imports, links: [:subject_sets, :users], only: [:index, :show, :create]
+
+      post '/inaturalist/import', to: 'inaturalist#import', format: false
 
       json_api_resources :collections, links: [:subjects, :default_subject]
 
@@ -145,12 +148,9 @@ Rails.application.routes.draw do
         constraints: Routes::Constraints::TranslationsConstraint.new,
         except: %i(new edit destroy)
       })
-    end
-  end
 
-  scope "subject_selection_strategies/:strategy", as: "subject_selection_strategy", constraints: { format: 'json' } do
-    get "workflows", to: "subject_selection_strategies#workflows"
-    get "subjects", to: "subject_selection_strategies#subjects"
+      json_api_resources :subject_groups, only: %w[index show]
+    end
   end
 
   get "health_check", to: "home#index"

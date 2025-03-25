@@ -4,7 +4,7 @@ class CreateClassificationsExport < Operation
 
   def execute
     medium = compose(CreateOrUpdateMedium, inputs.merge(type: :classifications_export))
-    ClassificationsDumpWorker.perform_async(object.id, object.class.to_s.downcase, medium.id, api_user.id)
+    ClassificationsDumpWorker.perform_async(object.id, object.model_name.singular, medium.id, api_user.id)
     medium
   end
 end

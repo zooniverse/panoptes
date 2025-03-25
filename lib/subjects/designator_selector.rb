@@ -37,7 +37,7 @@ module Subjects
     end
 
     def enabled?
-      Panoptes.flipper["designator"].enabled?
+      Flipper.enabled?(:designator)
     end
 
     def self.client
