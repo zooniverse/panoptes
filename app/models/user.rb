@@ -13,7 +13,7 @@ class User < ApplicationRecord
   attr_accessor :minor_age
 
   devise :database_authenticatable, :registerable,
-    :recoverable, :rememberable, :trackable, :validatable, :confirmable,
+    :recoverable, :rememberable, :trackable, :validatable, :confirmable
 
   has_many :classifications, dependent: :restrict_with_exception
   has_many :collection_preferences, class_name: "UserCollectionPreference", dependent: :destroy
