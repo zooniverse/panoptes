@@ -219,7 +219,6 @@ GEM
       guard-compat (~> 1.1)
       rspec (>= 2.99.0, < 4.0)
     hashdiff (1.0.1)
-    hashie (5.0.0)
     honeybadger (5.2.1)
     http-accept (1.7.0)
     http-cookie (1.0.5)
@@ -283,7 +282,6 @@ GEM
     minitest (5.25.1)
     mock_redis (0.36.0)
       ruby2_keywords
-    multi_json (1.15.0)
     multi_xml (0.6.0)
     multipart-post (2.3.0)
     nenv (0.3.0)
@@ -307,24 +305,6 @@ GEM
     notiffany (0.1.3)
       nenv (~> 0.1)
       shellany (~> 0.0)
-    oauth2 (1.4.9)
-      faraday (>= 0.17.3, < 3.0)
-      jwt (>= 1.0, < 3.0)
-      multi_json (~> 1.3)
-      multi_xml (~> 0.5)
-      rack (>= 1.2, < 3)
-    omniauth (1.9.1)
-      hashie (>= 3.4.6)
-      rack (>= 1.6.2, < 3)
-    omniauth-facebook (5.0.0)
-      omniauth-oauth2 (~> 1.2)
-    omniauth-google-oauth2 (0.5.4)
-      jwt (>= 1.5)
-      omniauth (>= 1.1.1)
-      omniauth-oauth2 (>= 1.5)
-    omniauth-oauth2 (1.7.2)
-      oauth2 (~> 1.4)
-      omniauth (>= 1.9, < 3)
     orm_adapter (0.5.0)
     p3p (2.0.0)
       rack (>= 1.6.2)
@@ -557,9 +537,6 @@ DEPENDENCIES
   mini_racer
   mock_redis
   newrelic_rpm
-  omniauth (~> 1.9)
-  omniauth-facebook (~> 5.0)
-  omniauth-google-oauth2
   p3p (~> 2.0)
   panoptes-client
   pg (~> 1.4)
