@@ -1,5 +1,6 @@
 class UserProjectPreferenceSerializer
   include Serialization::PanoptesRestpack
+  include CachedSerializer
 
   can_include :user, :project
   can_sort_by :updated_at, :display_name
@@ -12,7 +13,7 @@ class UserProjectPreferenceSerializer
   end
 
   def self.page(params = {}, scope = nil, context = {})
-    page_with_options NonCustomScopeFilterOptions.new(self, params, scope, context)
+    page_with_options CustomScopeFilterOptions.new(self, params, scope, context)
   end
 
   def self.page_with_options(options)
@@ -66,7 +67,7 @@ class UserProjectPreferenceSerializer
     end
   end
 
-  class NonCustomScopeFilterOptions < RestPack::Serializer::Options
+  class CustomScopeFilterOptions < RestPack::Serializer::Options
     CUSTOM_SCOPE_FILTERS = %i(non_null_activity_count).freeze
 
     def scope_with_filters
@@ -81,9 +82,13 @@ class UserProjectPreferenceSerializer
 
 
       if @filters.key?(:non_null_activity_count)
-        filtered_scope = @scope.where(scope_filter)
-        non_null_activity_count_upp_ids = filtered_scope.filter { |upp| !count_activity(upp).nil? && count_activity(upp) > 0 }.map(&:id)
+        # RestPack Serializer's .page method requires scope param to be instance of ActiveRecord::Relation (result of a db query.)
+        # To get around this, we first filter by non custom filters (eg. filter UPP by user_id)
+        # Then we use that result to filter UPPs with non_zero and non null activity counts (Note result of Ruby's .filter method returns a new Array) and grab the ids
+        # Then query UPPs by ids to get scope.
 
+        filtered_scope = @scope.where(scope_filter)
+        non_null_activity_count_upp_ids = filtered_scope.filter { |upp| !perform_cached_lookup(count_activity, upp).nil? && perform_cached_lookup(count_activity, upp) > 0 }.map(&:id)
         @scope.where(id: non_null_activity_count_upp_ids)
       end
     end
@@ -102,11 +107,11 @@ class UserProjectPreferenceSerializer
       Workflow.where(project_id: upp.project_id).pluck(:id)
     end
 
-    # def perform_cached_lookup(method_to_send, upp)
-    #   cache_key = "#{upp.class}/#{upp.id}/#{method_to_send}"
-    #   Rails.cache.fetch(cache_key, expires_in: CACHE_MINS.minutes) do
-    #     send method_to_send
-    #   end
-    # end
+    def perform_cached_lookup(method_to_send, upp)
+      cache_key = "#{upp.class}/#{upp.id}/#{method_to_send}"
+      Rails.cache.fetch(cache_key, expires_in: CACHE_MINS.minutes) do
+        send method_to_send
+      end
+    end
   end
 end
