@@ -16,9 +16,6 @@ class UserProjectPreferenceSerializer
   end
 
   def self.page_with_options(options)
-    puts "MDY114 HITS OPTIONS NOW"
-    puts options.inspect
-
     if options.sorting.key?(:display_name)
       display_sort, other_sorts = options.sorting.partition do |field, direction|
         field.match(/display_name/)
