@@ -1,12 +1,9 @@
 class UserProjectPreferenceSerializer
   include Serialization::PanoptesRestpack
-  include CachedSerializer
 
-  attributes :id, :email_communication, :preferences, :href,
-    :activity_count, :activity_count_by_workflow, :settings,
-    :created_at, :updated_at
   can_include :user, :project
   can_sort_by :updated_at, :display_name
+  can_filter_by :non_null_activity_count
 
   CACHE_MINS = (ENV["UPP_ACTIVITY_COUNT_CACHE_MINS"] || 5).freeze
 
@@ -14,7 +11,14 @@ class UserProjectPreferenceSerializer
     "project_preferences"
   end
 
+  def self.page(params = {}, scope = nil, context = {})
+    page_with_options NonCustomScopeFilterOptions.new(self, params, scope, context)
+  end
+
   def self.page_with_options(options)
+    puts "MDY114 HITS OPTIONS NOW"
+    puts options.inspect
+
     if options.sorting.key?(:display_name)
       display_sort, other_sorts = options.sorting.partition do |field, direction|
         field.match(/display_name/)
@@ -26,6 +30,7 @@ class UserProjectPreferenceSerializer
         .order("projects.display_name #{display_sort[:display_name]}")
         .order(other_sorts)
     end
+
     super(options)
   end
 
@@ -62,5 +67,49 @@ class UserProjectPreferenceSerializer
     Rails.cache.fetch(cache_key, expires_in: CACHE_MINS.minutes) do
       send method_to_send
     end
+  end
+
+  class NonCustomScopeFilterOptions < RestPack::Serializer::Options
+    CUSTOM_SCOPE_FILTERS = %i(non_null_activity_count).freeze
+
+    def scope_with_filters
+      scope_filter = {}
+
+      non_custom_filters = @filters.except(*CUSTOM_SCOPE_FILTERS)
+      non_custom_filters.keys.each do |filter|
+        value = query_to_array(@filters[filter])
+        scope_filter[filter] = value
+      end
+      @scope.where(scope_filter)
+
+
+      if @filters.key?(:non_null_activity_count)
+        filtered_scope = @scope.where(scope_filter)
+        non_null_activity_count_upp_ids = filtered_scope.filter { |upp| !count_activity(upp).nil? && count_activity(upp) > 0 }.map(&:id)
+
+        @scope.where(id: non_null_activity_count_upp_ids)
+      end
+    end
+
+    private
+
+    def count_activity(upp)
+      if count = upp.summated_activity_count
+        count
+      elsif !project_workflows_ids(upp).empty?
+        UserSeenSubject.count_user_activity(upp.user_id, project_workflows_ids(upp))
+      end
+    end
+
+    def project_workflows_ids(upp)
+      Workflow.where(project_id: upp.project_id).pluck(:id)
+    end
+
+    # def perform_cached_lookup(method_to_send, upp)
+    #   cache_key = "#{upp.class}/#{upp.id}/#{method_to_send}"
+    #   Rails.cache.fetch(cache_key, expires_in: CACHE_MINS.minutes) do
+    #     send method_to_send
+    #   end
+    # end
   end
 end
