@@ -2,6 +2,9 @@ class UserProjectPreferenceSerializer
   include Serialization::PanoptesRestpack
   include CachedSerializer
 
+  attributes :id, :email_communication, :preferences, :href,
+    :activity_count, :activity_count_by_workflow, :settings,
+    :created_at, :updated_at
   can_include :user, :project
   can_sort_by :updated_at, :display_name
   can_filter_by :non_null_activity_count
@@ -72,7 +75,6 @@ class UserProjectPreferenceSerializer
 
     def scope_with_filters
       filtered_scope = apply_standard_filters
-
       return filtered_scope unless @filters.key?(:non_null_activity_count)
 
       filter_non_null_activity_count(filtered_scope)
