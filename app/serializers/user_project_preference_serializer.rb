@@ -91,7 +91,9 @@ class UserProjectPreferenceSerializer
     end
 
     def filter_non_null_activity_count(filtered)
-      non_null_activity_count_upp_ids = filtered.select { |upp| perform_cached_lookup(count_activity, upp).to_i.positive? }.map(&:id)
+      non_null_activity_count_upp_ids = filtered.select do |upp|
+        cached_activity_count(upp).to_i.positive?
+      end.map(&:id)
       @scope.where(id: non_null_activity_count_upp_ids)
     end
 
@@ -107,10 +109,10 @@ class UserProjectPreferenceSerializer
       Workflow.where(project_id: upp.project_id).pluck(:id)
     end
 
-    def perform_cached_lookup(method_to_send, upp)
-      cache_key = "#{upp.class}/#{upp.id}/#{method_to_send}"
+    def cached_activity_count(upp)
+      cache_key = "#{upp.class}/#{upp.id}/count_activity"
       Rails.cache.fetch(cache_key, expires_in: CACHE_MINS.minutes) do
-        send method_to_send
+        count_activity(upp)
       end
     end
   end
