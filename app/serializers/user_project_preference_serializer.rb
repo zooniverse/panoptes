@@ -31,7 +31,6 @@ class UserProjectPreferenceSerializer
         .order("projects.display_name #{display_sort[:display_name]}")
         .order(other_sorts)
     end
-
     super(options)
   end
 
