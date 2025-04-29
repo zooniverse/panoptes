@@ -71,29 +71,29 @@ class UserProjectPreferenceSerializer
     CUSTOM_SCOPE_FILTERS = %i(non_null_activity_count).freeze
 
     def scope_with_filters
-      scope_filter = {}
+      filtered_scope = apply_standard_filters
 
+      return filtered_scope unless @filters.key?(:non_null_activity_count)
+
+      filter_non_null_activity_count(filtered_scope)
+    end
+
+    private
+
+    def apply_standard_filters
+      scope_filter = {}
       non_custom_filters = @filters.except(*CUSTOM_SCOPE_FILTERS)
       non_custom_filters.keys.each do |filter|
         value = query_to_array(@filters[filter])
         scope_filter[filter] = value
       end
       @scope.where(scope_filter)
-
-
-      if @filters.key?(:non_null_activity_count)
-        # RestPack Serializer's .page method requires scope param to be instance of ActiveRecord::Relation (result of a db query.)
-        # To get around this, we first filter by non custom filters (eg. filter UPP by user_id)
-        # Then we use that result to filter UPPs with non_zero and non null activity counts (Note result of Ruby's .filter method returns a new Array) and grab the ids
-        # Then query UPPs by ids to get scope.
-
-        filtered_scope = @scope.where(scope_filter)
-        non_null_activity_count_upp_ids = filtered_scope.filter { |upp| !perform_cached_lookup(count_activity, upp).nil? && perform_cached_lookup(count_activity, upp) > 0 }.map(&:id)
-        @scope.where(id: non_null_activity_count_upp_ids)
-      end
     end
 
-    private
+    def filter_non_null_activity_count(filtered)
+      non_null_activity_count_upp_ids = filtered.select { |upp| perform_cached_lookup(count_activity, upp).to_i.positive? }.map(&:id)
+      @scope.where(id: non_null_activity_count_upp_ids)
+    end
 
     def count_activity(upp)
       if count = upp.summated_activity_count
