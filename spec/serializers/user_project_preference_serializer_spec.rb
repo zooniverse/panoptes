@@ -167,17 +167,17 @@ describe UserProjectPreferenceSerializer do
       end
     end
     let(:project2) { create :project }
-    let(:upp_with_no_activity) { create(:user_project_preference, project: project2, user: user, activity_count: nil)}
-    let(:params) { { non_null_activity_count: "true" } }
+    let(:upp_with_no_activity) { create(:user_project_preference, project: project2, user: user, activity_count: nil) }
+    let(:params) { { non_null_activity_count: 'true' } }
     let(:serialized_page) do
-      UserProjectPreferenceSerializer.page(
+      described_class.page(
         params,
         UserProjectPreference.all,
         {}
       )
     end
     let(:result_ids) do
-      serialized_page["project_preferences"].map{ |r| r[:id].to_i }
+      serialized_page['project_preferences'].map { |r| r[:id].to_i }
     end
 
     it 'filters out non-zero activity counts' do
