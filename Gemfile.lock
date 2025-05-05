@@ -252,7 +252,7 @@ GEM
     librato-metrics (2.1.2)
       aggregate (~> 0.2.2)
       faraday
-    libv8-node (16.10.0.0)
+    libv8-node (23.6.1.0)
     listen (3.8.0)
       rb-fsevent (~> 0.10, >= 0.10.3)
       rb-inotify (~> 0.9, >= 0.9.10)
@@ -277,8 +277,8 @@ GEM
     mime-types-data (3.2022.0105)
     mini_mime (1.1.2)
     mini_portile2 (2.8.4)
-    mini_racer (0.6.3)
-      libv8-node (~> 16.10.0.0)
+    mini_racer (0.18.1)
+      libv8-node (~> 23.6.1.0)
     minitest (5.25.1)
     mock_redis (0.36.0)
       ruby2_keywords
