@@ -459,7 +459,8 @@ GEM
     sidekiq (6.5.12)
       connection_pool (>= 2.2.5, < 3)
       rack (~> 2.0)
-      redis (>= 4.5.0, < 5)
+      rack-protection (>= 2.0.0)
+      redis (>= 4.1.0)
     sidekiq-congestion (0.1.1)
       congestion (~> 0.1)
       sidekiq (>= 3.0)
@@ -515,12 +516,13 @@ GEM
       addressable (>= 2.8.0)
       crack (>= 0.3.2)
       hashdiff (>= 0.4.0, < 2.0.0)
-    websocket-driver (0.7.7)
-      base64
+    webrick (1.7.0)
+    websocket-driver (0.7.5)
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
-    yard (0.9.37)
-    zeitwerk (2.6.18)
+    yard (0.9.28)
+      webrick (~> 1.7.0)
+    zeitwerk (2.6.6)
     zoo_stream (1.0.1)
       aws-sdk
 
