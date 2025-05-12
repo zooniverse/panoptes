@@ -1,7 +1,7 @@
 class UserSeenSubjectsWorker
   include Sidekiq::Worker
 
-  sidekiq_options queue: :data_high, lock: :while_executing, lock_args_method: ->(args) { [ args[0], args[1] ] }, on_conflict: :reschedule
+  sidekiq_options queue: :data_high, lock: :until_executed
 
   def perform(user_id, workflow_id, subject_ids)
     user = User.find(user_id)

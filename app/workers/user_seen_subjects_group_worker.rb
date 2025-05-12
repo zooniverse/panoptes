@@ -3,8 +3,10 @@ class UserSeenSubjectsGroupWorker
 
     sidekiq_options(
         retry: 5,
-        batch_flush_size: 9,
+        batch_flush_size: 1000,
         batch_flush_interval: 3,
+        queue: :data_high,
+        lock: :until_executed
       )
      #[ [{user_id: , workflow_id:, subject_ids_arr:}]
      #  [{user_id: , workflow_id:, subject_ids_arr:}]
