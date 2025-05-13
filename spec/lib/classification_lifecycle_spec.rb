@@ -305,13 +305,13 @@ describe ClassificationLifecycle do
 
     context "with a user" do
       it 'should call the worker to add the subject_id to the seen subjects' do
-        expect(UserSeenSubjectsWorker)
+        expect(UserSeenSubjectsGroupWorker)
           .to receive(:perform_async)
-          .with(
-            classification.user_id,
-            classification.workflow_id,
-            classification.subject_ids
-          )
+          .with({
+            user_id: classification.user_id,
+            workflow_id: classification.workflow_id,
+            subject_ids_arr: classification.subject_ids
+          })
         subject.update_seen_subjects
       end
     end
