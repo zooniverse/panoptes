@@ -311,7 +311,7 @@ describe ClassificationLifecycle do
             user_id: classification.user_id,
             workflow_id: classification.workflow_id,
             subject_ids_arr: classification.subject_ids
-          })
+      }.stringify_keys)
         subject.update_seen_subjects
       end
     end
@@ -319,14 +319,14 @@ describe ClassificationLifecycle do
     context "without a user" do
       let(:classification) { build(:classification, user: nil) }
       it 'should not call the worker' do
-        expect(UserSeenSubjectsWorker).to_not receive(:perform_async)
+        expect(UserSeenSubjectsGroupWorker).to_not receive(:perform_async)
         subject.update_seen_subjects
       end
     end
 
     it 'should not call the worker when subjects have been seen' do
       allow(subject).to receive(:subjects_are_unseen_by_user?).and_return(false)
-      expect(UserSeenSubjectsWorker).to_not receive(:perform_async)
+      expect(UserSeenSubjectsGroupWorker).to_not receive(:perform_async)
       subject.update_seen_subjects
     end
   end
