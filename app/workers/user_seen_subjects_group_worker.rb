@@ -6,8 +6,7 @@ class UserSeenSubjectsGroupWorker
   sidekiq_options(
     retry: 5,
     batch_flush_interval: 5,
-    queue: :data_high,
-    lock: :until_executed
+    batch_flush_size: 15
   )
 
   def perform(grouped_args)
