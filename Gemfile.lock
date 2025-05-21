@@ -448,6 +448,10 @@ GEM
       fugit (~> 1.8)
       globalid (>= 1.0.1)
       sidekiq (>= 6)
+    sidekiq-grouping (1.3.0)
+      activesupport
+      concurrent-ruby
+      sidekiq (>= 3.4.2)
     sidekiq-unique-jobs (7.1.33)
       brpoplpush-redis_script (> 0.1.1, <= 2.0.0)
       concurrent-ruby (~> 1.0, >= 1.0.5)
@@ -559,6 +563,7 @@ DEPENDENCIES
   sidekiq (< 7)
   sidekiq-congestion (~> 0.1.0)
   sidekiq-cron
+  sidekiq-grouping
   sidekiq-unique-jobs
   spring (~> 2.1.1)
   spring-commands-rspec
