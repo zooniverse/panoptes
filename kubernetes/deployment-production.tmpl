@@ -320,6 +320,10 @@ spec:
               command:
                 - /rails_app/scripts/docker/sidekiq_status
             initialDelaySeconds: 20
+          lifecycle:
+            preStop:
+              exec:
+              command: ["sidekiqctl", "quiet"]
           args: ["/rails_app/scripts/docker/start-sidekiq.sh"]
           env:
           - name: RAILS_MAX_THREADS
