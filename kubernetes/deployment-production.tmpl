@@ -322,7 +322,7 @@ spec:
           lifecycle:
             preStop:
               exec:
-              command: ["sidekiqctl", "quiet"]
+                command: ["sidekiqctl", "quiet"]
           args: ["/rails_app/scripts/docker/start-sidekiq.sh"]
           env:
           - name: RAILS_MAX_THREADS
