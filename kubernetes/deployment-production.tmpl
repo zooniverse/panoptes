@@ -296,7 +296,6 @@ metadata:
   labels:
     app: panoptes-production-sidekiq-dumpworker
 spec:
-  replicas: 2
   selector:
     matchLabels:
       app: panoptes-production-sidekiq-dumpworker
@@ -314,12 +313,16 @@ spec:
               cpu: "250m"
             limits:
               memory: "10000Mi"
-              cpu: "2000m"
+              cpu: "1000m"
           livenessProbe:
             exec:
               command:
                 - /rails_app/scripts/docker/sidekiq_status
             initialDelaySeconds: 20
+          lifecycle:
+            preStop:
+              exec:
+              command: ["sidekiqctl", "quiet"]
           args: ["/rails_app/scripts/docker/start-sidekiq.sh"]
           env:
           - name: RAILS_MAX_THREADS
@@ -409,19 +412,6 @@ spec:
         - name: jwt-production
           secret:
             secretName: panoptes-doorkeeper-jwt-production
----
-apiVersion: autoscaling/v1
-kind: HorizontalPodAutoscaler
-metadata:
-  name: panoptes-production-sidekiq
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: panoptes-production-sidekiq
-  minReplicas: 2
-  maxReplicas: 16
-  targetCPUUtilizationPercentage: 95
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget

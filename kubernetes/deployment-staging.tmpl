@@ -275,7 +275,6 @@ metadata:
   labels:
     app: panoptes-staging-sidekiq-dumpworker
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: panoptes-staging-sidekiq-dumpworker
@@ -299,6 +298,10 @@ spec:
               command:
                 - /rails_app/scripts/docker/sidekiq_status
             initialDelaySeconds: 20
+          lifecycle:
+            preStop:
+              exec:
+              command: ["sidekiqctl", "quiet"]
           args: ["/rails_app/scripts/docker/start-sidekiq.sh"]
           env:
           - name: SIDEKIQ_ARGS
@@ -384,19 +387,6 @@ spec:
         - name: jwt-staging
           secret:
             secretName: panoptes-doorkeeper-jwt-staging
----
-apiVersion: autoscaling/v1
-kind: HorizontalPodAutoscaler
-metadata:
-  name: panoptes-staging-sidekiq
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: panoptes-staging-sidekiq
-  minReplicas: 1
-  maxReplicas: 2
-  targetCPUUtilizationPercentage: 80
 ---
 kind: PersistentVolumeClaim
 apiVersion: v1
