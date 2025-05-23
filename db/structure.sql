@@ -138,41 +138,6 @@ CREATE TABLE public.ar_internal_metadata (
 
 
 --
--- Name: authorizations; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.authorizations (
-    id integer NOT NULL,
-    user_id integer,
-    provider character varying,
-    uid character varying,
-    token character varying,
-    expires_at timestamp without time zone,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
-);
-
-
---
--- Name: authorizations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.authorizations_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: authorizations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.authorizations_id_seq OWNED BY public.authorizations.id;
-
-
---
 -- Name: classification_subjects; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2011,13 +1976,6 @@ ALTER TABLE ONLY public.aggregations ALTER COLUMN id SET DEFAULT nextval('public
 
 
 --
--- Name: authorizations id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.authorizations ALTER COLUMN id SET DEFAULT nextval('public.authorizations_id_seq'::regclass);
-
-
---
 -- Name: classifications id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2375,14 +2333,6 @@ ALTER TABLE ONLY public.aggregations
 
 ALTER TABLE ONLY public.ar_internal_metadata
     ADD CONSTRAINT ar_internal_metadata_pkey PRIMARY KEY (key);
-
-
---
--- Name: authorizations authorizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.authorizations
-    ADD CONSTRAINT authorizations_pkey PRIMARY KEY (id);
 
 
 --
@@ -2809,13 +2759,6 @@ CREATE INDEX index_access_control_lists_on_user_group_id ON public.access_contro
 --
 
 CREATE INDEX index_aggregations_on_workflow_id ON public.aggregations USING btree (workflow_id);
-
-
---
--- Name: index_authorizations_on_user_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_authorizations_on_user_id ON public.authorizations USING btree (user_id);
 
 
 --
@@ -3962,14 +3905,6 @@ ALTER TABLE ONLY public.user_project_preferences
 
 
 --
--- Name: authorizations fk_rails_4ecef5b8c5; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.authorizations
-    ADD CONSTRAINT fk_rails_4ecef5b8c5 FOREIGN KEY (user_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
 -- Name: recents fk_rails_5244e2cc55; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4603,6 +4538,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20240216171653'),
 ('20240216171937'),
 ('20240304201959'),
-('20240531184258');
+('20240531184258'),
+('20250326191749');
 
 

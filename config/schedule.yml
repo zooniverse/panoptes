@@ -24,11 +24,6 @@ doorkeeper_access_cleaner_worker:
   class: "DoorkeeperAccessCleanerWorker"
   queue: "data_low"
   description: "Daily worker that cleans Doorkeeper access"
-emails_export_worker:
-  cron: "0 3 * * *"
-  class: "EmailsExportWorker"
-  queue: "data_medium"
-  description: "Daily worker that runs the email dump exporter. Runs every 3rd hour of the day."
 requeue_classifications_worker:
   cron: "*/15 * * * *"
   class: "RequeueClassificationsWorker"

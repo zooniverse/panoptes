@@ -3,6 +3,7 @@ ActionDispatch::Routing::Mapper.send :include, Routes::JsonApiRoutes
 # require 'sidekiq/web' via
 require 'sidekiq_unique_jobs/web'
 require 'sidekiq/cron/web'
+require 'sidekiq/grouping/web'
 
 Rails.application.routes.draw do
 
@@ -21,7 +22,7 @@ Rails.application.routes.draw do
   end
 
   devise_for :users,
-    controllers: { confirmations: 'confirmations', omniauth_callbacks: 'omniauth_callbacks', passwords: 'passwords' },
+    controllers: { confirmations: 'confirmations', passwords: 'passwords' },
     skip: [ :sessions, :registrations ]
 
   as :user do
