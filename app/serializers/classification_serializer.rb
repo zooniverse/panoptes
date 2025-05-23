@@ -7,6 +7,8 @@ class ClassificationSerializer
 
   can_include :project, :user, :user_group, :workflow
 
+  can_sort_by :created_at
+
   preload :subjects
 
   def self.page(params = {}, scope = nil, context = {})

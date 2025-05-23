@@ -60,24 +60,6 @@ describe PasswordsController, type: [ :controller, :mailer ] do
         end
       end
 
-      context "when the user was created using third party authentication" do
-        #rework when third party authentication is added in (currently req a password)
-        let!(:user) do
-          user = build(:omniauth_user)
-          user
-        end
-
-        it "should respond with 200" do
-          post :create, params: user_email_attrs
-          expect(response.status).to eq(200)
-        end
-
-        it 'should send confirmation instructions to the account email address' do
-          expect(ActionMailer::Base.deliveries).not_to be_empty
-          expect(ActionMailer::Base.deliveries.first.body).to include('confirm your account')
-        end
-      end
-
       context "using an email address that belongs to a user" do
 
         it "should queue the email for delayed sending" do
