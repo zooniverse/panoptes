@@ -7,8 +7,8 @@ class AggregationCompletedMailer < ApplicationMailer
     @user = User.find(agg.user_id)
     @email_to = @user.email
     base_url = ENV.fetch('AGGREGATION_STORAGE_BASE_URL', '')
-    @zip_url = "#{base_url}/#{agg.uuid}/#{agg.uuid}.zip"
-    @reductions_url = "#{base_url}/#{agg.uuid}/reductions.csv"
+    @zip_url = "#{base_url}/#{agg.uuid}/#{agg.workflow_id}_aggregation.zip"
+    @reductions_url = "#{base_url}/#{agg.uuid}/#{agg.workflow_id}_reductions.csv"
 
     @success = agg.completed?
     agg_status = @success ? 'was successful!' : 'failed'
