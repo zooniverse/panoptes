@@ -13,9 +13,9 @@ RSpec.describe AggregationCompletedMailer, type: :mailer do
     let(:mail) { described_class.aggregation_complete(aggregation) }
 
     context 'with a successful aggregation' do
-      let(:aggregation) { create(:aggregation, status: 'completed', uuid: 'asdf123asdf', workflow_id: 1) }
+      let(:aggregation) { create(:aggregation, status: 'completed', uuid: 'asdf123asdf') }
       let(:uuid) { aggregation.uuid }
-      let(:workflow_id) { aggregation.workflow_id }
+      let(:workflow) { aggregation.workflow }
 
       it 'mails the user' do
         expect(mail.to).to match_array([aggregation.user.email])
@@ -26,11 +26,11 @@ RSpec.describe AggregationCompletedMailer, type: :mailer do
       end
 
       it 'includes the zip file link' do
-        expect(mail.body.encoded).to include("#{base_url}/#{uuid}/#{workflow_id}_aggregation.zip")
+        expect(mail.body.encoded).to include("#{base_url}/#{uuid}/#{workflow.id}_aggregation.zip")
       end
 
       it 'includes the reductions file link' do
-        expect(mail.body.encoded).to include("#{base_url}/#{uuid}/#{workflow_id}_reductions.csv")
+        expect(mail.body.encoded).to include("#{base_url}/#{uuid}/#{workflow.id}_reductions.csv")
       end
 
       it 'comes from no-reply@zooniverse.org' do
