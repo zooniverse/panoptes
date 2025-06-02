@@ -2734,6 +2734,13 @@ CREATE UNIQUE INDEX idx_lower_email ON public.users USING btree (lower((email)::
 
 
 --
+-- Name: idx_subjects_project_id_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_subjects_project_id_id ON public.subjects USING btree (project_id, id);
+
+
+--
 -- Name: idx_translations_on_translated_type+id_and_language; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4539,6 +4546,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20240216171937'),
 ('20240304201959'),
 ('20240531184258'),
-('20250326191749');
+('20250326191749'),
+('20250530191528');
 
 
