@@ -1,4 +1,4 @@
-# app/workers/requeue_export_job_worker.rb
+# frozen_string_literal: true
 require 'sidekiq-status'
 require 'sidekiq/api'
 

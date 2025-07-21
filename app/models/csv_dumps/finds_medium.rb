@@ -27,7 +27,7 @@ module CsvDumps
 
     def load_medium
       m = Medium.find(medium_id)
-      metadata = m.metadata.merge("state" => "creating", "job_id" => job_id)
+      metadata = m.metadata.merge('state' => 'creating', 'job_id' => job_id)
       m.update!(
         path_opts: resource_file_path,
         private: true,

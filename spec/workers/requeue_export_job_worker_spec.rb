@@ -1,3 +1,4 @@
+# frozen_string_literal: true
 require 'spec_helper'
 require 'sidekiq-status'
 require 'sidekiq/api'
@@ -30,23 +31,24 @@ RSpec.describe RequeueExportJobWorker, type: :worker do
     context 'with uncompleted export media' do
       before do
         create_list(:medium, 2, type: export_type, metadata: { 'state' => 'creating' }, content_type: 'text/csv')
+        allow(worker).to receive(:process_media_status)
       end
 
       it 'calls process_media_status for each record' do
-        expect(worker).to receive(:process_media_status).twice
         worker.perform
+        expect(worker).to have_received(:process_media_status).twice
       end
     end
   end
 
   describe '#process_media_status' do
-    subject { worker.send(:process_media_status, media) }
+    subject(:process_media_status_call) { worker.send(:process_media_status, media) }
 
     context 'when metadata has no job_id' do
       let(:metadata) { { 'state' => 'creating' } }
 
       it 'marks media as failed' do
-        subject
+        process_media_status_call
         expect(media.reload.metadata['state']).to eq(RequeueExportJobWorker::STATE_FAILED)
       end
     end
@@ -59,22 +61,23 @@ RSpec.describe RequeueExportJobWorker, type: :worker do
       end
 
       it 'marks media as completed' do
-        subject
+        process_media_status_call
         expect(media.reload.metadata['state']).to eq(RequeueExportJobWorker::STATE_COMPLETED)
       end
     end
 
     context 'when job failed and requeue succeeds' do
       let(:metadata) { { 'state' => 'failed', 'job_id' => 'jid456' } }
-      let(:retry_job) { double('job', requeue: true) }
+      let(:retry_job) { instance_double(Sidekiq::SortedEntry, add_to_queue: true) }
+      let(:fake_retry_set) { instance_double(Sidekiq::RetrySet, find_job: retry_job) }
 
       before do
         allow(Sidekiq::Status).to receive(:status).with('jid456').and_return(:failed)
-        allow(retry_set).to receive(:find_job).with('jid456').and_return(retry_job)
+        allow(Sidekiq::RetrySet).to receive(:new).and_return(fake_retry_set)
       end
 
       it 'marks media as requeued' do
-        subject
+        process_media_status_call
         expect(media.reload.metadata['state']).to eq(RequeueExportJobWorker::STATE_REQUEUED)
       end
     end
@@ -89,7 +92,7 @@ RSpec.describe RequeueExportJobWorker, type: :worker do
       end
 
       it 'marks media as failed and clears job_id' do
-        subject
+        process_media_status_call
         reloaded = media.reload.metadata
         expect(reloaded['state']).to eq(RequeueExportJobWorker::STATE_FAILED)
         expect(reloaded['job_id']).to be_nil
@@ -104,22 +107,23 @@ RSpec.describe RequeueExportJobWorker, type: :worker do
       end
 
       it 'does not change state' do
-        subject
+        process_media_status_call
         expect(media.reload.metadata['state']).to eq('creating')
       end
     end
 
     context 'when status is nil and job found via RetrySet' do
       let(:metadata) { { 'state' => 'creating', 'job_id' => 'jid202' } }
-      let(:retry_job) { double('job', requeue: true) }
+      let(:retry_job) { instance_double(Sidekiq::SortedEntry, add_to_queue: true) }
+      let(:fake_retry_set) { instance_double(Sidekiq::RetrySet, find_job: retry_job) }
 
       before do
         allow(Sidekiq::Status).to receive(:status).with('jid202').and_return(nil)
-        allow(retry_set).to receive(:find_job).with('jid202').and_return(retry_job)
+        allow(Sidekiq::RetrySet).to receive(:new).and_return(fake_retry_set)
       end
 
-      it 'requeues and leaves state unchanged' do
-        subject
+      it 'requeues and leaves state as before' do
+        process_media_status_call
         expect(media.reload.metadata['state']).to eq('creating')
       end
     end
@@ -134,7 +138,7 @@ RSpec.describe RequeueExportJobWorker, type: :worker do
       end
 
       it 'marks media as completed' do
-        subject
+        process_media_status_call
         expect(media.reload.metadata['state']).to eq(RequeueExportJobWorker::STATE_COMPLETED)
       end
     end
