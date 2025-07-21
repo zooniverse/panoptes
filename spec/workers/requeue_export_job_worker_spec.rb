@@ -30,7 +30,7 @@ RSpec.describe RequeueExportJobWorker, type: :worker do
 
     context 'with uncompleted export media' do
       before do
-        create_list(:medium, 2, type: export_type, metadata: { 'state' => 'creating' }, content_type: 'text/csv')
+        create_list(:medium, 2, type: export_type, metadata: { 'state' => 'creating' }, content_type: 'text/csv', created_at: 2.days.ago)
         allow(worker).to receive(:process_media_status)
       end
 

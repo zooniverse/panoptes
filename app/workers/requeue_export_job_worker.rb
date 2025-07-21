@@ -8,6 +8,12 @@ class RequeueExportJobWorker
 
   sidekiq_options queue: :dumpworker
 
+  EXPIRATION_PERIODS = {
+    'workflow_classifications_export' => 36.hours,
+  }
+
+  DEFAULT_EXPIRATION = 24.hours
+
   EXPORT_MEDIA_TYPES = %w[
     project_aggregations_export
     project_classifications_export
@@ -33,6 +39,9 @@ class RequeueExportJobWorker
 
     Rails.logger.info "Found #{export_media.count} uncompleted export media to check."
     export_media.find_each do |media|
+      Rails.logger.info "Media ID #{media.id} expired: #{expired?(media)}"
+      next unless expired?(media)
+
       process_media_status(media)
     end
 
@@ -40,7 +49,7 @@ class RequeueExportJobWorker
   end
 
   private
-  
+
   def process_media_status(media)
     Rails.logger.info "Processing Media ID: #{media.id}, Type: #{media.type}, Current State: #{media.metadata&.[]('state')}"
 
@@ -165,5 +174,13 @@ class RequeueExportJobWorker
       return false
     end
     true
+  end
+
+  def expiration_period_for(media)
+    EXPIRATION_PERIODS.fetch(media.type, DEFAULT_EXPIRATION)
+  end
+
+  def expired?(media)
+    media.created_at < expiration_period_for(media).ago
   end
 end
