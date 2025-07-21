@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+
 require 'sidekiq-status'
 require 'sidekiq/api'
 
@@ -14,11 +15,11 @@ class RequeueExportJobWorker
     project_workflow_contents_export
     project_workflows_export
     workflow_classifications_export
-  ].freeze
+  ]
 
-  STATE_COMPLETED = 'completed'.freeze
-  STATE_FAILED    = 'failed'.freeze
-  STATE_REQUEUED  = 'requeued'.freeze
+  STATE_COMPLETED = 'completed'
+  STATE_FAILED    = 'failed'
+  STATE_REQUEUED  = 'requeued'
 
   def perform
     Rails.logger.info 'Starting RequeueExportJobWorker to check export statuses.'
@@ -39,6 +40,7 @@ class RequeueExportJobWorker
   end
 
   private
+  
   def process_media_status(media)
     Rails.logger.info "Processing Media ID: #{media.id}, Type: #{media.type}, Current State: #{media.metadata&.[]('state')}"
 
