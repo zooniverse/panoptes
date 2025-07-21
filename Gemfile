@@ -86,3 +86,5 @@ group :test do
   gem 'spring-commands-rspec'
   gem 'webmock'
 end
+
+gem "sidekiq-status", "~> 3.0"
