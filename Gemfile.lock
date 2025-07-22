@@ -478,7 +478,7 @@ GEM
       activesupport
       colorize (>= 0.8.1)
       rest-client (>= 2.0.2)
-    thor (1.3.0)
+    thor (1.4.0)
     timeout (0.4.3)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
