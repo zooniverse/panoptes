@@ -1,7 +1,9 @@
 require 'csv'
+require 'sidekiq-status'
 
 class SubjectsDumpWorker
   include Sidekiq::Worker
+  include Sidekiq::Status::Worker
   include RateLimitDumpWorker
 
   sidekiq_options queue: ENV.fetch('DUMP_WORKER_SIDEKIQ_QUEUE', 'data_high').to_sym
@@ -12,7 +14,7 @@ class SubjectsDumpWorker
     raise ApiErrors::FeatureDisabled unless Flipper.enabled?(:dump_worker_exports)
 
     if @resource = CsvDumps::FindsDumpResource.find(resource_type, resource_id)
-      @medium = CsvDumps::FindsMedium.new(medium_id, @resource, dump_target).medium
+      @medium = CsvDumps::FindsMedium.new(medium_id, @resource, dump_target, jid).medium
       scope = get_scope(resource)
       @processor = CsvDumps::DumpProcessor.new(formatter, scope, medium)
       @processor.execute
