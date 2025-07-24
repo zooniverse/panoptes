@@ -9,8 +9,8 @@ class RequeueExportJobWorker
   sidekiq_options queue: :dumpworker
 
   EXPIRATION_PERIODS = {
-    'workflow_classifications_export' => 36.hours,
-  }
+    'workflow_classifications_export' => 36.hours
+  }.freeze
 
   DEFAULT_EXPIRATION = 24.hours
 
@@ -21,7 +21,7 @@ class RequeueExportJobWorker
     project_workflow_contents_export
     project_workflows_export
     workflow_classifications_export
-  ]
+  ].freeze
 
   STATE_COMPLETED = 'completed'
   STATE_FAILED    = 'failed'
@@ -30,7 +30,7 @@ class RequeueExportJobWorker
   def perform
     Rails.logger.info 'Starting RequeueExportJobWorker to check export statuses.'
 
-    export_media = Medium.where(type: EXPORT_MEDIA_TYPES).where("metadata ->> 'state' IN (?)", %w[creating requeued failed interrupted])
+    export_media = fetch_uncompleted_exports
 
     if export_media.empty?
       Rails.logger.info 'No uncompleted export media found to process.'
@@ -38,30 +38,34 @@ class RequeueExportJobWorker
     end
 
     Rails.logger.info "Found #{export_media.count} uncompleted export media to check."
-    export_media.find_each do |media|
-      Rails.logger.info "Media ID #{media.id} expired: #{expired?(media)}"
-      next unless expired?(media)
-
-      process_media_status(media)
-    end
-
+    export_media.find_each { |media| process_if_expired(media) }
     Rails.logger.info 'Finished RequeueExportJobWorker.'
   end
 
   private
+
+  def fetch_uncompleted_exports
+    Medium.where(type: EXPORT_MEDIA_TYPES)
+          .where("metadata ->> 'state' IN (?)", %w[creating requeued failed interrupted])
+  end
+
+  def process_if_expired(media)
+    Rails.logger.info "Media ID #{media.id} expired: #{expired?(media)}"
+    process_media_status(media) if expired?(media)
+  end
 
   def process_media_status(media)
     Rails.logger.info "Processing Media ID: #{media.id}, Type: #{media.type}, Current State: #{media.metadata&.[]('state')}"
 
     metadata = media.metadata.is_a?(Hash) ? media.metadata : {}
 
-    if metadata['job_id'].blank?
-      Rails.logger.warn "Media ID #{media.id} has no 'job_id' in its metadata. Marking as '#{STATE_FAILED}'."
-      update_media_metadata(media, state: STATE_FAILED)
+    target_job_id = metadata['job_id']
+
+    if target_job_id.blank?
+      handle_missing_job_id(media)
       return
     end
 
-    target_job_id = metadata['job_id']
     Rails.logger.info "Checking status for job_id: #{target_job_id} linked to Media ID: #{media.id}"
 
     job_status = Sidekiq::Status.status(target_job_id)
@@ -72,25 +76,11 @@ class RequeueExportJobWorker
       Rails.logger.info "Job #{target_job_id} is complete. Marking media ID #{media.id} as '#{STATE_COMPLETED}'."
       update_media_metadata(media, state: STATE_COMPLETED)
     when :failed, :interrupted, :retrying
-      Rails.logger.warn 'Job failed or was interrupted. Attempting to requeue.'
-      if requeue_sidekiq_job(target_job_id)
-        Rails.logger.info "Job #{target_job_id} successfully requeued. Updating state to '#{STATE_REQUEUED}'."
-        update_media_metadata(media, state: STATE_REQUEUED)
-      else
-        Rails.logger.error "Failed to requeue job #{target_job_id}. Marking as '#{STATE_FAILED}'."
-        update_media_metadata(media, state: STATE_FAILED, job_id: nil)
-      end
+      attempt_requeue(media, target_job_id)
     when :queued, :working, :scheduled
       Rails.logger.info "Job #{target_job_id} is still active (#{job_status})."
     when nil
-      Rails.logger.warn "Sidekiq::Status returned nil for job #{target_job_id}. Attempting to find via Sidekiq::API."
-
-      found_via_api = find_and_requeue_via_sidekiq_api(target_job_id, media)
-
-      unless found_via_api
-        Rails.logger.warn "Job #{target_job_id} not found in any Sidekiq sets. Assuming complete and marking '#{STATE_COMPLETED}'."
-        update_media_metadata(media, state: STATE_COMPLETED)
-      end
+      handle_nil_status(media, target_job_id)
     else
       Rails.logger.warn "Unknown Sidekiq::Status for job #{target_job_id}: #{job_status}. Skipping."
     end
@@ -113,56 +103,24 @@ class RequeueExportJobWorker
   # If found in retry/dead, it attempts to requeue it.
   # Returns true if the job is found in any active Sidekiq state, false otherwise.
   def find_and_requeue_via_sidekiq_api(job_id, media)
-    Sidekiq::Queue.all.each do |queue|
-      job = queue.find { |j| j.jid == job_id }
-      if job
-        Rails.logger.info "Job #{job_id} found in queue '#{queue.name}'. Active. Media ID: #{media.id}"
-        return true
-      end
-    end
-
-    retry_set = Sidekiq::RetrySet.new
-    retry_job_object = retry_set.find_job(job_id)
-    if retry_job_object
-      Rails.logger.info "Job #{job_id} found in RetrySet. Requeuing."
-      perform_requeue_action(retry_job_object, job_id, 'RetrySet')
-      return true
-    end
-
-    dead_set = Sidekiq::DeadSet.new
-    dead_job_object = dead_set.find_job(job_id)
-    if dead_job_object
-      Rails.logger.info "Job #{job_id} found in DeadSet. Requeuing."
-      perform_requeue_action(dead_job_object, job_id, 'DeadSet')
-      return true
-    end
-
+    return true if any_queue_contains?(job_id)
+    return true if perform_requeue_action(Sidekiq::RetrySet.new, job_id)
+    return true if perform_requeue_action(Sidekiq::DeadSet.new, job_id)
     false
   end
 
   def requeue_sidekiq_job(job_id)
     Rails.logger.debug "Attempting to requeue job: #{job_id} from direct call."
-
-    retry_set = Sidekiq::RetrySet.new
-    job_in_retry = retry_set.find_job(job_id)
-
-    if job_in_retry
-      perform_requeue_action(job_in_retry, job_id, 'RetrySet')
-      return true
-    end
-
-    dead_set = Sidekiq::DeadSet.new
-    job_in_dead_set_object = dead_set.find_job(job_id)
-
-    if job_in_dead_set_object
-      perform_requeue_action(job_in_dead_set_object, job_id, 'DeadSet')
-      return true
-    end
-
+    return true if perform_requeue_action(Sidekiq::RetrySet.new, job_id)
+    return true if perform_requeue_action(Sidekiq::DeadSet.new, job_id)
     false
   end
 
-  def perform_requeue_action(job_object, job_id, source_set_name)
+  def perform_requeue_action(set, job_id)
+    job_object = set.find_job(job_id)
+    return false unless job_object
+
+    source_set_name = set.class.name
     if job_object.respond_to?(:requeue)
       Rails.logger.debug "Using 'requeue' method for job #{job_id} from #{source_set_name}."
       job_object.requeue
@@ -182,5 +140,43 @@ class RequeueExportJobWorker
 
   def expired?(media)
     media.created_at < expiration_period_for(media).ago
+  end
+
+  def handle_missing_job_id(media)
+    Rails.logger.warn "Media ID #{media.id} has no 'job_id' in its metadata. Marking as '#{STATE_FAILED}'."
+    update_media_metadata(media, state: STATE_FAILED)
+  end
+
+  def attempt_requeue(media, job_id)
+    Rails.logger.warn 'Job failed or was interrupted. Attempting to requeue.'
+    if requeue_sidekiq_job(job_id)
+      Rails.logger.info "Job #{job_id} successfully requeued. Updating state to '#{STATE_REQUEUED}'."
+      update_media_metadata(media, state: STATE_REQUEUED)
+    else
+      Rails.logger.error "Failed to requeue job #{job_id}. Marking as '#{STATE_FAILED}'."
+      update_media_metadata(media, state: STATE_FAILED, job_id: nil)
+    end
+  end
+
+  def handle_nil_status(media, job_id)
+    Rails.logger.warn "Sidekiq::Status returned nil for job #{job_id}. Attempting to find via Sidekiq::API."
+
+    found_via_api = find_and_requeue_via_sidekiq_api(job_id, media)
+
+    unless found_via_api
+      Rails.logger.warn "Job #{job_id} not found in any Sidekiq sets. Assuming complete and marking '#{STATE_COMPLETED}'."
+      update_media_metadata(media, state: STATE_COMPLETED)
+    end
+  end
+
+  def any_queue_contains?(job_id)
+    Sidekiq::Queue.all.each do |queue|
+      job = queue.find { |j| j.jid == job_id }
+      if job
+        Rails.logger.info "Job #{job_id} found in queue '#{queue.name}'. Active. Media ID: #{media.id}"
+        return true
+      end
+    end
+    return false
   end
 end
