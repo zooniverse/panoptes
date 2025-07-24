@@ -102,17 +102,22 @@ class RequeueExportJobWorker
   # Checks all Sidekiq sets (queues, retry, scheduled, dead) for a job.
   # If found in retry/dead, it attempts to requeue it.
   # Returns true if the job is found in any active Sidekiq state, false otherwise.
-  def find_and_requeue_via_sidekiq_api(job_id, media)
+  def find_and_requeue_via_sidekiq_api(job_id)
     return true if any_queue_contains?(job_id)
+
     return true if perform_requeue_action(Sidekiq::RetrySet.new, job_id)
+
     return true if perform_requeue_action(Sidekiq::DeadSet.new, job_id)
+
     false
   end
 
   def requeue_sidekiq_job(job_id)
     Rails.logger.debug "Attempting to requeue job: #{job_id} from direct call."
     return true if perform_requeue_action(Sidekiq::RetrySet.new, job_id)
+
     return true if perform_requeue_action(Sidekiq::DeadSet.new, job_id)
+
     false
   end
 
@@ -161,12 +166,10 @@ class RequeueExportJobWorker
   def handle_nil_status(media, job_id)
     Rails.logger.warn "Sidekiq::Status returned nil for job #{job_id}. Attempting to find via Sidekiq::API."
 
-    found_via_api = find_and_requeue_via_sidekiq_api(job_id, media)
+    return if find_and_requeue_via_sidekiq_api(job_id)
 
-    unless found_via_api
-      Rails.logger.warn "Job #{job_id} not found in any Sidekiq sets. Assuming complete and marking '#{STATE_COMPLETED}'."
-      update_media_metadata(media, state: STATE_COMPLETED)
-    end
+    Rails.logger.warn "Job #{job_id} not found in any Sidekiq sets. Assuming complete and marking '#{STATE_COMPLETED}'."
+    update_media_metadata(media, state: STATE_COMPLETED)
   end
 
   def any_queue_contains?(job_id)
@@ -177,6 +180,6 @@ class RequeueExportJobWorker
         return true
       end
     end
-    return false
+    false
   end
 end
