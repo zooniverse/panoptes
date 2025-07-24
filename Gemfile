@@ -51,6 +51,7 @@ gem 'sidekiq', '< 7'
 gem 'sidekiq-congestion', '~> 0.1.0'
 gem 'sidekiq-cron'
 gem 'sidekiq-grouping'
+gem 'sidekiq-status', '~> 3.0'
 gem 'sidekiq-unique-jobs'
 gem 'standby'
 gem 'stringex', '~> 2.8'
@@ -87,4 +88,3 @@ group :test do
   gem 'webmock'
 end
 
-gem "sidekiq-status", "~> 3.0"
