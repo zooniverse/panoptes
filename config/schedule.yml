@@ -30,7 +30,7 @@ requeue_classifications_worker:
   queue: "data_medium"
   description: "Queues ClassificationWorker on any non-lifecycles classifications found. Runs every 15 minutes."
 requeue_export_job_worker:
-  cron: "0 0 * * *"
+  cron: "0 0,12 * * *"
   class: "RequeueExportJobWorker"
   queue: "data_medium"
   description: "Checks, updates and requeues export jobs"
