@@ -1,7 +1,6 @@
-# frozen_string_literal: true
+# spec/workers/requeue_export_job_worker_spec.rb
 
 require 'spec_helper'
-require 'sidekiq-status'
 require 'sidekiq/api'
 
 RSpec.describe RequeueExportJobWorker, type: :worker do
@@ -9,21 +8,25 @@ RSpec.describe RequeueExportJobWorker, type: :worker do
   let(:export_type) { described_class::EXPORT_MEDIA_TYPES.first }
   let(:metadata) { {} }
   let(:media) { create(:medium, type: export_type, metadata: metadata, content_type: 'text/csv') }
-
+  let(:scheduled_set) { instance_double(Sidekiq::ScheduledSet) }
   let(:retry_set) { instance_double(Sidekiq::RetrySet) }
-  let(:dead_set)  { instance_double(Sidekiq::DeadSet) }
+  let(:dead_set) { instance_double(Sidekiq::DeadSet) }
 
   before do
-    allow(Sidekiq::Queue).to receive(:all).and_return([])
+    allow(Sidekiq::ScheduledSet).to receive(:new).and_return(scheduled_set)
     allow(Sidekiq::RetrySet).to receive(:new).and_return(retry_set)
     allow(Sidekiq::DeadSet).to receive(:new).and_return(dead_set)
 
+    allow(scheduled_set).to receive(:find_job).and_return(nil)
+    allow(retry_set).to receive(:find_job).and_return(nil)
     allow(dead_set).to receive(:find_job).and_return(nil)
+
+    allow(Sidekiq::Queue).to receive(:all).and_return([])
   end
 
   describe '#perform' do
     context 'when no export media exists' do
-      it 'logs and returns nil' do
+      it 'returns nil' do
         allow(Medium).to receive(:where).and_return(Medium.none)
         expect(worker.perform).to be_nil
       end
@@ -31,7 +34,14 @@ RSpec.describe RequeueExportJobWorker, type: :worker do
 
     context 'with uncompleted export media' do
       before do
-        create_list(:medium, 2, type: export_type, metadata: { 'state' => 'creating' }, content_type: 'text/csv', created_at: 2.days.ago)
+        create_list(
+          :medium,
+          2,
+          type: export_type,
+          metadata: { 'state' => 'creating' },
+          content_type: 'text/csv',
+          created_at: 2.days.ago
+        )
         allow(worker).to receive(:process_media_status)
       end
 
@@ -43,104 +53,96 @@ RSpec.describe RequeueExportJobWorker, type: :worker do
   end
 
   describe '#process_media_status' do
-    subject(:process_media_status_call) { worker.send(:process_media_status, media) }
+    subject { worker.send(:process_media_status, media) }
 
     context 'when metadata has no job_id' do
       let(:metadata) { { 'state' => 'creating' } }
 
-      it 'marks media as failed' do
-        process_media_status_call
-        expect(media.reload.metadata['state']).to eq(RequeueExportJobWorker::STATE_FAILED)
+      it 'returns immediately and does not touch metadata' do
+        expect { subject }.not_to change { media.reload.metadata }
       end
     end
 
-    context 'when Sidekiq status is :complete' do
-      let(:metadata) { { 'state' => 'creating', 'job_id' => 'jid123' } }
+    context 'when job is in the scheduled set' do
+      let(:metadata) { { 'state' => 'creating', 'job_id' => 'jid_scheduled' } }
 
       before do
-        allow(Sidekiq::Status).to receive(:status).with('jid123').and_return(:complete)
+        allow(scheduled_set).to receive(:find_job).with('jid_scheduled').and_return(double)
+        allow(worker).to receive(:requeue_from_media)
       end
 
-      it 'marks media as completed' do
-        process_media_status_call
-        expect(media.reload.metadata['state']).to eq(RequeueExportJobWorker::STATE_COMPLETED)
+      it 'does not requeue or change state' do
+        subject
+        expect(worker).not_to have_received(:requeue_from_media)
+        expect(media.reload.metadata['state']).to eq('creating')
       end
     end
 
-    context 'when job failed and requeue succeeds' do
-      let(:metadata) { { 'state' => 'failed', 'job_id' => 'jid456' } }
-      let(:retry_job) { instance_double(Sidekiq::SortedEntry, add_to_queue: true) }
-      let(:fake_retry_set) { instance_double(Sidekiq::RetrySet, find_job: retry_job) }
+    context 'when job is in the retry set' do
+      let(:metadata) { { 'state' => 'creating', 'job_id' => 'jid_retry' } }
 
       before do
-        allow(Sidekiq::Status).to receive(:status).with('jid456').and_return(:failed)
-        allow(Sidekiq::RetrySet).to receive(:new).and_return(fake_retry_set)
+        allow(retry_set).to receive(:find_job).with('jid_retry').and_return(double)
+        allow(worker).to receive(:requeue_from_media)
       end
 
-      it 'marks media as requeued' do
-        process_media_status_call
-        expect(media.reload.metadata['state']).to eq(RequeueExportJobWorker::STATE_REQUEUED)
+      it 'does not requeue or change state' do
+        subject
+        expect(worker).not_to have_received(:requeue_from_media)
+        expect(media.reload.metadata['state']).to eq('creating')
       end
     end
 
-    context 'when job failed and requeue fails' do
-      let(:metadata) { { 'state' => 'failed', 'job_id' => 'jid789' } }
+    context 'when job is in the dead set' do
+      let(:metadata) { { 'state' => 'creating', 'job_id' => 'jid_dead' } }
 
       before do
-        allow(Sidekiq::Status).to receive(:status).with('jid789').and_return(:failed)
-        allow(retry_set).to receive(:find_job).with('jid789').and_return(nil)
-        allow(dead_set).to receive(:find_job).with('jid789').and_return(nil)
+        allow(dead_set).to receive(:find_job).with('jid_dead').and_return(double)
+        allow(worker).to receive(:update_media_metadata).and_call_original
       end
 
-      it 'marks media as failed and clears job_id' do
-        process_media_status_call
-        reloaded = media.reload.metadata
-        expect(reloaded['state']).to eq(RequeueExportJobWorker::STATE_FAILED)
-        expect(reloaded['job_id']).to be_nil
+      it 'delegates to update_media_metadata with STATE_FAILED' do
+        subject
+        expect(worker).to have_received(:update_media_metadata)
+          .with(media, RequeueExportJobWorker::STATE_FAILED)
       end
     end
 
-    context 'when job is still active' do
-      let(:metadata) { { 'state' => 'creating', 'job_id' => 'jid101' } }
+    context 'when the job is already in an active queue' do
+      let(:metadata) { { 'state' => 'creating', 'job_id' => 'jid_active' } }
+      let(:fake_queue) { double('queue', name: 'dumpworker', any?: true) }
 
       before do
-        allow(Sidekiq::Status).to receive(:status).with('jid101').and_return(:working)
+        allow(Sidekiq::Queue).to receive(:all).and_return([fake_queue])
+        allow(worker).to receive(:requeue_from_media)
+      end
+
+      it 'does not requeue or change state' do
+        subject
+        expect(worker).not_to have_received(:requeue_from_media)
+        expect(media.reload.metadata['state']).to eq('creating')
+      end
+    end
+
+    context 'when not found in scheduled, retry, dead and all queues' do
+      let(:metadata) { { 'state' => 'creating', 'job_id' => 'jid_requeue' } }
+
+      before do
+        media.update!(type: 'project_subjects_export')
+        allow(media).to receive(:path_opts).and_return([nil, 123])
+        allow(worker).to receive(:get_media_owner).and_return(double(id: 9))
+        allow(SubjectsDumpWorker).to receive(:perform_async)
+      end
+
+      it 'calls perform_async on the mapped worker with correct args' do
+        subject
+        expect(SubjectsDumpWorker).to have_received(:perform_async)
+          .with(123, media.linked_type.downcase, media.id, 9)
       end
 
       it 'does not change state' do
-        process_media_status_call
+        subject
         expect(media.reload.metadata['state']).to eq('creating')
-      end
-    end
-
-    context 'when status is nil and job found via RetrySet' do
-      let(:metadata) { { 'state' => 'creating', 'job_id' => 'jid202' } }
-      let(:retry_job) { instance_double(Sidekiq::SortedEntry, add_to_queue: true) }
-      let(:fake_retry_set) { instance_double(Sidekiq::RetrySet, find_job: retry_job) }
-
-      before do
-        allow(Sidekiq::Status).to receive(:status).with('jid202').and_return(nil)
-        allow(Sidekiq::RetrySet).to receive(:new).and_return(fake_retry_set)
-      end
-
-      it 'requeues and leaves state as before' do
-        process_media_status_call
-        expect(media.reload.metadata['state']).to eq('creating')
-      end
-    end
-
-    context 'when status is nil and job not found in any set' do
-      let(:metadata) { { 'state' => 'creating', 'job_id' => 'jid303' } }
-
-      before do
-        allow(Sidekiq::Status).to receive(:status).with('jid303').and_return(nil)
-        allow(retry_set).to receive(:find_job).with('jid303').and_return(nil)
-        allow(dead_set).to receive(:find_job).with('jid303').and_return(nil)
-      end
-
-      it 'marks media as completed' do
-        process_media_status_call
-        expect(media.reload.metadata['state']).to eq(RequeueExportJobWorker::STATE_COMPLETED)
       end
     end
   end

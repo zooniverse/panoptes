@@ -1,9 +1,7 @@
 require 'csv'
-require 'sidekiq-status'
 
 class SubjectsDumpWorker
   include Sidekiq::Worker
-  include Sidekiq::Status::Worker
   include RateLimitDumpWorker
 
   sidekiq_options queue: ENV.fetch('DUMP_WORKER_SIDEKIQ_QUEUE', 'data_high').to_sym
