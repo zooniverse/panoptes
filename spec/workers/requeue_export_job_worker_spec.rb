@@ -104,7 +104,7 @@ RSpec.describe RequeueExportJobWorker, type: :worker do
       it 'delegates to update_media_metadata with STATE_FAILED' do
         invoke_process_media_status
         expect(worker).to have_received(:update_media_metadata)
-          .with(media, RequeueExportJobWorker::STATE_FAILED)
+          .with(media, state: RequeueExportJobWorker::STATE_FAILED)
       end
     end
 
@@ -124,7 +124,23 @@ RSpec.describe RequeueExportJobWorker, type: :worker do
       end
     end
 
-    context 'when not found in scheduled, retry, dead and all queues' do
+    context 'when metadata specifies recipients' do
+      let(:metadata) { { 'state' => 'creating', 'job_id' => 'jid_requeue', 'recipients' => [789] } }
+
+      before do
+        media.update!(type: 'project_subjects_export')
+        allow(media).to receive(:path_opts).and_return([nil, 123])
+        allow(SubjectsDumpWorker).to receive(:perform_async)
+      end
+
+      it 'uses the first recipient id instead of owner id' do
+        invoke_process_media_status
+        expect(SubjectsDumpWorker).to have_received(:perform_async)
+          .with(123, media.linked_type.downcase, media.id, 789)
+      end
+    end
+
+    context 'when nothing found (scheduled/retry/dead/queues) and a mapping exists' do
       let(:metadata) { { 'state' => 'creating', 'job_id' => 'jid_requeue' } }
 
       before do

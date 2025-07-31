@@ -49,7 +49,7 @@ class RequeueExportJobWorker
     return if find_job_in_set?(Sidekiq::RetrySet.new, target_job_id)
 
     if find_job_in_set?(Sidekiq::DeadSet.new, target_job_id)
-      update_media_metadata(media, STATE_FAILED)
+      update_media_metadata(media, state: STATE_FAILED)
       return
     end
 
@@ -99,7 +99,9 @@ class RequeueExportJobWorker
     if worker
       id = media.path_opts[1]
       owner = get_media_owner(media)
-      worker.perform_async(id, media.linked_type.downcase, media.id, owner.id)
+      recipients = media.metadata['recipients']
+      recipient_id = (recipients.is_a?(Array) && recipients.any? ? recipients.first : owner.id)
+      worker.perform_async(id, media.linked_type.downcase, media.id, recipient_id)
     else
       Rails.logger.error "No worker for #{media.id}"
     end
