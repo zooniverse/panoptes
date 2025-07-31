@@ -29,13 +29,7 @@ class RequeueExportJobWorker
   STATE_REQUEUED = 'requeued'
 
   def perform
-    export_media = fetch_uncompleted_exports
-
-    if export_media.empty?
-      return
-    end
-
-    export_media.find_each { |media| process_media_status(media) }
+    fetch_uncompleted_exports.find_each { |media| process_media_status(media) }
   end
 
   private
@@ -45,16 +39,13 @@ class RequeueExportJobWorker
           .where("metadata ->> 'state' = 'creating'")
   end
 
-
   def process_media_status(media)
     metadata = media.metadata.is_a?(Hash) ? media.metadata : {}
 
     target_job_id = metadata['job_id']
 
     return if target_job_id.blank?
-
     return if find_job_in_set?(Sidekiq::ScheduledSet.new, target_job_id)
-
     return if find_job_in_set?(Sidekiq::RetrySet.new, target_job_id)
 
     if find_job_in_set?(Sidekiq::DeadSet.new, target_job_id)
@@ -63,7 +54,6 @@ class RequeueExportJobWorker
     end
 
     return if any_queue_contains?(target_job_id)
-
 
     requeue_from_media(media)
   rescue StandardError => e
@@ -89,6 +79,7 @@ class RequeueExportJobWorker
   def find_job_in_set?(set, job_id)
     job_object = set.find_job(job_id)
     return false unless job_object
+
     job_object
   end
 
