@@ -199,7 +199,7 @@ spec:
               exec:
                 command: ["/bin/bash", "-c", "cp -Ru /rails_app/public/* /static-assets"]
         - name: panoptes-production-nginx
-          image: zooniverse/nginx
+          image: ghcr.io/zooniverse/docker-nginx
           resources:
             requests:
               memory: "50Mi"
