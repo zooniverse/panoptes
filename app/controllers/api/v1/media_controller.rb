@@ -14,6 +14,7 @@ class Api::V1::MediaController < Api::ApiController
     avatar: :avatar,
     background: :background,
     attached_images: :attached_images,
+    attached_media: :attached_media
     classifications_export: :classifications_export,
     subjects_export: :subjects_export,
     workflows_export: :workflows_export,
