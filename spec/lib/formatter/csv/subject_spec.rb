@@ -69,6 +69,17 @@ RSpec.describe Formatter::Csv::Subject do
       expect(result).to match_array(expected)
     end
 
+    context "with SubjectDumpCache provided" do
+      let(:cache) { SubjectDumpCache.new }
+      let(:formatter_with_cache) { described_class.new(project, cache) }
+      let(:result_with_cache) { formatter_with_cache.to_rows(subject) }
+
+      it "matches output when cache is preloaded for batch" do
+        cache.reset_for_batch([subject], project.workflows.pluck(:id))
+        expect(result_with_cache).to match_array(expected)
+      end
+    end
+
     context "with an old unlinked subject" do
       let(:subject_set_ids) { [ ] }
       let(:empty_attrs) do

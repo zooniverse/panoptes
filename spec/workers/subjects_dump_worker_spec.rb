@@ -15,4 +15,21 @@ RSpec.describe SubjectsDumpWorker do
       let(:num_entries) { num_subjects + 1 }
     end
   end
+
+  describe 'cache wiring' do
+    it 'passes a shared cache to scope and formatter' do
+      allow(CsvDumps::FindsDumpResource).to receive(:find).and_return(project)
+      allow(CsvDumps::FindsMedium).to receive(:new).and_return(double(medium: double(metadata: {}, save!: true, put_file_with_retry: true)))
+      allow(DumpMailer).to receive(:new).and_return(double(send_email: true))
+      allow_any_instance_of(CsvDumps::DumpProcessor).to receive(:execute).and_return(true)
+
+      shared_cache = SubjectDumpCache.new
+      allow(worker).to receive(:cache).and_return(shared_cache)
+
+      expect(Formatter::Csv::Subject).to receive(:new).with(project, shared_cache).and_call_original
+      expect(CsvDumps::SubjectScope).to receive(:new).with(project, shared_cache).and_call_original
+
+      worker.perform(project.id, 'project')
+    end
+  end
 end
