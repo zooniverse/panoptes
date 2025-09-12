@@ -1,4 +1,4 @@
-require "spec_helper"
+require 'spec_helper'
 
 RSpec.describe SubjectsDumpWorker do
   let(:worker) { described_class.new }
@@ -10,8 +10,8 @@ RSpec.describe SubjectsDumpWorker do
   end
   let(:num_subjects) { unlinked_subject_set.subjects.count + workflow.subjects.count }
 
-  describe "#perform" do
-    it_behaves_like "dump worker", SubjectDataMailerWorker, "project_subjects_export" do
+  describe '#perform' do
+    it_behaves_like 'dump worker', SubjectDataMailerWorker, 'project_subjects_export' do
       let(:num_entries) { num_subjects + 1 }
     end
   end
@@ -26,10 +26,13 @@ RSpec.describe SubjectsDumpWorker do
       shared_cache = SubjectDumpCache.new
       allow(worker).to receive(:cache).and_return(shared_cache)
 
-      expect(Formatter::Csv::Subject).to receive(:new).with(project, shared_cache).and_call_original
-      expect(CsvDumps::SubjectScope).to receive(:new).with(project, shared_cache).and_call_original
+      allow(Formatter::Csv::Subject).to receive(:new).and_call_original
+      allow(CsvDumps::SubjectScope).to receive(:new).and_call_original
 
       worker.perform(project.id, 'project')
+
+      expect(Formatter::Csv::Subject).to have_received(:new).with(project, shared_cache)
+      expect(CsvDumps::SubjectScope).to have_received(:new).with(project, shared_cache)
     end
   end
 end

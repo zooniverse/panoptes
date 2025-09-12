@@ -3,7 +3,7 @@ module Formatter
     class Subject
       attr_reader :subject, :project, :project_workflow_ids, :cache
 
-      def initialize(project, cache = nil)
+      def initialize(project, cache=nil)
         @project = project
         @cache = cache
         @project_workflow_ids = project.workflows.pluck(:id)
@@ -117,9 +117,9 @@ module Formatter
             cache.statuses_for_subject(subject.id)
           else
             SubjectWorkflowStatus.by_subject(subject.id)
-              .where(workflow_id: project_workflow_ids)
-              .to_a
-              .index_by(&:workflow_id)
+                                   .where(workflow_id: project_workflow_ids)
+                                   .to_a
+                                   .index_by(&:workflow_id)
           end
         end
       end
