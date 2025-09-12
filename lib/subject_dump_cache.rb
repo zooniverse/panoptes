@@ -15,12 +15,8 @@ class SubjectDumpCache
     reset!
     return if subjects.empty? || project_workflow_ids.empty?
 
-    subject_ids = subjects.map(&:id)
-    load_subject_workflow_statuses(subject_ids, project_workflow_ids) if subject_ids.any?
-
-    # Prefetch SubjectSetsWorkflow for all set ids present in the batch
-    set_ids = subjects.flat_map { |s| s.subject_set_ids.presence || [] }.uniq
-    load_subject_sets_workflows(set_ids, project_workflow_ids) if set_ids.any?
+    load_subject_workflow_statuses_for(subjects, project_workflow_ids)
+    load_subject_sets_workflows_for(subjects, project_workflow_ids)
   end
 
   def statuses_for_subject(subject_id)
@@ -37,20 +33,29 @@ class SubjectDumpCache
 
   private
 
-  def load_subject_workflow_statuses(subject_ids, project_workflow_ids)
-    sws_records = SubjectWorkflowStatus
-                    .where(subject_id: subject_ids, workflow_id: project_workflow_ids)
-                    .load
+  def load_subject_workflow_statuses_for(subjects, project_workflow_ids)
+    subject_ids = subjects.map(&:id)
+    return if subject_ids.empty?
 
-    @sws_by_subject_id = sws_records
-                           .group_by(&:subject_id)
-                           .transform_values { |arr| arr.index_by(&:workflow_id) }
+    load_subject_workflow_statuses(subject_ids, project_workflow_ids)
+  end
+
+  def load_subject_sets_workflows_for(subjects, project_workflow_ids)
+    # Prefetch SubjectSetsWorkflow for all set ids present in the batch
+    set_ids = subjects.flat_map { |s| s.subject_set_ids.presence || [] }.uniq
+    return if set_ids.empty?
+
+    load_subject_sets_workflows(set_ids, project_workflow_ids)
+  end
+
+  def load_subject_workflow_statuses(subject_ids, project_workflow_ids)
+    sws_records = SubjectWorkflowStatus.where(subject_id: subject_ids, workflow_id: project_workflow_ids).load
+
+    @sws_by_subject_id = sws_records.group_by(&:subject_id).transform_values { |arr| arr.index_by(&:workflow_id) }
   end
 
   def load_subject_sets_workflows(set_ids, project_workflow_ids)
-    ssw_records = SubjectSetsWorkflow
-                    .where(workflow_id: project_workflow_ids, subject_set_id: set_ids)
-                    .load
+    ssw_records = SubjectSetsWorkflow.where(workflow_id: project_workflow_ids, subject_set_id: set_ids).load
 
     @ssw_by_set_id = ssw_records.group_by(&:subject_set_id)
   end

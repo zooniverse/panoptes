@@ -8,13 +8,13 @@ module CsvDumps
       @project_workflow_ids = resource.workflows.pluck(:id)
     end
 
-    def each(&block)
+    def each
       read_from_database do
         ActiveRecord::Base.uncached do
           # Use batch iteration to allow prefetching per batch
           project_subjects.find_in_batches do |batch|
             cache&.reset_for_batch(batch, project_workflow_ids)
-            batch.each { |subject| block.call(subject) }
+            batch.each { |subject| yield subject }
           end
         end
       end

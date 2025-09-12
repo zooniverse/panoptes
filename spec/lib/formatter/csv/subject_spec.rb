@@ -67,7 +67,7 @@ RSpec.describe Formatter::Csv::Subject do
 
     let(:result) { described_class.new(project).to_rows(export_subject) }
 
-    it "should match the expected output" do
+    it 'matches the expected output' do
       expect(result).to match_array(expected)
     end
 
@@ -97,7 +97,7 @@ RSpec.describe Formatter::Csv::Subject do
         [ workflow_one_row.merge(empty_attrs).values ]
       end
 
-      it 'should match the expected output' do
+      it 'matches the expected output' do
         sms.destroy
         export_subject.reload
         expect(result).to match_array(expected)
@@ -105,7 +105,7 @@ RSpec.describe Formatter::Csv::Subject do
     end
 
     context 'with a subject that has no location metadata' do
-      it 'should match the db ordered subject_locations array' do
+      it 'matches the db ordered subject_locations array' do
         allow_any_instance_of(Medium::CollectionProxy)
           .to receive(:loaded?)
           .and_return(true)
@@ -152,7 +152,7 @@ RSpec.describe Formatter::Csv::Subject do
         }
       end
 
-      it 'should export a third row for the non-linked set' do
+      it 'exports a third row for the non-linked set' do
         export_subject.subject_sets << not_linked_set
         expect(result).to match_array(expected | [non_linked_subject.values])
       end

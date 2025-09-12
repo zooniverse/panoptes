@@ -116,10 +116,7 @@ module Formatter
           if cache
             cache.statuses_for_subject(subject.id)
           else
-            SubjectWorkflowStatus.by_subject(subject.id)
-                                   .where(workflow_id: project_workflow_ids)
-                                   .to_a
-                                   .index_by(&:workflow_id)
+            SubjectWorkflowStatus.by_subject(subject.id).where(workflow_id: project_workflow_ids).to_a.index_by(&:workflow_id)
           end
         end
       end
