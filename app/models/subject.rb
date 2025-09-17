@@ -16,8 +16,8 @@ class Subject < ApplicationRecord
     -> { where(type: 'subject_location') },
     class_name: "Medium",
     as: :linked
-  has_many :attached_media,
-    -> { where(type: 'subject_attached_media') },
+  has_many :attached_images,
+    -> { where(type: 'subject_attached_image') },
     class_name: "Medium",
     as: :linked
   has_many :recents, dependent: :destroy
