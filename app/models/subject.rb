@@ -18,7 +18,7 @@ class Subject < ApplicationRecord
     as: :linked
   has_many :attached_images,
     -> { where(type: 'subject_attached_image') },
-    class_name: "Medium",
+    class_name: 'Medium',
     as: :linked
   has_many :recents, dependent: :destroy
   has_many :tutorial_workflows,
