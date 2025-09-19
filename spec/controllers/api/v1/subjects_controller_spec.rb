@@ -15,7 +15,7 @@ describe Api::V1::SubjectsController, type: :controller do
     [ "id", "metadata", "locations", "zooniverse_id", "created_at", "updated_at" ]
   end
   let(:api_resource_links) do
-    ['subjects.project','subjects.collections', 'subjects.subject_sets', 'subjects.attached_images']
+    ['subjects.project', 'subjects.collections', 'subjects.subject_sets', 'subjects.attached_images']
   end
 
   describe "#index" do
