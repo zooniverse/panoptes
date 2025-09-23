@@ -16,24 +16,27 @@ class CreateOrUpdateMedium < Operation
 
   def execute
     media['metadata']["state"] = 'creating'
-    medium = find_existing_medium
 
-    if medium
-      medium.update!(media)
-      medium.touch
-      cleanup_duplicate_media(medium)
-      medium
-    else
-      new_medium = object.send("create_#{type}!", media)
-      cleanup_duplicate_media(new_medium)
-      new_medium
+    object.with_lock do
+      medium = find_existing_medium
+
+      if medium
+        medium.update!(media)
+        medium.touch
+        cleanup_duplicate_media(medium)
+        medium
+      else
+        new_medium = object.send("create_#{type}!", media)
+        cleanup_duplicate_media(new_medium)
+        new_medium
+      end
     end
   end
 
   private
 
   def find_existing_medium
-    scoped_media
+    existing_media
       .order(updated_at: :desc, id: :desc)
       .first
   end
@@ -41,12 +44,16 @@ class CreateOrUpdateMedium < Operation
   def cleanup_duplicate_media(primary_medium)
     return unless primary_medium
 
-    scoped_media
+    existing_media
       .where.not(id: primary_medium.id)
       .find_each(&:destroy)
   end
 
-  def scoped_media
-    @scoped_media ||= object.association(type).scope.unscope(:order, :limit)
+  def existing_media
+    Medium.where(linked: object, type: medium_type)
+  end
+
+  def medium_type
+    "#{object.model_name.singular}_#{type}"
   end
 end
