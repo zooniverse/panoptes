@@ -121,7 +121,7 @@ data:
   TALK_API_APPLICATION: '1'
   USER_SUBJECT_LIMIT: '10000'
   AGGREGATION_HOST: http://aggregation-production-app/
-  AGGREGATION_STORAGE_BASE_URL: https://aggregationdata.blob.core.windows.net
+  AGGREGATION_STORAGE_BASE_URL: https://aggregationdata.blob.core.windows.net/production
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -199,7 +199,7 @@ spec:
               exec:
                 command: ["/bin/bash", "-c", "cp -Ru /rails_app/public/* /static-assets"]
         - name: panoptes-production-nginx
-          image: zooniverse/nginx
+          image: ghcr.io/zooniverse/docker-nginx
           resources:
             requests:
               memory: "50Mi"
@@ -296,7 +296,6 @@ metadata:
   labels:
     app: panoptes-production-sidekiq-dumpworker
 spec:
-  replicas: 2
   selector:
     matchLabels:
       app: panoptes-production-sidekiq-dumpworker
@@ -314,12 +313,16 @@ spec:
               cpu: "250m"
             limits:
               memory: "10000Mi"
-              cpu: "2000m"
+              cpu: "1000m"
           livenessProbe:
             exec:
               command:
                 - /rails_app/scripts/docker/sidekiq_status
             initialDelaySeconds: 20
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sidekiqctl", "quiet"]
           args: ["/rails_app/scripts/docker/start-sidekiq.sh"]
           env:
           - name: RAILS_MAX_THREADS
@@ -410,19 +413,6 @@ spec:
           secret:
             secretName: panoptes-doorkeeper-jwt-production
 ---
-apiVersion: autoscaling/v1
-kind: HorizontalPodAutoscaler
-metadata:
-  name: panoptes-production-sidekiq
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: panoptes-production-sidekiq
-  minReplicas: 2
-  maxReplicas: 16
-  targetCPUUtilizationPercentage: 95
----
 apiVersion: policy/v1
 kind: PodDisruptionBudget
 metadata:
@@ -486,7 +476,7 @@ spec:
           command: ["sh", "-c", "echo never >/host-sys/kernel/mm/transparent_hugepage/enabled"]
       containers:
         - name: panoptes-production-redis
-          image: redis:6.0.5
+          image: redis:6.2.18
           resources:
             requests:
               memory: "2500Mi"

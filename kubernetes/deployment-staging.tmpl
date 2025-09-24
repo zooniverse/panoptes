@@ -110,7 +110,7 @@ data:
   TALK_API_APPLICATION: '1'
   USER_SUBJECT_LIMIT: '100'
   AGGREGATION_HOST: http://aggregation-staging-app/
-  AGGREGATION_STORAGE_BASE_URL: https://aggregationdata.blob.core.windows.net
+  AGGREGATION_STORAGE_BASE_URL: https://aggregationdata.blob.core.windows.net/staging
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -188,7 +188,7 @@ spec:
               exec:
                 command: ["/bin/bash", "-c", "cp -Ru /rails_app/public/* /static-assets"]
         - name: panoptes-staging-nginx
-          image: zooniverse/nginx
+          image: ghcr.io/zooniverse/docker-nginx
           resources:
             requests:
               memory: "25Mi"
@@ -275,7 +275,6 @@ metadata:
   labels:
     app: panoptes-staging-sidekiq-dumpworker
 spec:
-  replicas: 1
   selector:
     matchLabels:
       app: panoptes-staging-sidekiq-dumpworker
@@ -299,6 +298,10 @@ spec:
               command:
                 - /rails_app/scripts/docker/sidekiq_status
             initialDelaySeconds: 20
+          lifecycle:
+            preStop:
+              exec:
+                command: ["sidekiqctl", "quiet"]
           args: ["/rails_app/scripts/docker/start-sidekiq.sh"]
           env:
           - name: SIDEKIQ_ARGS
@@ -385,19 +388,6 @@ spec:
           secret:
             secretName: panoptes-doorkeeper-jwt-staging
 ---
-apiVersion: autoscaling/v1
-kind: HorizontalPodAutoscaler
-metadata:
-  name: panoptes-staging-sidekiq
-spec:
-  scaleTargetRef:
-    apiVersion: apps/v1
-    kind: Deployment
-    name: panoptes-staging-sidekiq
-  minReplicas: 1
-  maxReplicas: 2
-  targetCPUUtilizationPercentage: 80
----
 kind: PersistentVolumeClaim
 apiVersion: v1
 metadata:
@@ -451,7 +441,7 @@ spec:
           command: ["sh", "-c", "echo never >/host-sys/kernel/mm/transparent_hugepage/enabled"]
       containers:
         - name: panoptes-staging-redis
-          image: redis:6.0.5
+          image: redis:6.2.18
           resources:
             requests:
               memory: "100Mi"
