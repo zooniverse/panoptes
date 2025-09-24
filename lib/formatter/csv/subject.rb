@@ -1,10 +1,11 @@
 module Formatter
   module Csv
     class Subject
-      attr_reader :subject, :project, :project_workflow_ids
+      attr_reader :subject, :project, :project_workflow_ids, :cache
 
-      def initialize(project)
+      def initialize(project, cache=nil)
         @project = project
+        @cache = cache
         @project_workflow_ids = project.workflows.pluck(:id)
       end
 
@@ -17,26 +18,32 @@ module Formatter
         @subject = subject
         reset_the_sws_memoizer_for_the_new_subject
 
-        rows = []
+        sid = subject.id
+        pid = project_id
+        meta_json = metadata
+        loc_json = locations
+        created = subject.created_at
+        updated = subject.updated_at
 
+        rows = []
         linked_workflows_and_sets(subject).each do |subject_workflow_set_link|
           workflow_id = subject_workflow_set_link.workflow_id
-          rows << HashWithIndifferentAccess.new(
-            subject_id: subject_workflow_set_link.subject.id,
-            project_id: project_id,
-            workflow_id: workflow_id,
-            subject_set_id: subject_workflow_set_link.subject_set_id,
-            metadata: metadata,
-            locations: locations,
-            classifications_count: classifications_count(workflow_id),
-            retired_at: retired_at(workflow_id),
-            retirement_reason: retirement_reason(workflow_id),
-            created_at: subject_workflow_set_link.subject.created_at,
-            updated_at: subject_workflow_set_link.subject.updated_at
-          )
+          rows << [
+            sid,
+            pid,
+            workflow_id,
+            subject_workflow_set_link.subject_set_id,
+            meta_json,
+            loc_json,
+            classifications_count(workflow_id),
+            retired_at(workflow_id),
+            retirement_reason(workflow_id),
+            created,
+            updated
+          ]
         end
 
-        rows.map { |row| row.values_at(*headers) }
+        rows
       end
 
       private
@@ -74,11 +81,11 @@ module Formatter
       end
 
       def locations
-        {}.tap do |locs|
-          subject.ordered_locations.each_with_index.map do |loc, index|
-            locs[index] = loc.get_url
-          end
-        end.to_json
+        locs = {}
+        subject.ordered_locations.each_with_index do |loc, index|
+          locs[index] = loc.get_url
+        end
+        locs.to_json
       end
 
       def retired_at(workflow_id)
@@ -105,11 +112,13 @@ module Formatter
       end
 
       def subject_workflow_statuses
-        @subject_workflow_statuses ||=
-          SubjectWorkflowStatus.by_subject(subject.id)
-          .where(workflow_id: project_workflow_ids)
-          .to_a
-          .index_by(&:workflow_id)
+        @subject_workflow_statuses ||= begin
+          if cache
+            cache.statuses_for_subject(subject.id)
+          else
+            SubjectWorkflowStatus.by_subject(subject.id).where(workflow_id: project_workflow_ids).to_a.index_by(&:workflow_id)
+          end
+        end
       end
 
       def linked_workflows_and_sets(subject)
@@ -134,10 +143,14 @@ module Formatter
       end
 
       def grouped_subject_set_workflows(subject_set_ids)
-        SubjectSetsWorkflow.where(
-          workflow_id: project_workflow_ids,
-          subject_set_id: subject_set_ids
-        ).group_by(&:subject_set_id)
+        if cache
+          cache.grouped_subject_set_workflows
+        else
+          SubjectSetsWorkflow.where(
+            workflow_id: project_workflow_ids,
+            subject_set_id: subject_set_ids
+          ).group_by(&:subject_set_id)
+        end
       end
 
       def subject_set_workflows_for_set(grouped_ssws, set_id)
