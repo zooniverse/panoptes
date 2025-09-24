@@ -5,7 +5,7 @@ data:
 
       proxy_buffer_size 8k;
       proxy_set_header Host $http_host;
-      proxy_set_header X-Real-IP $remote_addr;
+      proxy_set_header X-Forwarded-Host $host;
 
       location = /commit_id.txt {
         root /static-assets/;
@@ -60,6 +60,7 @@ data:
       server_name panoptes-staging.zooniverse.org;
       include /etc/nginx/ssl.default.conf;
       include /etc/nginx/shared/panoptes-nginx-common.conf;
+      include /etc/nginx/nginx-azure-ips.conf;
     }
 kind: ConfigMap
 metadata:
