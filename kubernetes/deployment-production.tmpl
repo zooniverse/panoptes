@@ -5,7 +5,7 @@ data:
 
     proxy_buffer_size 8k;
     proxy_set_header Host $http_host;
-    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-Host $host;
 
     location = /commit_id.txt {
       root /static-assets/;
@@ -55,6 +55,8 @@ data:
     upstream docker-panoptes {
       server 127.0.0.1:81;
     }
+
+    include /etc/nginx/nginx-azure-ips.conf;
 
     server {
       server_name www.zooniverse.org;
