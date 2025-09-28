@@ -16,20 +16,17 @@ class CreateOrUpdateMedium < Operation
 
   def execute
     media['metadata']["state"] = 'creating'
+    medium = find_existing_medium
 
-    object.with_lock do
-      medium = find_existing_medium
-
-      if medium
-        medium.update!(media)
-        medium.touch
-        cleanup_duplicate_media(medium)
-        medium
-      else
-        new_medium = object.send("create_#{type}!", media)
-        cleanup_duplicate_media(new_medium)
-        new_medium
-      end
+    if medium
+      medium.update!(media)
+      medium.touch
+      cleanup_duplicate_media(medium)
+      medium
+    else
+      new_medium = object.send("create_#{type}!", media)
+      cleanup_duplicate_media(new_medium)
+      new_medium
     end
   end
 
