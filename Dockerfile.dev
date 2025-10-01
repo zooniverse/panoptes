@@ -1,4 +1,4 @@
-FROM ruby:2.7-slim-buster
+FROM ruby:2.7-slim
 
 WORKDIR /rails_app
 
@@ -9,7 +9,7 @@ RUN apt-get update && apt-get -y upgrade && \
       git \
       libpq-dev \
       # debian buster and comes with pg client v11 by default
-      postgresql-client-11 \
+      postgresql-client-13 \
       tmpreaper
 
 # set MRI memory allocator to mimic jemalloc memory savings

@@ -1,4 +1,4 @@
-FROM ruby:2.7-slim-buster
+FROM ruby:2.7-slim
 
 WORKDIR /rails_app
 
@@ -7,7 +7,7 @@ RUN apt-get update && apt-get -y upgrade && \
     build-essential \
     git \
     libpq-dev \
-    postgresql-client-11 \
+    postgresql-client-13 \
     tmpreaper \
     && \
     apt-get clean
