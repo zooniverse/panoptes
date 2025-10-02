@@ -20,20 +20,21 @@ class AggregationClient
     end
   end
 
-  def send_aggregation_request(project_id, workflow_id, user_id)
-    params = { project_id: project_id, workflow_id: workflow_id, user_id: user_id }
+  def send_aggregation_request(project_id, workflow_id, bearer_token)
+    params = { project_id: project_id, workflow_id: workflow_id }
 
-    request(:post, '/run_aggregation') do |req|
+    request(:post, '/run_aggregation', bearer_token) do |req|
       req.body = params
     end
   end
 
   private
 
-  def request(http_method, params)
+  def request(http_method, params, bearer_token=nil)
     response = connection.send(http_method, *params) do |req|
       req.headers['Accept'] = 'application/json'
       req.headers['Content-Type'] = 'application/json'
+      req.headers['Authorization'] = bearer_token if bearer_token
       req.options.timeout = 5      # open/read timeout in seconds
       req.options.open_timeout = 2 # connection open timeout in seconds
       yield req if block_given?
