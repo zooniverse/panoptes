@@ -1,6 +1,45 @@
 # Media Resources
 ```json
-{}
+{
+    "media": [
+        {
+            "id": "177939",
+            "href": "/projects/1936/attached_images/177939",
+            "src": "https://panoptes-uploads-staging.zooniverse.org/project_attached_image/goofy_test.png",
+            "content_type": "image/png",
+            "media_type": "project_attached_image",
+            "external_link": false,
+            "created_at": "2021-10-07T17:57:37.886Z",
+            "metadata": {
+                "size": 11352,
+                "filename": "goofy_test.png"
+            },
+            "updated_at": "2021-10-07T17:57:37.886Z",
+            "links": {
+                "linked": {
+                    "href": "/projects/1936",
+                    "id": "1936",
+                    "type": "projects"
+                }
+            }
+        }
+    ],
+    "meta": {
+        "media": {
+            "page": 1,
+            "page_size": 20,
+            "count": 1,
+            "include": [],
+            "page_count": 1,
+            "previous_page": null,
+            "next_page": null,
+            "first_href": "/media?id=177939",
+            "previous_href": null,
+            "next_href": null,
+            "last_href": "/media?id=177939"
+        }
+    }
+}
 ```
 
 A media record is a polymorphic resource that can be associated with different types of Panoptes resources.   A media record has the following attributes:
