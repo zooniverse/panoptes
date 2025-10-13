@@ -188,7 +188,8 @@ spec:
               exec:
                 command: ["/bin/bash", "-c", "cp -Ru /rails_app/public/* /static-assets"]
         - name: panoptes-staging-nginx
-          image: ghcr.io/zooniverse/docker-nginx
+          image: ghcr.io/zooniverse/docker-nginx:latest
+          imagePullPolicy: Always
           resources:
             requests:
               memory: "25Mi"
