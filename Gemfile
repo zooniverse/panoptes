@@ -40,7 +40,7 @@ gem 'puma', '~> 6.4.3'
 gem 'pundit', '~> 2.4.0'
 gem 'rack-cors', '~> 1.0', require: 'rack/cors'
 if next?
-  gem 'rails', '~> 6.1'
+  gem 'rails', '7.0.8.7'
 else
   gem 'rails', '~> 6.1'
 end
