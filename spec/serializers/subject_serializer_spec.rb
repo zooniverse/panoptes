@@ -9,7 +9,7 @@ describe SubjectSerializer do
   it_should_behave_like "a panoptes restpack serializer" do
     let(:resource) { subject }
     let(:includes) { %i(project collections subject_sets) }
-    let(:preloads) { %i(locations project collections subject_sets) }
+    let(:preloads) { %i(locations project collections subject_sets attached_images) }
   end
 
   it_should_behave_like "a filter has many serializer" do
