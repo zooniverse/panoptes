@@ -52,14 +52,17 @@ linked_id | string | id of the Panoptes resource that the media record is associ
 linked_type | string | type of Panoptes resource the media record is associated to  (See the <b>Panoptes Resource</b> column entries in the table within the [<b>Panoptes Resources to Media Resource Types</b>](#panoptes-resources-to-media-resource-types) )
 content_type | string | mime type of the media record (See [<b>Supported Mime Types of Panoptes Media Records</b>](#supported-mime-types-of-panoptes-media-records))
 src | string | path link to the media record
-path_opts | {} |
+path_opts | hash |
 private | boolean |
 external_link | boolean |
 metadata | hash |
 created_at | datetime | read-only
 updated_at | datetime | read-only
 
-## Supported Mime Types of Panoptes Media Records
+*id*, *created_at*, and *updated_at* are assigned by
+the API.
+
+ ## Supported Mime Types of Panoptes Media Records
 
 Supported mimetypes currently are:
 
@@ -85,15 +88,15 @@ Within Panoptes, Media is a polymorphic resource that can be associated with dif
 
 Panoptes resources that can have an associated media resource are the following:
 
-Panoptes Resource | Media Types
+Panoptes Resource | Media Types <i>(Panoptes Resource to Media Type Relation)</i>
 ----------------- | ----------
-Subjects <sup>*</sup> | <li>attached_images</li>
-Users | <li>avatar</li><li>profile_header</li>
-Organizations | <li>avatar</li><li>background</li><li>attached_images</li>
-Projects  <sup>**</sup> | <li>avatar</li><li>background</li><li>attached_images</li>
-Workflows  <sup>***</sup> | <li>attached_images</li>
-Tutorials | <li>attached_images</li>
-Field Guides | <li>attached_images</li>
+Subjects <sup>*</sup> | <li>attached_images <i>(one to many)</i></li>
+Users | <li>avatar <i>(one to one)</i></li><li>profile_header <i>(one to one) </i></li>
+Organizations | <li>avatar <i>(one to one) </i></li><li>background <i>(one to one)</i></li><li>attached_images <i>(one to many)</i></li>
+Projects  <sup>**</sup> | <li>avatar <i>(one to one)</i></li><li>background <i>(one to one)</i></li><li>attached_images <i>(one to many)</i></li>
+Workflows  <sup>***</sup> | <li>attached_images <i>(one to many)</i></li>
+Tutorials | <li>attached_images <i>(one to many)</i></li>
+Field Guides | <li>attached_images <i>(one to many) </i></li>
 
 <sup>* Subjects have a media type of `subject_locations` that are created and queried from the API in a different fashion to a typical media resource pattern. </sup> <br>
 
@@ -102,6 +105,27 @@ Field Guides | <li>attached_images</li>
 <sup>*** Workflows also have a media type of `classifications_export` that do not fall into typical media resource pattern. </sup> <br>
 
 
+## List Media Records
 
+For the following examples, we will be using Subject as the example Panoptes Resource and `attached_images` as the example media type, but note that the same pattern follows for any of the listed Panoptes Resources and listed Media Types list on the [<b>Panoptes Resources to Media Resource Types table</b>](#panoptes-resources-to-media-resource-types).
 
+```http
+GET /api/:panoptes_resource/:panoptes_resource_id/:media_type HTTP/1.1
+Accept: application/vnd.api+json; version=1
+Content-Type: application/json
+```
+
+```http
+# (Eg. where panoptes_resource = subject,
+# panoptes_resource_id = 123,
+# media_type = attached_images)
+
+GET /api/subjects/123/attached_images HTTP/1.1
+Accept: application/vnd.api+json; version=1
+Content-Type: application/json
+```
+
++ Parameters
+  + page (optional, integer) ... the index of the page to retrieve default is 1
+  + page_size (optional, integer) ... number of items to include on a page default is 20
 
