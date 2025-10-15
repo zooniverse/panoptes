@@ -62,7 +62,7 @@ updated_at | datetime | read-only
 *id*, *created_at*, and *updated_at* are assigned by
 the API.
 
- ## Supported Mime Types of Panoptes Media Records
+## Supported Mime Types of Panoptes Media Records
 
 Supported mimetypes currently are:
 
