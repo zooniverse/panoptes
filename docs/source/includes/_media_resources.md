@@ -197,6 +197,10 @@ Content-Type: application/json
 }
 ```
 
+To have the Zooniverse host your media resources, the `external_link` must be `false` and the `src` should be blank in your request body.
+
+The create response will contain a signed panoptesuploads blob url that the client may make a PUT request containing the media to. <i>The signed urls will be valid for 20 minutes.</i>
+
 ## Destroy a Single Media Record Associated with a Panoptes Resource
 
 For the following examples, we will be using Subject as the example Panoptes Resource and `attached_images` as the example media type, but note that the same pattern follows for any of the listed Panoptes Resources and listed Media Types list on the [<b>Panoptes Resources to Media Resource Types table</b>](#panoptes-resources-to-media-resource-types).
