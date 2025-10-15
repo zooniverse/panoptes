@@ -129,3 +129,91 @@ Content-Type: application/json
   + page (optional, integer) ... the index of the page to retrieve default is 1
   + page_size (optional, integer) ... number of items to include on a page default is 20
 
+
+
+## Retrieve a single Subject
+
+For the following examples, we will be using Subject as the example Panoptes Resource and `attached_images` as the example media type, but note that the same pattern follows for any of the listed Panoptes Resources and listed Media Types list on the [<b>Panoptes Resources to Media Resource Types table</b>](#panoptes-resources-to-media-resource-types).
+
+```http
+GET /api/:panoptes_resource/:panoptes_resource_id/:media_type/:media_id HTTP/1.1
+Accept: application/vnd.api+json; version=1
+Content-Type: application/json
+```
+
+```http
+# (Eg. where panoptes_resource = subject,
+# panoptes_resource_id = 123,
+# media_type = attached_images
+# media_type_id = 345)
+
+GET /api/subjects/123/attached_images/345 HTTP/1.1
+Accept: application/vnd.api+json; version=1
+Content-Type: application/json
+```
+
++ Parameters
+  + id (required, integer) ... integer id of the media resource
+
+## Create a Media Record Associated with a Panoptes Resource
+
+For the following examples, we will be using Subject as the example Panoptes Resource and `attached_images` as the example media type, but note that the same pattern follows for any of the listed Panoptes Resources and listed Media Types list on the [<b>Panoptes Resources to Media Resource Types table</b>](#panoptes-resources-to-media-resource-types).
+
+```http
+POST /api/:panoptes_resource/:panoptes_resource_id/:media_type HTTP/1.1
+Accept: application/vnd.api+json; version=1
+Content-Type: application/json
+
+{
+    "media": {
+        "content_type": "image/png",
+        "external_link": true,
+        "src": "https://your.s3_account.com/subjects/1.png",
+        "metadata": {
+            "filename": "your_image_title.png",
+            "size": 606805,
+        }
+    }
+}
+```
+
+```http
+# (Eg. where panoptes_resource = subject,
+# panoptes_resource_id = 123,
+# media_type = attached_images)
+
+POST /api/subjects/123/attached_images HTTP/1.1
+Accept: application/vnd.api+json; version=1
+Content-Type: application/json
+
+{
+    "media": {
+        "content_type": "image/png",
+        "metadata": {
+            "filename": "your_image_title.png",
+            "size": 606805
+        }
+    }
+}
+```
+
+## Destroy a Single Media Record Associated with a Panoptes Resource
+
+For the following examples, we will be using Subject as the example Panoptes Resource and `attached_images` as the example media type, but note that the same pattern follows for any of the listed Panoptes Resources and listed Media Types list on the [<b>Panoptes Resources to Media Resource Types table</b>](#panoptes-resources-to-media-resource-types).
+
+```http
+DELETE /api/:panoptes_resource/:panoptes_resource_id/:media_type/:media_record_id HTTP/1.1
+Accept: application/vnd.api+json; version=1
+Content-Type: application/json
+```
+
+```http
+# (Eg. where panoptes_resource = subject,
+# panoptes_resource_id = 123,
+# media_type = attached_images
+# media_record_id = 345)
+
+DELETE /api/subjects/123/attached_images/345 HTTP/1.1
+Accept: application/vnd.api+json; version=1
+Content-Type: application/json
+```
