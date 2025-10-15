@@ -131,7 +131,7 @@ Content-Type: application/json
 
 
 
-## Retrieve a single Subject
+## Retrieve a single Media Record
 
 For the following examples, we will be using Subject as the example Panoptes Resource and `attached_images` as the example media type, but note that the same pattern follows for any of the listed Panoptes Resources and listed Media Types list on the [<b>Panoptes Resources to Media Resource Types table</b>](#panoptes-resources-to-media-resource-types).
 
