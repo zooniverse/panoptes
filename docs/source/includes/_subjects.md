@@ -135,9 +135,9 @@ should have the mime-types of the subject's associated media,
 e.g `"locations":["image/png", "image/jpeg", "image/png"]`,
 note the locations mime types are stored in order.
 
-The create response will contain signed s3 urls the client may make a PUT
+The create response will contain signed panoptesuploads blob urls the client may make a PUT
 request containing the media to. The signed urls will be valid for 20 minutes.
-Please take the order of the returned s3 urls into account when PUT'ing
+Please take the order of the returned panoptesuploads urls into account when PUT'ing
 local media resources to the remote location.
 
 To use your own hosted media resources the *locations* array
@@ -170,7 +170,7 @@ has edit permissions for. A user may not change the project of a
 subject.
 
 The *locations* array should have the mime-types of the subject's
-associated media. The response will contain signed s3 urls the client
+associated media. The response will contain signed panoptesuploads blob urls the client
 may make a PUT request containing the media to. The signed urls will
 be valid for 20 minutes.
 

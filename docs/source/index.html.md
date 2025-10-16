@@ -33,6 +33,7 @@ includes:
   - user_groups
   - users
   - workflows
+  - media_resources
 
 search: true
 ---
