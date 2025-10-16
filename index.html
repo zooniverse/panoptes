@@ -660,6 +660,29 @@
                   </li>
               </ul>
           </li>
+          <li>
+            <a href="#media-resources" class="toc-h1 toc-link" data-title="Media Resources">Media Resources</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#supported-mime-types-of-panoptes-media-records" class="toc-h2 toc-link" data-title="Media Resources">Supported Mime Types of Panoptes Media Records</a>
+                  </li>
+                  <li>
+                    <a href="#panoptes-resources-to-media-resource-types" class="toc-h2 toc-link" data-title="Media Resources">Panoptes Resources to Media Resource Types</a>
+                  </li>
+                  <li>
+                    <a href="#list-media-records" class="toc-h2 toc-link" data-title="Media Resources">List Media Records</a>
+                  </li>
+                  <li>
+                    <a href="#retrieve-a-single-media-record" class="toc-h2 toc-link" data-title="Media Resources">Retrieve a single Media Record</a>
+                  </li>
+                  <li>
+                    <a href="#create-a-media-record-associated-with-a-panoptes-resource" class="toc-h2 toc-link" data-title="Media Resources">Create a Media Record Associated with a Panoptes Resource</a>
+                  </li>
+                  <li>
+                    <a href="#destroy-a-single-media-record-associated-with-a-panoptes-resource" class="toc-h2 toc-link" data-title="Media Resources">Destroy a Single Media Record Associated with a Panoptes Resource</a>
+                  </li>
+              </ul>
+          </li>
       </div>
         <ul class="toc-footer">
             <li><a href='https://github.com/zooniverse/panoptes/tree/master/docs/source/'>Modify documentation</a></li>
@@ -3624,9 +3647,9 @@ should have the mime-types of the subject&#39;s associated media,
 e.g <code>&quot;locations&quot;:[&quot;image/png&quot;, &quot;image/jpeg&quot;, &quot;image/png&quot;]</code>,
 note the locations mime types are stored in order.</p>
 
-<p>The create response will contain signed s3 urls the client may make a PUT
+<p>The create response will contain signed panoptesuploads blob urls the client may make a PUT
 request containing the media to. The signed urls will be valid for 20 minutes.
-Please take the order of the returned s3 urls into account when PUT&#39;ing
+Please take the order of the returned panoptesuploads urls into account when PUT&#39;ing
 local media resources to the remote location.</p>
 
 <p>To use your own hosted media resources the <em>locations</em> array
@@ -3655,7 +3678,7 @@ has edit permissions for. A user may not change the project of a
 subject.</p>
 
 <p>The <em>locations</em> array should have the mime-types of the subject&#39;s
-associated media. The response will contain signed s3 urls the client
+associated media. The response will contain signed panoptesuploads blob urls the client
 may make a PUT request containing the media to. The signed urls will
 be valid for 20 minutes.</p>
 
@@ -4804,7 +4827,278 @@ information.</p>
 <li>id (required, integer) ... integer id of the version to retrieve</li>
 </ul></li>
 </ul>
+<h1 id='media-resources'>Media Resources</h1><div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+    </span><span class="s2">"media"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"177939"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/projects/1936/attached_images/177939"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"src"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://panoptes-uploads-staging.zooniverse.org/project_attached_image/goofy_test.png"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"content_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"image/png"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"media_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"project_attached_image"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"external_link"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2021-10-07T17:57:37.886Z"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"metadata"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                </span><span class="s2">"size"</span><span class="p">:</span><span class="w"> </span><span class="mi">11352</span><span class="p">,</span><span class="w">
+                </span><span class="s2">"filename"</span><span class="p">:</span><span class="w"> </span><span class="s2">"goofy_test.png"</span><span class="w">
+            </span><span class="p">},</span><span class="w">
+            </span><span class="s2">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2021-10-07T17:57:37.886Z"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                </span><span class="s2">"linked"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                    </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/projects/1936"</span><span class="p">,</span><span class="w">
+                    </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1936"</span><span class="p">,</span><span class="w">
+                    </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"projects"</span><span class="w">
+                </span><span class="p">}</span><span class="w">
+            </span><span class="p">}</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">],</span><span class="w">
+    </span><span class="s2">"meta"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"media"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"page"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"page_size"</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"count"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"include"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+            </span><span class="s2">"page_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"previous_page"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"next_page"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"first_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/media?id=177939"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"previous_href"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"next_href"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"last_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/media?id=177939"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p>A media record is a polymorphic resource that can be associated with different types of Panoptes resources.   A media record has the following attributes:</p>
 
+<table><thead>
+<tr>
+<th>Attribute</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>id</td>
+<td>integer</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>type</td>
+<td>string</td>
+<td>media type of the media record (See the <b>Media Types</b> column in the table within the <a href="#panoptes-resources-to-media-resource-types"><b>Panoptes Resources to Media Resource Types</b></a> )</td>
+</tr>
+<tr>
+<td>linked_id</td>
+<td>string</td>
+<td>id of the Panoptes resource that the media record is associated to</td>
+</tr>
+<tr>
+<td>linked_type</td>
+<td>string</td>
+<td>type of Panoptes resource the media record is associated to  (See the <b>Panoptes Resource</b> column entries in the table within the <a href="#panoptes-resources-to-media-resource-types"><b>Panoptes Resources to Media Resource Types</b></a> )</td>
+</tr>
+<tr>
+<td>content_type</td>
+<td>string</td>
+<td>mime type of the media record (See <a href="#supported-mime-types-of-panoptes-media-records"><b>Supported Mime Types of Panoptes Media Records</b></a>)</td>
+</tr>
+<tr>
+<td>src</td>
+<td>string</td>
+<td>path link to the media record</td>
+</tr>
+<tr>
+<td>path_opts</td>
+<td>hash</td>
+<td></td>
+</tr>
+<tr>
+<td>private</td>
+<td>boolean</td>
+<td></td>
+</tr>
+<tr>
+<td>external_link</td>
+<td>boolean</td>
+<td></td>
+</tr>
+<tr>
+<td>metadata</td>
+<td>hash</td>
+<td></td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>datetime</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>updated_at</td>
+<td>datetime</td>
+<td>read-only</td>
+</tr>
+</tbody></table>
+
+<p><em>id</em>, <em>created_at</em>, and <em>updated_at</em> are assigned by
+the API.</p>
+<h2 id='supported-mime-types-of-panoptes-media-records'>Supported Mime Types of Panoptes Media Records</h2>
+<p>Supported mimetypes currently are:</p>
+
+<ul>
+<li>image/jpeg</li>
+<li>image/png</li>
+<li>image/gif</li>
+<li>image/svg+xml</li>
+<li>audio/mpeg</li>
+<li>audio/mp3</li>
+<li>audio/mp4</li>
+<li>audio/x-m4a</li>
+<li>text/plain</li>
+<li>text/csv</li>
+<li>video/mp4</li>
+<li>application/pdf</li>
+<li>application/json</li>
+</ul>
+<h2 id='panoptes-resources-to-media-resource-types'>Panoptes Resources to Media Resource Types</h2>
+<p>Within Panoptes, Media is a polymorphic resource that can be associated with different types of Panoptes resources.</p>
+
+<p>Panoptes resources that can have an associated media resource are the following:</p>
+
+<table><thead>
+<tr>
+<th>Panoptes Resource</th>
+<th>Media Types <i>(Panoptes Resource to Media Type Relation)</i></th>
+</tr>
+</thead><tbody>
+<tr>
+<td>Subjects <sup>*</sup></td>
+<td><li>attached_images <i>(one to many)</i></li></td>
+</tr>
+<tr>
+<td>Users</td>
+<td><li>avatar <i>(one to one)</i></li><li>profile_header <i>(one to one) </i></li></td>
+</tr>
+<tr>
+<td>Organizations</td>
+<td><li>avatar <i>(one to one) </i></li><li>background <i>(one to one)</i></li><li>attached_images <i>(one to many)</i></li></td>
+</tr>
+<tr>
+<td>Projects  <sup>**</sup></td>
+<td><li>avatar <i>(one to one)</i></li><li>background <i>(one to one)</i></li><li>attached_images <i>(one to many)</i></li></td>
+</tr>
+<tr>
+<td>Workflows  <sup>***</sup></td>
+<td><li>attached_images <i>(one to many)</i></li></td>
+</tr>
+<tr>
+<td>Tutorials</td>
+<td><li>attached_images <i>(one to many)</i></li></td>
+</tr>
+<tr>
+<td>Field Guides</td>
+<td><li>attached_images <i>(one to many) </i></li></td>
+</tr>
+</tbody></table>
+
+<p><sup>* Subjects have a media type of <code>subject_locations</code> that are created and queried from the API in a different fashion to a typical media resource pattern. </sup> <br></p>
+
+<p><sup>** Projects have a media type of   <code>classifications_export</code>, <code>subjects_export</code>, <code>workflows_export</code>, <code>workflows_contents_export</code> that do not fall into typical media resource pattern. </sup> <br></p>
+
+<p><sup>*** Workflows also have a media type of <code>classifications_export</code> that do not fall into typical media resource pattern. </sup> <br></p>
+<h2 id='list-media-records'>List Media Records</h2>
+<p>For the following examples, we will be using Subject as the example Panoptes Resource and <code>attached_images</code> as the example media type, but note that the same pattern follows for any of the listed Panoptes Resources and listed Media Types list on the <a href="#panoptes-resources-to-media-resource-types"><b>Panoptes Resources to Media Resource Types table</b></a>.</p>
+<div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/:panoptes_resource/:panoptes_resource_id/:media_type</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div><div class="highlight"><pre class="highlight http tab-http"><code><span class="err"># (Eg. where panoptes_resource = subject,
+# panoptes_resource_id = 123,
+# media_type = attached_images)
+
+</span><span class="nf">GET</span> <span class="nn">/api/subjects/123/attached_images</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div>
+<ul>
+<li>Parameters
+
+<ul>
+<li>page (optional, integer) ... the index of the page to retrieve default is 1</li>
+<li>page_size (optional, integer) ... number of items to include on a page default is 20</li>
+</ul></li>
+</ul>
+<h2 id='retrieve-a-single-media-record'>Retrieve a single Media Record</h2>
+<p>For the following examples, we will be using Subject as the example Panoptes Resource and <code>attached_images</code> as the example media type, but note that the same pattern follows for any of the listed Panoptes Resources and listed Media Types list on the <a href="#panoptes-resources-to-media-resource-types"><b>Panoptes Resources to Media Resource Types table</b></a>.</p>
+<div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/:panoptes_resource/:panoptes_resource_id/:media_type/:media_id</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div><div class="highlight"><pre class="highlight http tab-http"><code><span class="err"># (Eg. where panoptes_resource = subject,
+# panoptes_resource_id = 123,
+# media_type = attached_images
+# media_type_id = 345)
+
+</span><span class="nf">GET</span> <span class="nn">/api/subjects/123/attached_images/345</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div>
+<ul>
+<li>Parameters
+
+<ul>
+<li>id (required, integer) ... integer id of the media resource</li>
+</ul></li>
+</ul>
+<h2 id='create-a-media-record-associated-with-a-panoptes-resource'>Create a Media Record Associated with a Panoptes Resource</h2>
+<p>For the following examples, we will be using Subject as the example Panoptes Resource and <code>attached_images</code> as the example media type, but note that the same pattern follows for any of the listed Panoptes Resources and listed Media Types list on the <a href="#panoptes-resources-to-media-resource-types"><b>Panoptes Resources to Media Resource Types table</b></a>.</p>
+<div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/:panoptes_resource/:panoptes_resource_id/:media_type</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+    </span><span class="s2">"media"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"content_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"image/png"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"external_link"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"src"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://your.s3_account.com/subjects/1.png"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"metadata"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"filename"</span><span class="p">:</span><span class="w"> </span><span class="s2">"your_image_title.png"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"size"</span><span class="p">:</span><span class="w"> </span><span class="mi">606805</span><span class="p">,</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div><div class="highlight"><pre class="highlight http tab-http"><code><span class="err"># (Eg. where panoptes_resource = subject,
+# panoptes_resource_id = 123,
+# media_type = attached_images)
+
+</span><span class="nf">POST</span> <span class="nn">/api/subjects/123/attached_images</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+    </span><span class="s2">"media"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"content_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"image/png"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"metadata"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"filename"</span><span class="p">:</span><span class="w"> </span><span class="s2">"your_image_title.png"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"size"</span><span class="p">:</span><span class="w"> </span><span class="mi">606805</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p>To have the Zooniverse host your media resources, the <code>external_link</code> must be <code>false</code> and the <code>src</code> should be blank in your request body.</p>
+
+<p>The create response will contain a signed panoptesuploads blob url that the client may make a PUT request containing the media to. <i>The signed urls will be valid for 20 minutes.</i></p>
+<h2 id='destroy-a-single-media-record-associated-with-a-panoptes-resource'>Destroy a Single Media Record Associated with a Panoptes Resource</h2>
+<p>For the following examples, we will be using Subject as the example Panoptes Resource and <code>attached_images</code> as the example media type, but note that the same pattern follows for any of the listed Panoptes Resources and listed Media Types list on the <a href="#panoptes-resources-to-media-resource-types"><b>Panoptes Resources to Media Resource Types table</b></a>.</p>
+<div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">DELETE</span> <span class="nn">/api/:panoptes_resource/:panoptes_resource_id/:media_type/:media_record_id</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div><div class="highlight"><pre class="highlight http tab-http"><code><span class="err"># (Eg. where panoptes_resource = subject,
+# panoptes_resource_id = 123,
+# media_type = attached_images
+# media_record_id = 345)
+
+</span><span class="nf">DELETE</span> <span class="nn">/api/subjects/123/attached_images/345</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div>
       </div>
       <div class="dark-box">
           <div class="lang-selector">
