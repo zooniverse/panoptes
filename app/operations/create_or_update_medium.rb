@@ -16,12 +16,41 @@ class CreateOrUpdateMedium < Operation
 
   def execute
     media['metadata']["state"] = 'creating'
-    if medium = object.public_send(type)
+    medium = find_existing_medium
+
+    if medium
       medium.update!(media)
       medium.touch
+      cleanup_duplicate_media(medium)
       medium
     else
-      object.send("create_#{type}!", media)
+      new_medium = object.send("create_#{type}!", media)
+      cleanup_duplicate_media(new_medium)
+      new_medium
     end
+  end
+
+  private
+
+  def find_existing_medium
+    existing_media
+      .order(updated_at: :desc, id: :desc)
+      .first
+  end
+
+  def cleanup_duplicate_media(primary_medium)
+    return unless primary_medium
+
+    existing_media
+      .where.not(id: primary_medium.id)
+      .find_each(&:destroy)
+  end
+
+  def existing_media
+    Medium.where(linked: object, type: medium_type)
+  end
+
+  def medium_type
+    "#{object.model_name.singular}_#{type}"
   end
 end
