@@ -88,6 +88,22 @@ RSpec.describe AggregationClient do
             described_class.new([:test, stubs]).send_aggregation_request(1, 10, bearer_token)
           end.to raise_error(AggregationClient::ResourceNotFound)
         end
+
+        it 'raises if the bearer token is nil' do
+          stubs = Faraday::Adapter::Test::Stubs.new do |stub|
+            stub.post(path, params.to_json, headers.except(:Authorization)) do
+              [
+                401,
+                { 'Content-Type' => 'application/json' },
+                { 'errors' => 'Authorization token required' }.to_json
+              ]
+            end
+          end
+
+          expect do
+            described_class.new([:test, stubs]).send_aggregation_request(1, 10, nil)
+          end.to raise_error(AggregationClient::NotAuthorized)
+        end
       end
     end
   end

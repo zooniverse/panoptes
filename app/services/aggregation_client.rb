@@ -3,6 +3,7 @@
 class AggregationClient
   class ConnectionError < StandardError; end
   class ResourceNotFound < ConnectionError; end
+  class NotAuthorized < ConnectionError; end
   class ServerError < ConnectionError; end
 
   attr_reader :connection
@@ -50,7 +51,9 @@ class AggregationClient
     case response.status
     when 404
       raise ResourceNotFound, status: response.status, body: response.body
-    when 400..600
+    when 401
+      raise NotAuthorized, status: response.status, body: response.body
+    when 402..600
       raise ServerError, response.body
     else
       response.body
