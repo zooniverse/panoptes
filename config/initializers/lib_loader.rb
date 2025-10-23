@@ -1,1 +1,1 @@
-require 'gem_ext'
+require 'gem_ext/gem_ext'

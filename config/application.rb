@@ -16,14 +16,17 @@ Bundler.require(*Rails.groups)
 
 module Panoptes
   class Application < Rails::Application
-    config.eager_load_paths += Dir[Rails.root.join('app', 'models', '*/')]
-    config.eager_load_paths += Dir[Rails.root.join('app', 'workers', '*/')]
-    config.eager_load_paths += Dir[Rails.root.join('app', 'operations', '*/')]
-    config.eager_load_paths += Dir[Rails.root.join('app', 'serializers', '*/')]
-    config.eager_load_paths += Dir[Rails.root.join('app', 'formatters', '*/')]
-    config.eager_load_paths += Dir[Rails.root.join('app', 'policies', '*/')]
+    autoload_paths = [
+      Rails.root.join('app', 'models').to_s,
+      Rails.root.join('app', 'workers').to_s,
+      Rails.root.join('app', 'operations').to_s,
+      Rails.root.join('app', 'serializers').to_s,
+      Rails.root.join('app', 'policies').to_s,
+      Rails.root.join('lib').to_s
+    ]
 
-    config.eager_load_paths += Dir[Rails.root.join('lib', '**/')]
+    config.autoload_paths.concat(autoload_paths)
+    config.eager_load_paths.concat(autoload_paths)
 
     config.action_dispatch.perform_deep_munge = false
     config.middleware.insert_before ActionDispatch::Cookies, RejectPatchRequests
