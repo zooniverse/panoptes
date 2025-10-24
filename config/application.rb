@@ -17,11 +17,11 @@ Bundler.require(*Rails.groups)
 module Panoptes
   class Application < Rails::Application
     autoload_paths = [
-      Rails.root.join('app', 'models').to_s,
-      Rails.root.join('app', 'workers').to_s,
-      Rails.root.join('app', 'operations').to_s,
-      Rails.root.join('app', 'serializers').to_s,
-      Rails.root.join('app', 'policies').to_s,
+      Rails.root.join('app/models').to_s,
+      Rails.root.join('app/workers').to_s,
+      Rails.root.join('app/operations').to_s,
+      Rails.root.join('app/serializers').to_s,
+      Rails.root.join('app/policies').to_s,
       Rails.root.join('lib').to_s
     ]
 

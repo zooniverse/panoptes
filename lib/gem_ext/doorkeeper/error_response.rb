@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'doorkeeper/oauth/error_response'
 
 Doorkeeper::OAuth::ErrorResponse.class_eval do
