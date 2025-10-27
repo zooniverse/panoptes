@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class MakeOauthAccessGrantsScopesNotNull < ActiveRecord::Migration[6.1]
   def up
     safety_assured do
@@ -7,13 +9,13 @@ class MakeOauthAccessGrantsScopesNotNull < ActiveRecord::Migration[6.1]
     change_column_default :oauth_access_grants, :scopes, ''
 
     safety_assured do
-      execute <<-SQL
+      execute <<-SQL.squish
         ALTER TABLE oauth_access_grants
         ADD CONSTRAINT check_oauth_access_grants_scopes_not_null
         CHECK (scopes IS NOT NULL) NOT VALID;
       SQL
 
-      execute <<-SQL
+      execute <<-SQL.squish
         ALTER TABLE oauth_access_grants
         VALIDATE CONSTRAINT check_oauth_access_grants_scopes_not_null;
       SQL
@@ -25,4 +27,3 @@ class MakeOauthAccessGrantsScopesNotNull < ActiveRecord::Migration[6.1]
     change_column_default :oauth_access_grants, :scopes, nil
   end
 end
-
