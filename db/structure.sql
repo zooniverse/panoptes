@@ -4276,7 +4276,7 @@ ALTER TABLE ONLY public.users
 -- PostgreSQL database dump complete
 --
 
-\unrestrict TAYyLkEhW6QLBZicY9koLE4tJDz53MbApYi64pEpOaQcXttYCgyvKlxA6JnSQZY
+
 
 SET search_path TO "$user", public;
 
@@ -4552,5 +4552,4 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20250326191749'),
 ('20250530191528'),
 ('20251027120000');
-
 
