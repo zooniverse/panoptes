@@ -1,4 +1,4 @@
-module ACLSerializer
+module AclSerializer
   extend ActiveSupport::Concern
 
   include Serialization::PanoptesRestpack

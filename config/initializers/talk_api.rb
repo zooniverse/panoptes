@@ -1,1 +1,3 @@
-TalkApiClient.load_configuration
+Rails.application.reloader.to_prepare do
+  TalkApiClient.load_configuration
+end
