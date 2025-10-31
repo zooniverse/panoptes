@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'export_json_project'
+require 'export/export_json_project'
 
 RSpec.describe Export::JSON::Project do
 

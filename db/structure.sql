@@ -555,7 +555,8 @@ CREATE TABLE public.oauth_access_grants (
     redirect_uri text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     revoked_at timestamp without time zone,
-    scopes character varying
+    scopes character varying DEFAULT ''::character varying,
+    CONSTRAINT check_oauth_access_grants_scopes_not_null CHECK ((scopes IS NOT NULL))
 );
 
 
@@ -4275,6 +4276,8 @@ ALTER TABLE ONLY public.users
 -- PostgreSQL database dump complete
 --
 
+
+
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
@@ -4547,6 +4550,6 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20240304201959'),
 ('20240531184258'),
 ('20250326191749'),
-('20250530191528');
-
+('20250530191528'),
+('20251027120000');
 
