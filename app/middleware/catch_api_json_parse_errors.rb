@@ -7,7 +7,8 @@ class CatchApiJsonParseErrors
     begin
       @app.call(env)
     rescue ActionDispatch::Http::Parameters::ParseError => e
-      return error.respond(e) if json_api_call?(env)
+      error_to_pass = Rails.version.start_with?('6') ? e : e.cause
+      return error.respond(error_to_pass) if json_api_call?(env)
 
       raise e
     end
