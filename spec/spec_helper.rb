@@ -9,6 +9,7 @@ require "rspec/rails"
 require "sidekiq/testing"
 require 'flipper/adapters/memory'
 require 'webmock/rspec'
+require 'net/smtp'
 
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
