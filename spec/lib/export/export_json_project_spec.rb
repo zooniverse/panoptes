@@ -1,5 +1,5 @@
 require 'spec_helper'
-require 'export/export_json_project'
+require 'export/json/project'
 
 RSpec.describe Export::JSON::Project do
 
@@ -58,7 +58,7 @@ RSpec.describe Export::JSON::Project do
 
       it "should be able to rebuild the project from the export" do
         new_project.valid?
-        expect(new_project.errors.keys).to match_array([:owner])
+        expect(new_project.errors.attribute_names).to match_array([:owner])
       end
 
       it "should be private by default" do
@@ -98,7 +98,7 @@ RSpec.describe Export::JSON::Project do
         export_values("workflows").each do |workflow_attrs|
           new_workflow = Workflow.new(workflow_attrs)
           new_workflow.valid?
-          expect(new_workflow.errors.keys).to match_array([:project])
+          expect(new_workflow.errors.attribute_names).to match_array([:project])
         end
       end
     end

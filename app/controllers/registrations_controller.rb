@@ -1,5 +1,5 @@
 class RegistrationsController < Devise::RegistrationsController
-  include JSONApiRender
+  include JsonApiRender
 
   def create
     respond_to do |format|
