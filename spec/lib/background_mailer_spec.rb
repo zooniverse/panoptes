@@ -13,7 +13,7 @@ describe Devise::BackgroundMailer, sidekiq: :inline do
   it "should send an email" do
     expect {
       mailer.deliver
-    }.to change { ActionMailer::Base.deliveries.count }.by(1)
+    }.to change { 'ActionMailer::Base'.constantize.deliveries.count }.by(1)
   end
 
   context "when redis is down" do
@@ -22,7 +22,7 @@ describe Devise::BackgroundMailer, sidekiq: :inline do
         allow(Devise::Mailer).to receive(:delay).and_raise(redis_error)
         expect {
           mailer.deliver
-        }.to change { ActionMailer::Base.deliveries.count }.by(1)
+        }.to change { 'ActionMailer::Base'.constantize.deliveries.count }.by(1)
       end
     end
   end
