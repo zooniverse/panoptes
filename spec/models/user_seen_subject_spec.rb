@@ -23,7 +23,7 @@ RSpec.describe UserSeenSubject, :type => :model do
 
       it "should fail" do
         expect do
-          UserSeenSubject.add_seen_subjects_for_user(**params)
+          described_class.add_seen_subjects_for_user(**params)
         end.to raise_error(ActiveRecord::RecordInvalid)
       end
     end
@@ -41,12 +41,12 @@ RSpec.describe UserSeenSubject, :type => :model do
 
         it "should create a new user_seen_subject" do
           expect do
-            UserSeenSubject.add_seen_subjects_for_user(**params)
-          end.to change{ UserSeenSubject.count }.by(1)
+            described_class.add_seen_subjects_for_user(**params)
+          end.to change{ described_class.count }.by(1)
         end
 
         it "should add the subject id to the subject_ids array" do
-          UserSeenSubject.add_seen_subjects_for_user(**params)
+          described_class.add_seen_subjects_for_user(**params)
           expect(created_uss.subject_ids).to eq([ subject.id ])
         end
       end
@@ -56,12 +56,12 @@ RSpec.describe UserSeenSubject, :type => :model do
 
         it "should not create a new user_seen_subejct" do
           expect do
-            UserSeenSubject.add_seen_subjects_for_user(**params)
-          end.not_to change{ UserSeenSubject.count }
+            described_class.add_seen_subjects_for_user(**params)
+          end.not_to change{ described_class.count }
         end
 
         it "should add the subject id to the subject_ids array" do
-          UserSeenSubject.add_seen_subjects_for_user(**params)
+          described_class.add_seen_subjects_for_user(**params)
           user_seen_subject.reload
           expect(user_seen_subject.subject_ids).to include(subject.id)
         end
@@ -93,23 +93,23 @@ RSpec.describe UserSeenSubject, :type => :model do
 
     describe "::count_user_activity" do
       it "should sum all the seen subjects across all workflows" do
-        count = UserSeenSubject.count_user_activity(user_seen_subject.user_id)
+        count = described_class.count_user_activity(user_seen_subject.user_id)
         expect(count).to eq(all_seen_counts)
       end
 
       it "should sum all the seen subjects across specific workflow ids" do
-        count = UserSeenSubject.count_user_activity(user_seen_subject.user_id, workflow_ids)
+        count = described_class.count_user_activity(user_seen_subject.user_id, workflow_ids)
         expect(count).to eq(all_seen_counts)
       end
 
       it "should sum all the seen subjects across a specific workflow" do
-        count = UserSeenSubject.count_user_activity(user_seen_subject.user_id, user_seen_subject.workflow_id)
+        count = described_class.count_user_activity(user_seen_subject.user_id, user_seen_subject.workflow_id)
         expect(count).to eq(user_seen_subject.subject_ids.size)
       end
 
       context "when no counts exist for the user" do
         it "should return 0" do
-          count = UserSeenSubject.count_user_activity(user_seen_subject.user_id+1)
+          count = described_class.count_user_activity(user_seen_subject.user_id+1)
           expect(count).to eq(0)
         end
       end
@@ -117,18 +117,18 @@ RSpec.describe UserSeenSubject, :type => :model do
 
     describe '::activity_by_workflow' do
       it 'should return number of elements equal to UserSeenSubjects for that user' do
-        expect( UserSeenSubject.activity_by_workflow(user_seen_subject.user_id).size).to eq(
-          UserSeenSubject.where(user_id: user_seen_subject.user_id).size
+        expect( described_class.activity_by_workflow(user_seen_subject.user_id).size).to eq(
+          described_class.where(user_id: user_seen_subject.user_id).size
         )
       end
 
       it 'should include keys for each workflow' do
-        expect(UserSeenSubject.activity_by_workflow(user_seen_subject.user_id).keys).to match_array(workflow_ids)
+        expect(described_class.activity_by_workflow(user_seen_subject.user_id).keys).to match_array(workflow_ids)
       end
 
       it 'sums to the same value as ::count_user_activity' do
-        count = UserSeenSubject.count_user_activity(user_seen_subject.user_id)
-        expect(UserSeenSubject.activity_by_workflow(user_seen_subject.user_id).values.map(&:to_i).reduce(:+)).to eq(count)
+        count = described_class.count_user_activity(user_seen_subject.user_id)
+        expect(described_class.activity_by_workflow(user_seen_subject.user_id).values.map(&:to_i).reduce(:+)).to eq(count)
       end
     end
   end

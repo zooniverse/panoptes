@@ -28,7 +28,7 @@ jobs:
           - Gemfile.next
         ruby:
           - 2.7
-          - 3.0
+          - '3.0'
         exclude:
           - gemfile: Gemfile
             ruby: '3.0'
