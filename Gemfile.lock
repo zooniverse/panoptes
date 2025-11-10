@@ -471,8 +471,8 @@ GEM
     standby (4.0.0)
       activerecord (>= 3.0.0)
     stringex (2.8.6)
-    strong_migrations (1.4.4)
-      activerecord (>= 5.2)
+    strong_migrations (2.1.0)
+      activerecord (>= 6.1)
     ten_years_rails (0.2.0)
       actionview
       activesupport
@@ -500,7 +500,7 @@ GEM
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
     yard (0.9.36)
-    zeitwerk (2.6.18)
+    zeitwerk (2.7.1)
     zoo_stream (1.0.1)
       aws-sdk
 
