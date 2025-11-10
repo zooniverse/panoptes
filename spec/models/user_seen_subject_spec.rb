@@ -23,7 +23,7 @@ RSpec.describe UserSeenSubject, :type => :model do
 
       it "should fail" do
         expect do
-          UserSeenSubject.add_seen_subjects_for_user(params)
+          UserSeenSubject.add_seen_subjects_for_user(**params)
         end.to raise_error(ActiveRecord::RecordInvalid)
       end
     end
@@ -41,12 +41,12 @@ RSpec.describe UserSeenSubject, :type => :model do
 
         it "should create a new user_seen_subject" do
           expect do
-            UserSeenSubject.add_seen_subjects_for_user(params)
+            UserSeenSubject.add_seen_subjects_for_user(**params)
           end.to change{ UserSeenSubject.count }.by(1)
         end
 
         it "should add the subject id to the subject_ids array" do
-          UserSeenSubject.add_seen_subjects_for_user(params)
+          UserSeenSubject.add_seen_subjects_for_user(**params)
           expect(created_uss.subject_ids).to eq([ subject.id ])
         end
       end
@@ -56,18 +56,18 @@ RSpec.describe UserSeenSubject, :type => :model do
 
         it "should not create a new user_seen_subejct" do
           expect do
-            UserSeenSubject.add_seen_subjects_for_user(params)
+            UserSeenSubject.add_seen_subjects_for_user(**params)
           end.not_to change{ UserSeenSubject.count }
         end
 
         it "should add the subject id to the subject_ids array" do
-          UserSeenSubject.add_seen_subjects_for_user(params)
+          UserSeenSubject.add_seen_subjects_for_user(**params)
           user_seen_subject.reload
           expect(user_seen_subject.subject_ids).to include(subject.id)
         end
 
         it 'touches the updated_at timestamp' do
-          expect { described_class.add_seen_subjects_for_user(params) }.to change { user_seen_subject.reload.updated_at }
+          expect { described_class.add_seen_subjects_for_user(**params) }.to change { user_seen_subject.reload.updated_at }
         end
       end
     end
