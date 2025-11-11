@@ -42,7 +42,7 @@ RSpec.describe UserSeenSubject, :type => :model do
         it "should create a new user_seen_subject" do
           expect do
             described_class.add_seen_subjects_for_user(**params)
-          end.to change{ described_class.count }.by(1)
+          end.to change(described_class, :count).by(1)
         end
 
         it "should add the subject id to the subject_ids array" do
@@ -57,7 +57,7 @@ RSpec.describe UserSeenSubject, :type => :model do
         it "should not create a new user_seen_subejct" do
           expect do
             described_class.add_seen_subjects_for_user(**params)
-          end.not_to change{ described_class.count }
+          end.not_to change(described_class, :count)
         end
 
         it "should add the subject id to the subject_ids array" do
@@ -109,7 +109,7 @@ RSpec.describe UserSeenSubject, :type => :model do
 
       context "when no counts exist for the user" do
         it "should return 0" do
-          count = described_class.count_user_activity(user_seen_subject.user_id+1)
+          count = described_class.count_user_activity(user_seen_subject.user_id + 1)
           expect(count).to eq(0)
         end
       end
@@ -117,7 +117,7 @@ RSpec.describe UserSeenSubject, :type => :model do
 
     describe '::activity_by_workflow' do
       it 'should return number of elements equal to UserSeenSubjects for that user' do
-        expect( described_class.activity_by_workflow(user_seen_subject.user_id).size).to eq(
+        expect(described_class.activity_by_workflow(user_seen_subject.user_id).size).to eq(
           described_class.where(user_id: user_seen_subject.user_id).size
         )
       end
@@ -128,7 +128,7 @@ RSpec.describe UserSeenSubject, :type => :model do
 
       it 'sums to the same value as ::count_user_activity' do
         count = described_class.count_user_activity(user_seen_subject.user_id)
-        expect(described_class.activity_by_workflow(user_seen_subject.user_id).values.map(&:to_i).reduce(:+)).to eq(count)
+        expect(described_class.activity_by_workflow(user_seen_subject.user_id).values.map(&:to_i).sum).to eq(count)
       end
     end
   end
