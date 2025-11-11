@@ -58,12 +58,7 @@ data:
       server 127.0.0.1:81;
     }
 
-    # set_real_ip_from for local and known Azure Front Door IPs
     set_real_ip_from 172.16.0.0/12;
-    include /etc/nginx/nginx-azure-ips.conf;
-
-    real_ip_header X-Forwarded-For;
-    real_ip_recursive on;
 
     server {
       server_name panoptes-staging.zooniverse.org;
