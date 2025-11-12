@@ -18,24 +18,24 @@ module Panoptes
   class Application < Rails::Application
     config.autoload_paths += Dir[Rails.root.join('lib')]
     config.autoload_paths += [
-        'app/models',
-        'app/workers',
-        'app/operations',
-        'app/serializers',
-        'app/policies',
-        'app/services',
-      ].collect { |path| Rails.root.join path }
+      'app/models',
+      'app/workers',
+      'app/operations',
+      'app/serializers',
+      'app/policies',
+      'app/services'
+    ].collect { |path| Rails.root.join path }
 
     config.eager_load_paths += [
-        'lib',
-        'app/models/concerns',
-        'app/models',
-        'app/workers',
-        'app/operations',
-        'app/serializers/concerns',
-        'app/serializers',
-        'app/policies',
-        'app/services',
+      'lib',
+      'app/models/concerns',
+      'app/models',
+      'app/workers',
+      'app/operations',
+      'app/serializers/concerns',
+      'app/serializers',
+      'app/policies',
+      'app/services'
     ].collect { |path| Rails.root.join path }
 
     config.action_dispatch.perform_deep_munge = false
