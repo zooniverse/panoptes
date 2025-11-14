@@ -4286,8 +4286,6 @@ ALTER TABLE ONLY public.users
 -- PostgreSQL database dump complete
 --
 
-\unrestrict PRrA2GTs384UNMN1MJdbKGQhiB8GigrgtcAoft1dyKpTNKiJkyfaTspeVLlzyM5
-
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
