@@ -1,3 +1,8 @@
+\restrict PRrA2GTs384UNMN1MJdbKGQhiB8GigrgtcAoft1dyKpTNKiJkyfaTspeVLlzyM5
+
+-- Dumped from database version 11.16 (Debian 11.16-1.pgdg90+1)
+-- Dumped by pg_dump version 13.22 (Debian 13.22-0+deb11u1)
+
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
@@ -52,8 +57,6 @@ COMMENT ON EXTENSION pg_trgm IS 'text similarity measurement and index searching
 
 
 SET default_tablespace = '';
-
-SET default_with_oids = false;
 
 --
 -- Name: access_control_lists; Type: TABLE; Schema: public; Owner: -
@@ -3155,6 +3158,13 @@ CREATE INDEX index_projects_on_beta_row_order ON public.projects USING btree (be
 
 
 --
+-- Name: index_projects_on_configuration; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_projects_on_configuration ON public.projects USING gin (configuration);
+
+
+--
 -- Name: index_projects_on_featured; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4276,7 +4286,7 @@ ALTER TABLE ONLY public.users
 -- PostgreSQL database dump complete
 --
 
-
+\unrestrict PRrA2GTs384UNMN1MJdbKGQhiB8GigrgtcAoft1dyKpTNKiJkyfaTspeVLlzyM5
 
 SET search_path TO "$user", public;
 
@@ -4551,5 +4561,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20240531184258'),
 ('20250326191749'),
 ('20250530191528'),
-('20251027120000');
+('20251027120000'),
+('20251113172303');
+
 
