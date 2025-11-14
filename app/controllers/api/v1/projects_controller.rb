@@ -201,9 +201,8 @@ class Api::V1::ProjectsController < Api::ApiController
   end
 
   def filter_by_languages
-    if languages = params.delete(:languages).try(:split, ",").try(:map, &:downcase)
-      @controlled_resources = controlled_resources
-      .where("configuration->'languages' @> ?", languages.to_json)
-    end
+    languages = params.delete(:languages)&.split(',')&.map(&:downcase)
+
+    @controlled_resources = controlled_resources.where("configuration->'languages' @> ?", languages.to_json) if languages.present?
   end
 end
