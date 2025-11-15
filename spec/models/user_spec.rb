@@ -688,6 +688,7 @@ describe User, type: :model do
   describe "#increment_subjects_count_cache", :with_cache_store do
     it 'should return nil if no cache entry' do
       uploader = create(:user_with_uploaded_subjects)
+      Rails.cache.delete(uploader.send(:subjects_count_cache_key))
       expect(uploader.increment_subjects_count_cache).to eq(nil)
     end
 
@@ -695,6 +696,23 @@ describe User, type: :model do
       uploader = create(:user_with_uploaded_subjects)
       count = uploader.uploaded_subjects_count
       expect(uploader.increment_subjects_count_cache).to eq(count+1)
+    end
+  end
+
+  describe '#increment_subjects_count_cache normalization', :with_cache_store do
+    let(:uploader) { create(:user_with_uploaded_subjects) }
+    let(:key) { uploader.send(:subjects_count_cache_key) }
+
+    it 'normalizes non-numeric cache values by using the DB count then increments' do
+      Rails.cache.write(key, 'notnumeric')
+      db_count = Subject.where(upload_user_id: uploader.id).count
+      expect(uploader.increment_subjects_count_cache).to eq(db_count + 1)
+    end
+
+    it 'normalizes too-large numeric strings (> MEMCACHED_UINT64_MAX_STRING) and increments' do
+      Rails.cache.write(key, '18446744073709551616')
+      db_count = Subject.where(upload_user_id: uploader.id).count
+      expect(uploader.increment_subjects_count_cache).to eq(db_count + 1)
     end
   end
 
