@@ -349,7 +349,7 @@ class User < ApplicationRecord
 
   private
 
-  MEMCACHED_UINT64_MAX_STRING = "18446744073709551615".freeze
+  MEMCACHED_UINT64_MAX_STRING = '18446744073709551615'
 
   def subjects_count_cache_key
     @subjects_count_cache_key ||= "User/#{id}/uploaded_subjects_count"
@@ -360,23 +360,24 @@ class User < ApplicationRecord
   end
 
   def normalize_subjects_count_cache!
-    # Compute a numeric value from cache/DB and write as raw numeric string.
     key = subjects_count_cache_key
     current = Rails.cache.read(key) || Rails.cache.read(key, raw: true)
-    count_i =
-      case current
-      when nil
-        db_uploaded_subjects_count
-      when String
-        valid_memcache_counter_string?(current) ? current.to_i : db_uploaded_subjects_count
-      when Integer
-        current
-      else
-        current.to_i
-      end
-
-    write_raw_subjects_count(count_i)
+    count_i = normalized_count_value(current)
+    write_raw_subjects_count(count_i) if !count_i.nil?
     count_i
+  end
+
+  def normalized_count_value(current)
+    case current
+    when String
+      valid_memcache_counter_string?(current) ? current.to_i : db_uploaded_subjects_count
+    when Integer
+      current
+    when nil
+      nil
+    else
+      current.to_i
+    end
   end
 
   def db_uploaded_subjects_count
@@ -391,8 +392,8 @@ class User < ApplicationRecord
 
   def valid_memcache_counter_string?(value)
     return false unless value.is_a?(String) && value.match?(/\A\d+\z/)
-    s = value
 
+    s = value
     max = MEMCACHED_UINT64_MAX_STRING
     return true if s.length < max.length
     return false if s.length > max.length

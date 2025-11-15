@@ -686,11 +686,10 @@ describe User, type: :model do
   end
 
   describe "#increment_subjects_count_cache", :with_cache_store do
-    it 'seeds from DB and returns incremented value if no cache entry' do
+    it 'should return nil if no cache entry' do
       uploader = create(:user_with_uploaded_subjects)
-      db_count = Subject.where(upload_user_id: uploader.id).count
       Rails.cache.delete(uploader.send(:subjects_count_cache_key))
-      expect(uploader.increment_subjects_count_cache).to eq(db_count + 1)
+      expect(uploader.increment_subjects_count_cache).to eq(nil)
     end
 
     it 'should inc the cache entry value if exists' do
