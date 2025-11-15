@@ -363,7 +363,7 @@ class User < ApplicationRecord
     key = subjects_count_cache_key
     current = Rails.cache.read(key) || Rails.cache.read(key, raw: true)
     count_i = normalized_count_value(current)
-    write_raw_subjects_count(count_i) if !count_i.nil?
+    write_raw_subjects_count(count_i) unless count_i.nil?
     count_i
   end
 
