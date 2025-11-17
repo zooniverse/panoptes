@@ -386,12 +386,8 @@ class User < ApplicationRecord
     end
   end
 
-  def numeric_string?(value)
-    value.is_a?(String) && value.match?(/\A\d+\z/)
-  end
-
   def valid_memcache_counter_string?(value)
-    return false unless numeric_string(value)
+    return false unless value.is_a?(String) && value.match?(/\A\d+\z/)
 
     s = value
     max = MEMCACHED_UINT64_MAX_STRING
