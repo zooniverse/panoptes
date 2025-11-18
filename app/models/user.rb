@@ -348,7 +348,6 @@ class User < ApplicationRecord
 
   private
 
-
   def subjects_count_cache_key
     @subjects_count_cache_key ||= "User/#{id}/uploaded_subjects_count:v1"
   end
