@@ -330,7 +330,7 @@ class User < ApplicationRecord
   end
 
   def uploaded_subjects_count
-    count = Rails.cache.fetch(subjects_count_cache_key, expires_in: subject_count_cache_expiry) do
+    count = Rails.cache.fetch(subjects_count_cache_key, expires_in: subject_count_cache_expiry, raw: true) do
       DatabaseReplica.read('read_user_uploaded_subjects_counts_from_replica') do
         Subject.where(upload_user_id: id).count
       end
@@ -339,7 +339,6 @@ class User < ApplicationRecord
   end
 
   def increment_subjects_count_cache
-    normalize_subjects_count_cache!
     Rails.cache.increment(subjects_count_cache_key)
   end
 
@@ -349,60 +348,13 @@ class User < ApplicationRecord
 
   private
 
-  MEMCACHED_UINT64_MAX_STRING = '18446744073709551615'
 
   def subjects_count_cache_key
-    @subjects_count_cache_key ||= "User/#{id}/uploaded_subjects_count"
+    @subjects_count_cache_key ||= "User/#{id}/uploaded_subjects_count:v1"
   end
 
   def subject_count_cache_expiry
     ENV.fetch("UPLOADED_SUBJECTS_COUNT_CACHE_EXPIRY", 1.hour).to_i.seconds
   end
 
-  def normalize_subjects_count_cache!
-    key = subjects_count_cache_key
-    current = Rails.cache.read(key) || Rails.cache.read(key, raw: true)
-    count_i = normalized_count_value(current)
-    write_raw_subjects_count(count_i) unless count_i.nil?
-    count_i
-  end
-
-  def normalized_count_value(current)
-    case current
-    when String
-      valid_memcache_counter_string?(current) ? current.to_i : db_uploaded_subjects_count
-    when Integer
-      current
-    when nil
-      nil
-    else
-      current.to_i
-    end
-  end
-
-  def db_uploaded_subjects_count
-    DatabaseReplica.read('read_user_uploaded_subjects_counts_from_replica') do
-      Subject.where(upload_user_id: id).count
-    end
-  end
-
-  def valid_memcache_counter_string?(value)
-    return false unless value.is_a?(String) && value.match?(/\A\d+\z/)
-
-    s = value
-    max = MEMCACHED_UINT64_MAX_STRING
-    return true if s.length < max.length
-    return false if s.length > max.length
-
-    s < max
-  end
-
-  def write_raw_subjects_count(count_i)
-    Rails.cache.write(
-      subjects_count_cache_key,
-      count_i.to_s,
-      expires_in: subject_count_cache_expiry,
-      raw: true
-    )
-  end
 end
