@@ -38,6 +38,7 @@ gem 'pg', '~> 1.4'
 gem 'pg_search'
 gem 'puma', '~> 6.4.3'
 gem 'pundit', '~> 2.4.0'
+gem 'rack-attack'
 gem 'rack-cors', '~> 1.0', require: 'rack/cors'
 if next?
   gem 'rails', '7.0.8.7'
@@ -86,4 +87,3 @@ group :test do
   gem 'spring-commands-rspec'
   gem 'webmock'
 end
-
