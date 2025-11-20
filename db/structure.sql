@@ -1,8 +1,3 @@
-\restrict PRrA2GTs384UNMN1MJdbKGQhiB8GigrgtcAoft1dyKpTNKiJkyfaTspeVLlzyM5
-
--- Dumped from database version 11.16 (Debian 11.16-1.pgdg90+1)
--- Dumped by pg_dump version 13.22 (Debian 13.22-0+deb11u1)
-
 SET statement_timeout = 0;
 SET lock_timeout = 0;
 SET idle_in_transaction_session_timeout = 0;
