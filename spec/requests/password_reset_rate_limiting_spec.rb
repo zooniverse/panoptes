@@ -40,7 +40,7 @@ describe 'password reset rate limiting', type: :request, with_cache_store: true 
       end
 
       it 'allows multiple requests up to the limit' do
-        limit.times do |request_number|
+        limit.times do
           password_reset_request(email)
           expect(response).to have_http_status(:ok)
         end
@@ -58,7 +58,7 @@ describe 'password reset rate limiting', type: :request, with_cache_store: true 
 
     context 'exceeding rate limit' do
       it 'blocks requests after exceeding the limit' do
-        limit.times do |_|
+        limit.times do
           password_reset_request(email)
           expect(response).to have_http_status(:ok)
         end
@@ -139,7 +139,7 @@ describe 'password reset rate limiting', type: :request, with_cache_store: true 
     context 'nil or blank email' do
       it 'does not apply rate limiting to nil email' do
         # nil email shouldn't trigger the throttle
-        (limit+1).times do
+        (limit + 1).times do
           post user_password_path,
                params: { user: { email: nil } }.to_json,
                headers: json_headers
@@ -150,7 +150,7 @@ describe 'password reset rate limiting', type: :request, with_cache_store: true 
 
       it 'does not apply rate limiting to blank email' do
         # blank email shouldn't trigger the throttle
-        (limit+1).times do
+        (limit + 1).times do
           post user_password_path,
                params: { user: { email: '' } }.to_json,
                headers: json_headers
@@ -163,7 +163,7 @@ describe 'password reset rate limiting', type: :request, with_cache_store: true 
     context 'other endpoint paths' do
       it 'only applies rate limiting to /users/password POST requests' do
         # Don't throttle GET requests
-        (limit+1).times do
+        (limit + 1).times do
           get user_password_path, headers: json_headers
           expect(response.status).not_to eq(429)
         end
@@ -171,7 +171,7 @@ describe 'password reset rate limiting', type: :request, with_cache_store: true 
 
       it 'does not throttle PUT requests to password endpoint' do
         # Ensure we're only throttling POST (create), not PUT (update)
-        (limit+1).times do
+        (limit + 1).times do
           put user_password_path,
               params: { user: { password: 'newpassword', password_confirmation: 'newpassword', reset_password_token: 'invalid' } }.to_json,
               headers: json_headers
@@ -217,11 +217,11 @@ describe 'password reset rate limiting', type: :request, with_cache_store: true 
     context 'shares the rate limit with JSON requests from the same email' do
       # Hit the limit with a mixed set of requests
       before do
-        (limit/2 +1).times do
+        (limit / 2 + 1).times do
           password_reset_request(email)
         end
 
-        (limit/2 +1).times do
+        (limit / 2 + 1).times do
           html_password_reset_request(email)
         end
       end
