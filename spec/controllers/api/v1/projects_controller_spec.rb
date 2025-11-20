@@ -242,11 +242,21 @@ describe Api::V1::ProjectsController, type: :controller do
             end
           end
 
-          it 'filters projects by language' do
-            translated_project = create(:full_project, configuration: { languages: ['fr'] })
-            get :index, params: { languages: 'fr' }
-            expect(json_response[api_resource_name].length).to eq(1)
-            expect(json_response['projects'][0]['id'].to_i).to eq(translated_project.id)
+          describe 'filter by language' do
+            let!(:translated_project) { create(:full_project, configuration: { languages: ['fr'] }) }
+
+            it 'filters projects by one language' do
+              get :index, params: { languages: 'fr' }
+              expect(json_response[api_resource_name].length).to eq(1)
+              expect(json_response['projects'][0]['id'].to_i).to eq(translated_project.id)
+            end
+
+            it 'filters projects by multiple languages' do
+              multi_translated_project = create(:full_project, configuration: { languages: %w[fr ja] })
+              get :index, params: { languages: 'fr,ja' }
+              expect(json_response[api_resource_name].length).to eq(1)
+              expect(json_response['projects'][0]['id'].to_i).to eq(multi_translated_project.id)
+            end
           end
         end
       end
