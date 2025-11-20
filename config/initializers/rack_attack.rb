@@ -12,7 +12,7 @@ class Rack::Attack
         # Otherwise, use the normal params hash
         params = req.params
       end
-      params.dig('user', 'email').to_s.downcase.gsub(/\s+/, "").presence
+      params.dig('user', 'email').to_s.downcase.gsub(/\s+/, '').presence
     end
   end
 end
