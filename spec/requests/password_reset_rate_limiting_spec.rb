@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe 'password reset rate limiting', type: :request, with_cache_store: true do
@@ -33,7 +35,7 @@ describe 'password reset rate limiting', type: :request, with_cache_store: true 
     let(:user) { create(:user) }
     let(:email) { user.email }
 
-    context 'within rate limit' do
+    context 'when within rate limit' do
       it 'allows the first request' do
         password_reset_request(email)
         expect(response).to have_http_status(:ok)
@@ -56,7 +58,7 @@ describe 'password reset rate limiting', type: :request, with_cache_store: true 
       end
     end
 
-    context 'exceeding rate limit' do
+    context 'when exceeding rate limit' do
       it 'blocks requests after exceeding the limit' do
         limit.times do
           password_reset_request(email)
@@ -77,7 +79,7 @@ describe 'password reset rate limiting', type: :request, with_cache_store: true 
       end
     end
 
-    context 'rate limit per email address' do
+    context 'with rate limiting per email address' do
       it 'tracks the limit separately for each email' do
         user1 = create(:user)
         user2 = create(:user)
@@ -95,7 +97,7 @@ describe 'password reset rate limiting', type: :request, with_cache_store: true 
       end
     end
 
-    context 'email normalization' do
+    context 'with email normalization' do
       it 'treats uppercase and lowercase emails as the same' do
         email_lower = user.email
         email_upper = user.email.upcase
@@ -122,7 +124,7 @@ describe 'password reset rate limiting', type: :request, with_cache_store: true 
       end
     end
 
-    context 'non-existent email addresses' do
+    context 'with non-existent email addresses' do
       it 'applies rate limiting even for non-existent emails' do
         email = 'nonexistent@example.com'
 
@@ -136,7 +138,7 @@ describe 'password reset rate limiting', type: :request, with_cache_store: true 
       end
     end
 
-    context 'nil or blank email' do
+    context 'with nil or blank email' do
       it 'does not apply rate limiting to nil email' do
         # nil email shouldn't trigger the throttle
         (limit + 1).times do
@@ -160,7 +162,7 @@ describe 'password reset rate limiting', type: :request, with_cache_store: true 
       end
     end
 
-    context 'other endpoint paths' do
+    context 'with other endpoint paths' do
       it 'only applies rate limiting to /users/password POST requests' do
         # Don't throttle GET requests
         (limit + 1).times do
@@ -201,7 +203,7 @@ describe 'password reset rate limiting', type: :request, with_cache_store: true 
     end
   end
 
-  context 'POST /users/password via HTML' do
+  describe 'POSTing to /users/password via HTML' do
     let(:user) { create(:user) }
     let(:email) { user.email }
 
@@ -214,7 +216,7 @@ describe 'password reset rate limiting', type: :request, with_cache_store: true 
       expect(response).to have_http_status(:too_many_requests)
     end
 
-    context 'shares the rate limit with JSON requests from the same email' do
+    describe 'shares the rate limit with JSON requests from the same email' do
       # Hit the limit with a mixed set of requests
       before do
         (limit / 2 + 1).times do
