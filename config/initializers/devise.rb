@@ -16,6 +16,6 @@ Devise.setup do |config|
   config.sign_out_via = :delete
 
   # MAILER
-  require 'devise_mailer/background_mailer'
+  require 'devise/background_mailer'
   config.mailer = "Devise::BackgroundMailer"
 end

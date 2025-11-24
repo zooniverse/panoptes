@@ -43,7 +43,7 @@ describe PasswordsController, type: [ :controller, :mailer ] do
         end
 
         it "should not send an email to the account email address" do
-          expect(ActionMailer::Base.deliveries).to be_empty
+          expect('ActionMailer::Base'.constantize.deliveries).to be_empty
         end
       end
 
@@ -56,15 +56,15 @@ describe PasswordsController, type: [ :controller, :mailer ] do
         end
 
         it "should not send an email to the account email address" do
-          expect(ActionMailer::Base.deliveries).to be_empty
+          expect('ActionMailer::Base'.constantize.deliveries).to be_empty
         end
       end
 
       context "using an email address that belongs to a user" do
 
         it "should queue the email for delayed sending" do
-          prev_mailer = Devise.mailer
-          Devise.mailer = Devise::BackgroundMailer
+          prev_mailer = Devise.mailer.to_s
+          Devise.mailer = 'Devise::BackgroundMailer'
           expect { post :create, params: user_email_attrs }
             .to change { Sidekiq::Extensions::DelayedMailer.jobs.size }
             .from(0).to(1)
@@ -87,24 +87,24 @@ describe PasswordsController, type: [ :controller, :mailer ] do
 
         it "should send an email" do
           post :create, params: user_email_attrs
-          expect(ActionMailer::Base.deliveries).to_not be_empty
+          expect('ActionMailer::Base'.constantize.deliveries).to_not be_empty
         end
 
         it "should send an email from the no-reply email address" do
           post :create, params: user_email_attrs
-          email = ActionMailer::Base.deliveries.first
+          email = 'ActionMailer::Base'.constantize.deliveries.first
           expect(email.from).to include("no-reply@zooniverse.org")
         end
 
         it "should send an email to the account email address" do
           post :create, params: user_email_attrs
-          email = ActionMailer::Base.deliveries.first
+          email = 'ActionMailer::Base'.constantize.deliveries.first
           expect(email.to).to include(user.email)
         end
 
         it "should contain the correct route url for the server" do
           post :create, params: user_email_attrs
-          email = ActionMailer::Base.deliveries.first
+          email = 'ActionMailer::Base'.constantize.deliveries.first
           url = "https://panoptes_test.zooniverse.org/users/password/edit?reset_password_token="
           expect(email.body.raw_source).to include(url)
         end

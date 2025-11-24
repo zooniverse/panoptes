@@ -330,7 +330,7 @@ class User < ApplicationRecord
   end
 
   def uploaded_subjects_count
-    count = Rails.cache.fetch(subjects_count_cache_key, expires_in: subject_count_cache_expiry) do
+    count = Rails.cache.fetch(subjects_count_cache_key, expires_in: subject_count_cache_expiry, raw: true) do
       DatabaseReplica.read('read_user_uploaded_subjects_counts_from_replica') do
         Subject.where(upload_user_id: id).count
       end
@@ -349,7 +349,7 @@ class User < ApplicationRecord
   private
 
   def subjects_count_cache_key
-    @subjects_count_cache_key ||= "User/#{id}/uploaded_subjects_count"
+    @subjects_count_cache_key ||= "User/#{id}/uploaded_subjects_count:v1"
   end
 
   def subject_count_cache_expiry
