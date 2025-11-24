@@ -17,7 +17,7 @@ describe 'password reset rate limiting', type: :request, with_cache_store: true 
     }
   end
 
-  let(:limit) { 5 }
+  let(:limit) { 1 }
 
   def password_reset_request(email)
     post user_password_path,
@@ -36,11 +36,6 @@ describe 'password reset rate limiting', type: :request, with_cache_store: true 
     let(:email) { user.email }
 
     context 'when within rate limit' do
-      it 'allows the first request' do
-        password_reset_request(email)
-        expect(response).to have_http_status(:ok)
-      end
-
       it 'allows multiple requests up to the limit' do
         limit.times do
           password_reset_request(email)

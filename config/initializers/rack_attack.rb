@@ -2,7 +2,7 @@
 
 module Rack
   class Attack
-    throttle('password_reset/email', limit: 5, period: 1.hour) do |req|
+    throttle('password_reset/email', limit: 1, period: 1.hour) do |req|
       if req.path.start_with?('/users/password') && req.post?
         # JSON request params must be manually parsed
         if req.env['CONTENT_TYPE'] == 'application/json'
