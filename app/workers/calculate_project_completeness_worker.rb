@@ -2,7 +2,6 @@
 
 class CalculateProjectCompletenessWorker
   include Sidekiq::Worker
-  using Refinements::RangeClamping
   attr_reader :project
 
   COMPLETENESS_ROUNDING_PRECISION = ENV.fetch('COMPLETENESS_ROUNDING_PRECISION', 4).to_i
@@ -68,7 +67,7 @@ class CalculateProjectCompletenessWorker
 
     retired_subjects = workflow.retired_subjects_count
     total_subjects = workflow_subjects_count
-    (0.0..1.0).clamp(retired_subjects / total_subjects.to_d)
+    (retired_subjects / total_subjects.to_d).clamp(0.0, 1.0)
   end
 
   def project_columns_to_update
