@@ -26,8 +26,9 @@ class CalculateProjectCompletenessWorker
         :real_set_member_subjects_count,
         :retired_set_member_subjects_count
       )
-      project_workflows.each do |workflow|
-        workflow.update_columns completeness: workflow_completeness(workflow)
+      project_workflows.find_each do |workflow|
+        # We use .where instead of .find since it does not instatiate AR model objects (and therefore not loading up a full AR object)
+        Workflow.where(id: workflow.id).update_all(completeness: workflow_completeness(workflow))
       end
 
       project.update_columns(project_columns_to_update)
