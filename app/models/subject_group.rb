@@ -11,14 +11,21 @@
 # This class is not associated with the 'SubjectSet' class (a way to association subjects with a workflow)
 class SubjectGroup < ApplicationRecord
   belongs_to :project
-  has_many :subject_group_members, dependent: :destroy
-  has_many :subjects, through: :subject_group_members
   # a 'group_subject' to record the grouped view of linked subject locations
   # for use in talk and to collect classifications, retirement information about the group
   belongs_to :group_subject, class_name: 'Subject'
 
   validates :project, presence: true
-  validates :subject_group_members, presence: true
   validates :key, presence: true
   validates :group_subject, presence: true
+
+  def subject_ids_from_key
+    key.split('-').map(&:to_i).reject(&:zero?)
+  end
+
+  def subjects
+    ids = subject_ids_from_key
+    return Subject.none if ids.empty?
+    Subject.where(id: ids).order(Arel.sql("array_position(ARRAY[#{ids.join(',')}], id)"))
+  end
 end

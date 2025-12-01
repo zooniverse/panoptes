@@ -14,10 +14,7 @@ describe SubjectGroup, type: :model do
     expect(subject_group).to be_invalid
   end
 
-  it 'is invalid without any subject_group_members' do
-    subject_group.subject_group_members = []
-    expect(subject_group).to be_invalid
-  end
+
 
   it 'is invalid without a key' do
     subject_group.key = nil
@@ -38,11 +35,6 @@ describe SubjectGroup, type: :model do
   describe '#destroy' do
     let(:subject_group) { create(:subject_group) }
 
-    it 'cleans up the group member records' do
-      members = subject_group.subject_group_members
-      subject_group.destroy
-      expect(members.map(&:destroyed?)).to all(be true)
-    end
 
     it 'is leaves the subjects intact' do
       test_subjects = subject_group.subjects

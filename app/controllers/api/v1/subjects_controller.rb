@@ -15,6 +15,12 @@ class Api::V1::SubjectsController < Api::ApiController
   def index
     params[:sort] = 'id' if params[:sort].blank?
 
+    if params[:subject_group_id].present?
+      safe_params = params.except(:subject_group_id)
+      render json_api: SubjectSerializer.page(safe_params, group_member_scope)
+      return
+    end
+
     case params[:sort]
     when 'queued'
       queued
@@ -213,5 +219,15 @@ class Api::V1::SubjectsController < Api::ApiController
         key
       end
     end
+  end
+
+
+  def group_member_scope
+    ids = SubjectGroup.find(params[:subject_group_id]).subject_ids_from_key
+    return Subject.none if ids.empty?
+
+    policy_scope
+      .where(id: ids)
+      .order(Arel.sql("idx(array[#{ids.join(',')}], id)"))
   end
 end

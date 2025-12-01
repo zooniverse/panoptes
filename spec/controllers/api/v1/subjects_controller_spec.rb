@@ -20,6 +20,29 @@ describe Api::V1::SubjectsController, type: :controller do
 
   describe "#index" do
     context "logged out user" do
+      context "with subject_group_id param" do
+        let(:project) { create(:project) }
+        let!(:group_subjects) { create_list(:subject, 4, project: project) }
+        let(:ordered_ids) do
+          [group_subjects[2].id, group_subjects[0].id, group_subjects[3].id, group_subjects[1].id]
+        end
+        let!(:subject_group) do
+          create(
+            :subject_group,
+            project: project,
+            group_subject: create(:subject, project: project),
+            key: ordered_ids.join('-')
+          )
+        end
+
+        it 'returns only the member subjects' do
+          get :index, params: { subject_group_id: subject_group.id }
+          expect(response.status).to eq(200)
+          ids = json_response['subjects'].map { |s| s['id'].to_i }
+          expect(ids).to eq(ordered_ids.sort)
+        end
+      end
+
       describe "filtering" do
         let(:expected_filtered_ids) { formated_string_ids(filterable_resources) }
 
