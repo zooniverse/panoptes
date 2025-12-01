@@ -26,6 +26,7 @@ class SubjectGroup < ApplicationRecord
   def subjects
     ids = subject_ids_from_key
     return Subject.none if ids.empty?
+
     Subject.where(id: ids).order(Arel.sql("array_position(ARRAY[#{ids.join(',')}], id)"))
   end
 end

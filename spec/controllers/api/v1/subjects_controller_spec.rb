@@ -20,7 +20,7 @@ describe Api::V1::SubjectsController, type: :controller do
 
   describe "#index" do
     context "logged out user" do
-      context "with subject_group_id param" do
+      context 'with subject_group_id param' do
         let(:project) { create(:project) }
         let!(:group_subjects) { create_list(:subject, 4, project: project) }
         let(:ordered_ids) do

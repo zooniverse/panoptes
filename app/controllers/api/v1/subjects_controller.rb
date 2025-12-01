@@ -221,7 +221,6 @@ class Api::V1::SubjectsController < Api::ApiController
     end
   end
 
-
   def group_member_scope
     ids = SubjectGroup.find(params[:subject_group_id]).subject_ids_from_key
     return Subject.none if ids.empty?

@@ -14,8 +14,6 @@ describe SubjectGroup, type: :model do
     expect(subject_group).to be_invalid
   end
 
-
-
   it 'is invalid without a key' do
     subject_group.key = nil
     expect(subject_group).to be_invalid
