@@ -21,12 +21,14 @@ class CalculateProjectCompletenessWorker
   def perform(project_id)
     @project = Project.find(project_id)
     Project.transaction do
+      # Order by id to have a consistent lock order
       project_workflows = project.workflows.select(
         :id,
         :real_set_member_subjects_count,
         :retired_set_member_subjects_count
-      )
-      project_workflows.find_each do |workflow|
+      ).order(:id).load
+
+      project_workflows.each do |workflow|
         # We use .where instead of .find since it does not instatiate AR model objects (and therefore not loading up a full AR object)
         Workflow.where(id: workflow.id).update_all(completeness: workflow_completeness(workflow))
       end
