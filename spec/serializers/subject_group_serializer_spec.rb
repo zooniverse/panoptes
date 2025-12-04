@@ -7,8 +7,8 @@ RSpec.describe SubjectGroupSerializer do
 
   it_behaves_like 'a panoptes restpack serializer' do
     let(:resource) { subject_group }
-    let(:includes) { %i[group_subject subjects project] }
-    let(:preloads) { %i[group_subject subjects project] }
+    let(:includes) { %i[group_subject project] }
+    let(:preloads) { %i[group_subject project] }
   end
 
   # hmm - what is the key to this serializer

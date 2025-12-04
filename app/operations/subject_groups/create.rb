@@ -67,9 +67,6 @@ module SubjectGroups
 
     def build_subject_group(subjects)
       subject_group = SubjectGroup.new(project: project, key: subject_group_key)
-      subjects.each_with_index do |subject, index|
-        subject_group.subject_group_members << build_subject_group_member(subject_group, subject, index)
-      end
       subject_group.group_subject = build_group_subject
       subject_group
     end
@@ -95,15 +92,6 @@ module SubjectGroups
           Arel.sql("idx(array[#{subject_ids.join(',')}], id)")
         )
         .load
-    end
-
-    def build_subject_group_member(subject_group, subject, index)
-      SubjectGroupMember.new(
-        project: project,
-        subject: subject,
-        subject_group: subject_group,
-        display_order: index
-      )
     end
 
     def build_group_subject

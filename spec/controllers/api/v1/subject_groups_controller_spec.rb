@@ -8,7 +8,7 @@ RSpec.describe Api::V1::SubjectGroupsController, type: :controller do
     %w[id context key created_at updated_at]
   end
   let(:api_resource_links) do
-    %w[subject_groups.group_subject subject_groups.subjects subject_groups.project]
+    %w[subject_groups.group_subject subject_groups.project]
   end
   let(:resource) { create(:subject_group) }
   let(:authorized_user) { resource.project.owner }

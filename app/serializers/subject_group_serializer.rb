@@ -6,8 +6,8 @@ class SubjectGroupSerializer
 
   attributes :id, :context, :key, :created_at, :updated_at, :href
 
-  can_include :group_subject, :subjects, :project
-  preload :group_subject, :subjects, :project
+  can_include :group_subject, :project
+  preload :group_subject, :project
 
   can_filter_by :key
 
