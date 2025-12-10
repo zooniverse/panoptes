@@ -115,23 +115,25 @@ class Api::V1::SubjectsController < Api::ApiController
       params: selector_params.to_h,
       user: api_user
     )
-    # get the list of the groups 'placeholder' group_subject ids
-    group_subject_ids = group_selection_result.subject_groups.map(&:group_subject_id)
 
-    selected_subject_scope =
-      Subject
-      .where(id: group_subject_ids)
-      .order(Arel.sql("idx(array[#{group_subject_ids.join(',')}], id)")) # guardrails-disable-line
+    subject_id_groups = group_selection_result.subject_id_groups
+
+
+    virtual_subjects = subject_id_groups.each_with_index.map do |ids, idx|
+      members = Subject.active.where(id: ids).order(Arel.sql("idx(array[#{ids.join(',')}], id)"))
+      # Using negative integers as id to avoid clashing with real Subject ids
+      VirtualSubject.from_member_subjects(members, virtual_id: -(idx + 1))
+    end
 
     selection_context = Subjects::SelectorContext.new(
       group_selection_result.subject_selector,
-      group_subject_ids
+      virtual_subjects.map(&:id)
     ).format
 
-    # serialize the subject_group's group_subject data
-    render json_api: SubjectSelectorSerializer.page(
+    # Serialize the virtual subjects
+    render json_api: VirtualSubjectSelectorSerializer.page(
       group_selection_result.subject_selector.params,
-      selected_subject_scope,
+      virtual_subjects,
       selection_context
     )
   end
