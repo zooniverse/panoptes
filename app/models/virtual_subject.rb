@@ -1,21 +1,22 @@
 # frozen_string_literal: true
 
 class VirtualSubject
-  VirtualMedium = Struct.new(:content_type, :url, keyword_init:true) do
-    def url_for_format(_fmt = :get)
+  VirtualMedium = Struct.new(:content_type, :url, keyword_init: true) do
+    def url_for_format(_fmt=:get)
       url
     end
   end
 
   attr_reader :id, :metadata, :created_at, :updated_at, :zooniverse_id
 
-  def initialize(id:, metadata:, locations: [], created_at: Time.now.utc, updated_at: Time.now.utc, zooniverse_id: nil)
+  def initialize(id:, metadata:, locations: [], zooniverse_id: nil)
     @id = id
     @metadata = metadata
     @locations = locations
-    @created_at = created_at
-    @updated_at = updated_at
     @zooniverse_id = zooniverse_id
+    now = Time.now.utc
+    @created_at = now
+    @updated_at = now
   end
 
   def self.from_member_subjects(member_subjects, virtual_id: -1)
