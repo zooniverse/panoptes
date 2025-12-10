@@ -18,7 +18,7 @@ describe VirtualSubjectSelectorSerializer do
       user_has_finished_workflow: false,
       selection_state: :normal,
       selected_at: Time.now.utc
-     }
+    }
   end
 
   describe '.page' do
