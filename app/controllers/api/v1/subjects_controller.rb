@@ -118,7 +118,6 @@ class Api::V1::SubjectsController < Api::ApiController
 
     subject_id_groups = group_selection_result.subject_id_groups
 
-
     virtual_subjects = subject_id_groups.each_with_index.map do |ids, idx|
       members = Subject.active.where(id: ids).order(Arel.sql("idx(array[#{ids.join(',')}], id)"))
       # Using negative integers as id to avoid clashing with real Subject ids

@@ -40,15 +40,8 @@ describe SubjectGroups::Selection do
     expect(result.subject_selector).to eq(subject_selector)
   end
 
-  context 'ephemeral grouping enabled' do
-    it 'returns subject_id_groups sliced by grid_size' do
-      expect(result.subject_id_groups).to eq([[1], [2], [3]])
-    end
-
-    it 'does not call SubjectGroups::Create' do
-      result
-      expect(SubjectGroups::Create).not_to have_received(:run!)
-    end
+  it 'returns subject_id_groups sliced by grid_size' do
+    expect(result.subject_id_groups).to eq([[1], [2], [3]])
   end
 
   context 'with an existing SubjectGroup' do

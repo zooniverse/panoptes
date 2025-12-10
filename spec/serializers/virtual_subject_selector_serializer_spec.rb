@@ -54,4 +54,3 @@ describe VirtualSubjectSelectorSerializer do
     end
   end
 end
-

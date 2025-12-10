@@ -3,11 +3,9 @@
 class VirtualSubjectSelectorSerializer
   include Serialization::PanoptesRestpack
 
-  attributes :id, :metadata, :locations, :zooniverse_id,
-    :created_at, :updated_at, :href, :selected_at
+  attributes :id, :metadata, :locations, :zooniverse_id, :created_at, :updated_at, :href, :selected_at
 
-  optional :retired, :already_seen, :finished_workflow,
-    :user_has_finished_workflow, :favorite, :selection_state
+  optional :retired, :already_seen, :finished_workflow, :user_has_finished_workflow, :favorite, :selection_state
 
   def self.key
     'subjects'
@@ -21,7 +19,7 @@ class VirtualSubjectSelectorSerializer
     []
   end
 
-  def self.page(params = {}, scope = nil, context = {})
+  def self.page(params={}, scope=nil, context={})
     items = Array(scope)
     page = params.fetch(:page, 1).to_i
     page = 1 if page < 1
@@ -46,7 +44,6 @@ class VirtualSubjectSelectorSerializer
       next_href: nil,
       last_href: nil
     }
-
 
     { key.to_sym => resources, links: {}, meta: { key.to_sym => meta } }
   end

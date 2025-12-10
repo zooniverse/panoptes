@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class VirtualSubject
-  VirtualMedium = Struct.new(:content_type, :url, keyword_init: true) do
+  VirtualMedium = Struct.new(:content_type, :url, keyword_init:true) do
     def url_for_format(_fmt = :get)
       url
     end
@@ -31,7 +31,7 @@ class VirtualSubject
 
     new(
       id: vid,
-      metadata: { "#subject_group_id" => true, '#group_subject_ids' => key },
+      metadata: { '#subject_group_id' => true, '#group_subject_ids' => key },
       locations: vmedia
     )
   end
@@ -39,5 +39,4 @@ class VirtualSubject
   def ordered_locations
     @locations
   end
-
 end
