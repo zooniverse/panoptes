@@ -10,14 +10,11 @@ describe SubjectGroups::Selection do
   let(:operation_params) do
     { num_rows: 1, num_columns: 1, params: params, user: user, uploader_id: workflow.owner.id.to_s }
   end
-  let(:subject_group) { instance_double(SubjectGroup) }
-  let(:created_subject_groups) { [subject_group, subject_group, subject_group] }
   let(:result) { described_class.run(operation_params).result }
 
   before do
     allow(subject_selector).to receive(:get_subject_ids).and_return([1, 2, 3])
     allow(Subjects::Selector).to receive(:new).and_return(subject_selector)
-    allow(SubjectGroups::Create).to receive(:run!).and_return(subject_group)
   end
 
   it 'validates num_rows and num_columns param' do
@@ -44,17 +41,6 @@ describe SubjectGroups::Selection do
     expect(result.subject_id_groups).to eq([[1], [2], [3]])
   end
 
-  context 'with an existing SubjectGroup' do
-    before do
-      allow(SubjectGroup).to receive(:find_by).and_return(subject_group)
-    end
-
-    it 'requests subject ids from the Subjects::Selector' do
-      result
-      expect(subject_selector).to have_received(:get_subject_ids)
-    end
-
-  end
 
   context 'when the num_rows and num_columns params mismatch the workflow config' do
     let(:workflow) { create(:workflow, configuration: { subject_group: { num_rows: 2, num_columns: 1 } }) }
