@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-class VirtualSubjectSelectorSerializer
+module SubjectGroups
+class VirtualGroupSubjectSelectorSerializer
   include Serialization::PanoptesRestpack
 
   attributes :id, :metadata, :locations, :zooniverse_id, :created_at, :updated_at, :href, :selected_at
@@ -115,4 +116,5 @@ class VirtualSubjectSelectorSerializer
   def select_context?
     !!@context[:select_context]
   end
+end
 end

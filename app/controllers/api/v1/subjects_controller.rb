@@ -121,7 +121,7 @@ class Api::V1::SubjectsController < Api::ApiController
     virtual_subjects = subject_id_groups.each_with_index.map do |ids, idx|
       members = Subject.active.where(id: ids).order(Arel.sql("idx(array[#{ids.join(',')}], id)"))
       # Using negative integers as id to avoid clashing with real Subject ids
-      VirtualSubject.from_member_subjects(members, virtual_id: -(idx + 1))
+      SubjectGroups::VirtualGroupSubject.from_member_subjects(members, virtual_id: -(idx + 1))
     end
 
     selection_context = Subjects::SelectorContext.new(
@@ -130,7 +130,7 @@ class Api::V1::SubjectsController < Api::ApiController
     ).format
 
     # Serialize the virtual subjects
-    render json_api: VirtualSubjectSelectorSerializer.page(
+    render json_api: SubjectGroups::VirtualGroupSubjectSelectorSerializer.page(
       group_selection_result.subject_selector.params,
       virtual_subjects,
       selection_context
