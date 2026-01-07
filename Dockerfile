@@ -1,4 +1,5 @@
-FROM ruby:2.7-slim
+FROM ruby:3.0-bullseye
+
 
 WORKDIR /rails_app
 
