@@ -10,14 +10,11 @@ describe SubjectGroups::Selection do
   let(:operation_params) do
     { num_rows: 1, num_columns: 1, params: params, user: user, uploader_id: workflow.owner.id.to_s }
   end
-  let(:subject_group) { instance_double(SubjectGroup) }
-  let(:created_subject_groups) { [subject_group, subject_group, subject_group] }
   let(:result) { described_class.run(operation_params).result }
 
   before do
     allow(subject_selector).to receive(:get_subject_ids).and_return([1, 2, 3])
     allow(Subjects::Selector).to receive(:new).and_return(subject_selector)
-    allow(SubjectGroups::Create).to receive(:run!).and_return(subject_group)
   end
 
   it 'validates num_rows and num_columns param' do
@@ -36,45 +33,14 @@ describe SubjectGroups::Selection do
     expect(Subjects::Selector).to have_received(:new).with(user.user, params.merge(page_size: 3))
   end
 
-  it 'calls the subject group create operations correctly' do
-    described_class.run(operation_params)
-    create_operation_params = {
-      subject_ids: [1],
-      uploader_id: workflow.owner.id.to_s,
-      project_id: workflow.project_id.to_s,
-      group_size: 1
-    }
-    # can not test the order of these calls via .ordered expectation
-    # https://github.com/rspec/rspec-mocks/issues/916
-    expect(SubjectGroups::Create).to have_received(:run!).with(create_operation_params)
-    create_operation_params[:subject_ids] = [2]
-    expect(SubjectGroups::Create).to have_received(:run!).with(create_operation_params)
-    create_operation_params[:subject_ids] = [3]
-    expect(SubjectGroups::Create).to have_received(:run!).with(create_operation_params)
-  end
-
-  it 'returns three newly created subject_group in the operation result' do
-    expect(result.subject_groups).to match_array(created_subject_groups)
-  end
-
   it 'returns the selector in the operation result' do
     expect(result.subject_selector).to eq(subject_selector)
   end
 
-  context 'with an existing SubjectGroup' do
-    before do
-      allow(SubjectGroup).to receive(:find_by).and_return(subject_group)
-    end
-
-    it 'requests subject ids from the Subjects::Selector' do
-      result
-      expect(subject_selector).to have_received(:get_subject_ids)
-    end
-
-    it 're-uses an existing subject_group in the operation result' do
-      expect(result.subject_groups).to match_array(created_subject_groups)
-    end
+  it 'returns subject_id_groups sliced by grid_size' do
+    expect(result.subject_id_groups).to eq([[1], [2], [3]])
   end
+
 
   context 'when the num_rows and num_columns params mismatch the workflow config' do
     let(:workflow) { create(:workflow, configuration: { subject_group: { num_rows: 2, num_columns: 1 } }) }
