@@ -2,11 +2,11 @@
 
 require 'spec_helper'
 
-describe SubjectGroups::VirtualGroupSubjectSelectorSerializer do
+describe SubjectGroupSelectorSerializer do
   let!(:s1) { create(:subject, :with_mediums, num_media: 1) }
   let!(:s2) { create(:subject, :with_mediums, num_media: 1) }
-  let(:virtual_subject_group1) { SubjectGroups::VirtualGroupSubject.from_member_subjects([s1], virtual_id: -1) }
-  let(:virtual_subject_group2) { SubjectGroups::VirtualGroupSubject.from_member_subjects([s2], virtual_id: -2) }
+  let(:virtual_subject_group1) { SubjectGroup.from_member_subjects([s1], virtual_id: -1) }
+  let(:virtual_subject_group2) { SubjectGroup.from_member_subjects([s2], virtual_id: -2) }
 
   let(:selection_context) do
     {

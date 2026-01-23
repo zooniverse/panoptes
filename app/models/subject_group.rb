@@ -1,7 +1,6 @@
 # frozen_string_literal: true
 
-module SubjectGroups
-  class VirtualGroupSubject
+class SubjectGroup
     VirtualMedium = Struct.new(:content_type, :url, keyword_init: true) do
       def url_for_format(_fmt=:get)
         url
@@ -41,5 +40,4 @@ module SubjectGroups
     def ordered_locations
       @locations
     end
-  end
 end
