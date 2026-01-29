@@ -25,10 +25,6 @@ class Subject < ApplicationRecord
     class_name: 'Workflow',
     foreign_key: 'tutorial_subject_id',
     dependent: :restrict_with_exception
-  # commented out as VirtualSubjectGroups are in use
-  # add inverse SubjectGroup associations
-  # has_many :subject_group_members, dependent: :restrict_with_exception
-  # has_many :subject_groups, through: :subject_group_members
 
   validates_presence_of :project, :uploader
 
