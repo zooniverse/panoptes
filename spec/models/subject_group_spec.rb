@@ -2,11 +2,11 @@
 
 require 'spec_helper'
 
-describe SubjectGroups::VirtualGroupSubject, type: :model do
+describe SubjectGroup, type: :model do
   let!(:s1) { create(:subject, :with_mediums, num_media: 1) }
   let!(:s2) { create(:subject, :with_mediums, num_media: 2) }
 
-  describe '.from_member_subjects' do
+  describe 'from_member_subjects' do
     it 'builds a virtual subject with negative id when not provided' do
       virtual_subject_group = described_class.from_member_subjects([s1, s2])
       expect(virtual_subject_group.id).to be < 0
