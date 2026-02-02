@@ -232,9 +232,7 @@ describe User, type: :model do
           .to receive(notification)
           .with(user, 'token', {})
           .and_return(mailer)
-      end
 
-      notifications.each do |notification|
         user.send(:send_devise_notification, notification, 'token', {})
         expect(Devise::Mailer).to have_received(notification).with(user, 'token', {})
       end
@@ -242,11 +240,10 @@ describe User, type: :model do
 
     it 'does not send when valid_email is false' do
       user.update!(valid_email: false)
-      notifications.each do |notification|
-        allow(Devise::Mailer).to receive(notification)
-      end
 
       notifications.each do |notification|
+        allow(Devise::Mailer).to receive(notification)
+
         user.send(:send_devise_notification, notification, 'token', {})
         expect(Devise::Mailer).not_to have_received(notification)
       end
