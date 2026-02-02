@@ -27,13 +27,7 @@ jobs:
           - Gemfile
           - Gemfile.next
         ruby:
-          - '3.0'
           - '3.1'
-        exclude:
-          - gemfile: Gemfile
-            ruby: '3.1'
-          - gemfile: Gemfile.next
-            ruby: '3.0'
         spec-commands:
           - 'spec/controllers/api/v1/[a-m]*.rb spec/counters spec/operations spec/serializers spec/workers'
           - 'spec/controllers/api/v1/[n-s]*.rb'
