@@ -38,11 +38,14 @@ RSpec.describe PublishClassificationWorker do
 
       it "should publish via kinesis" do
         publisher = class_double("ZooStream").as_stubbed_const
-        expect(publisher).to receive(:publish)
-          .with(event: "classification",
-                shard_by: "#{classification.workflow_id}-#{classification.subjects[0].id}-#{classification.subjects[1].id}",
-                data: duck_type(:to_json),
-                linked: duck_type(:to_json))
+        expect(publisher).to receive(:publish).with(
+          hash_including(
+            event: "classification",
+            shard_by: "#{classification.workflow_id}-#{classification.subjects[0].id}-#{classification.subjects[1].id}",
+            data: kind_of(Hash),
+            linked: kind_of(Hash)
+          )
+        )
         worker.perform(classification.id)
       end
     end
