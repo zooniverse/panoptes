@@ -183,7 +183,7 @@ class User < ApplicationRecord
   end
 
   def send_devise_notification(notification, *args)
-    return if respond_to?(:valid_email) && !valid_email
+    return unless valid_email
 
     super
   end
