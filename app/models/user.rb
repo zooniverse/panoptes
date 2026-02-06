@@ -182,6 +182,12 @@ class User < ApplicationRecord
     recoverable
   end
 
+  def send_devise_notification(notification, *args)
+    return unless valid_email
+
+    super
+  end
+
   def self.find_by_lower_login(login)
     find_by("lower(login) = ?", login.downcase)
   end
