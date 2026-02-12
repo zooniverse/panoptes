@@ -60,10 +60,9 @@ class ProjectSerializer
     scope ||= Project.all
     organization_ids = params.delete('organization_id') || params.delete(:organization_id)
     if organization_ids.present?
-      scope = scope
-        .joins(:organizations)
-        .where(organizations: { id: organization_ids.to_s.split(',') })
-        .distinct
+      scope = scope.joins(:organizations).where(
+        organizations: { id: organization_ids.to_s.split(',') }
+      ).distinct
     end
 
     if Project.states.include?(params["state"])
