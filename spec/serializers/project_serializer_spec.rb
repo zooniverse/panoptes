@@ -117,7 +117,7 @@ describe ProjectSerializer do
     end
   end
 
-  describe "organization_id filtering" do
+  describe 'organization_id filtering' do
     let(:organization) { create(:organization) }
     let(:other_organization) { create(:organization) }
     let(:project_for_org) { create(:project) }
@@ -128,11 +128,17 @@ describe ProjectSerializer do
       create(:organization_project, organization: other_organization, project: project_for_other_org)
     end
 
-    it "filters projects via organization_projects join records" do
-      result = described_class.page({ "organization_id" => organization.id.to_s }, Project.where(id: [project_for_org.id, project_for_other_org.id]))
+    it 'includes projects linked to the requested organization' do
+      result = described_class.page({ 'organization_id' => organization.id.to_s }, Project.where(id: [project_for_org.id, project_for_other_org.id]))
       found_ids = result[:projects].map { |p| p[:id] }
 
       expect(found_ids).to include(project_for_org.id.to_s)
+    end
+
+    it 'excludes projects linked to other organizations' do
+      result = described_class.page({ 'organization_id' => organization.id.to_s }, Project.where(id: [project_for_org.id, project_for_other_org.id]))
+      found_ids = result[:projects].map { |p| p[:id] }
+
       expect(found_ids).not_to include(project_for_other_org.id.to_s)
     end
   end

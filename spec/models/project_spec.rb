@@ -203,10 +203,10 @@ describe Project, type: :model do
     end
   end
 
-  describe "#organizations" do
+  describe '#organizations' do
     let(:organization) { create(:organization) }
 
-    it "returns organizations linked through organization_projects" do
+    it 'returns organizations linked through organization_projects' do
       create(:organization_project, organization: organization, project: project)
 
       expect(project.organizations).to include(organization)
