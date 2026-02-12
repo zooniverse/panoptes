@@ -15,13 +15,13 @@ class ProjectSerializer
 
   optional :avatar_src
   can_include :workflows, :active_workflows, :subject_sets, :owners,
-    :project_roles, :pages, :organization, :organizations
+    :project_roles, :pages, :organizations
   media_include :avatar, :background, :attached_images,
     classifications_export: { include: false},
     subjects_export: { include: false }
   can_filter_by :display_name, :slug, :beta_requested, :beta_approved,
     :launch_requested, :launch_approved, :private, :state, :live,
-    :mobile_friendly, :organization_id, :featured
+    :mobile_friendly, :featured
   can_sort_by :launch_date, :activity, :completeness, :classifiers_count,
     :updated_at, :display_name
 
@@ -40,6 +40,12 @@ class ProjectSerializer
           :subjects_export
 
   def self.page(params = {}, scope = nil, context = {})
+    scope = scope || Project.all
+    organization_ids = params.delete("organization_id") || params.delete(:organization_id)
+    if organization_ids.present?
+      scope = scope.joins(:organizations).where(organizations: { id: organization_ids.to_s.split(",") }).distinct
+    end
+
     if Project.states.include?(params["state"])
       params["state"] = Project.states[params["state"]]
     elsif params["state"] == "live"

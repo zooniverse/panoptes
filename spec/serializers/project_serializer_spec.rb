@@ -49,11 +49,23 @@ describe ProjectSerializer do
 
   it_should_behave_like "a panoptes restpack serializer", "test_owner_include", "test_blank_links" do
     let(:resource) { project }
-    let(:includes) { %i(workflows active_workflows subject_sets project_roles pages organization) }
+    let(:includes) { %i(workflows active_workflows subject_sets project_roles pages organizations) }
     let(:preloads) { ProjectSerializer.preloads }
     let(:expected_links) do
       non_owners_includes = described_class.can_includes - [:owners]
       non_owners_includes | [:owner] | described_class.media_links
+    end
+  end
+
+  describe "organizations include" do
+    let(:organization) { create(:organization) }
+
+    it "includes linked organizations" do
+      create(:organization_project, organization: organization, project: project)
+      result = described_class.page({ include: "organizations" }, Project.where(id: project.id), {})
+      linked_organization_ids = result.dig(:linked, :organizations).map { |org| org[:id] }
+
+      expect(linked_organization_ids).to include(organization.id.to_s)
     end
   end
 
@@ -102,6 +114,26 @@ describe ProjectSerializer do
         expect(results[:projects].map { |p| p[:id] }).not_to include(paused_live_project.id.to_s)
         expect(results[:projects].map { |p| p[:id] }).not_to include(paused_project.id.to_s)
       end
+    end
+  end
+
+  describe "organization_id filtering" do
+    let(:organization) { create(:organization) }
+    let(:other_organization) { create(:organization) }
+    let(:project_for_org) { create(:project) }
+    let(:project_for_other_org) { create(:project) }
+
+    before do
+      create(:organization_project, organization: organization, project: project_for_org)
+      create(:organization_project, organization: other_organization, project: project_for_other_org)
+    end
+
+    it "filters projects via organization_projects join records" do
+      result = described_class.page({ "organization_id" => organization.id.to_s }, Project.where(id: [project_for_org.id, project_for_other_org.id]))
+      found_ids = result[:projects].map { |p| p[:id] }
+
+      expect(found_ids).to include(project_for_org.id.to_s)
+      expect(found_ids).not_to include(project_for_other_org.id.to_s)
     end
   end
 

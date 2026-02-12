@@ -203,6 +203,16 @@ describe Project, type: :model do
     end
   end
 
+  describe "#organizations" do
+    let(:organization) { create(:organization) }
+
+    it "returns organizations linked through organization_projects" do
+      create(:organization_project, organization: organization, project: project)
+
+      expect(project.organizations).to include(organization)
+    end
+  end
+
   describe "#field_guides" do
     let(:field_guide) { build(:field_guide, project: project) }
 

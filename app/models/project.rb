@@ -14,7 +14,6 @@ class Project < ApplicationRecord
 
   has_many :tutorials
   has_many :field_guides, dependent: :destroy
-  belongs_to :organization
   has_many :organization_projects, dependent: :destroy
   has_many :organizations, through: :organization_projects
   has_many :user_project_preference, dependent: :destroy

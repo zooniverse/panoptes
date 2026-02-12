@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 class CreateOrganizationProjects < ActiveRecord::Migration[7.0]
   def up
     create_table :organization_projects do |t|
@@ -6,7 +8,7 @@ class CreateOrganizationProjects < ActiveRecord::Migration[7.0]
       t.timestamps
     end
 
-    add_index :organization_projects, [:organization_id, :project_id], unique: true
+    add_index :organization_projects, %i[organization_id project_id], unique: true
 
     safety_assured do
       execute <<~SQL.squish
