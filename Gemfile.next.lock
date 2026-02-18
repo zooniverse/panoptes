@@ -1,12 +1,12 @@
 GIT
   remote: https://github.com/zooniverse/restpack_serializer.git
-  revision: ef87bcf1fafe71faf58594297424d8de921fe1b4
-  ref: ef87bcf1fafe
-  branch: talk-api-version
+  revision: 100e3e3fd17924d2e6edbb5f2e096437fd8b285b
+  ref: 100e3e3
+  branch: panoptes-rails-7-1
   specs:
     restpack_serializer (0.5.9)
-      activerecord (< 8)
-      activesupport (< 8)
+      activerecord (>= 5.2, < 7.2)
+      activesupport (>= 5.2, < 7.2)
       kaminari (< 2.0)
 
 GEM

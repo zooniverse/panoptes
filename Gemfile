@@ -42,8 +42,7 @@ gem 'rack-attack'
 gem 'rack-cors', '~> 1.0', require: 'rack/cors'
 if next?
   gem 'rails', '7.1.6'
-  # talk api version as it has support for ruby 3.2
-  gem 'restpack_serializer', git: 'https://github.com/zooniverse/restpack_serializer.git', branch: 'talk-api-version', ref: 'ef87bcf1fafe'
+  gem 'restpack_serializer', git: 'https://github.com/zooniverse/restpack_serializer.git', branch: 'panoptes-rails-7-1', ref: '100e3e3'
 else
   gem 'rails', '7.0.8.7'
   gem 'restpack_serializer', git: 'https://github.com/zooniverse/restpack_serializer.git', branch: 'panoptes-api-version', ref: '5f1ef6c2b2'
