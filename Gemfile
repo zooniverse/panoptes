@@ -41,12 +41,13 @@ gem 'pundit', '~> 2.4.0'
 gem 'rack-attack'
 gem 'rack-cors', '~> 1.0', require: 'rack/cors'
 if next?
-  gem 'rails', '7.0.8.7'
+  gem 'rails', '7.1.6'
+  gem 'restpack_serializer', git: 'https://github.com/zooniverse/restpack_serializer.git', branch: 'panoptes-rails-7-1', ref: '100e3e3'
 else
   gem 'rails', '7.0.8.7'
+  gem 'restpack_serializer', git: 'https://github.com/zooniverse/restpack_serializer.git', branch: 'panoptes-api-version', ref: '5f1ef6c2b2'
 end
 gem 'ranked-model', '~> 0.4.8'
-gem 'restpack_serializer', git: 'https://github.com/zooniverse/restpack_serializer.git', branch: 'panoptes-api-version', ref: '5f1ef6c2b2'
 gem 'scientist', '~> 1.6.4'
 gem 'sidekiq', '< 7'
 gem 'sidekiq-congestion', '~> 0.1.0'
@@ -77,7 +78,7 @@ group :development, :test do
 end
 
 group :test do
-  gem 'database_cleaner', '~> 1.99.0'
+  gem 'database_cleaner', '~> 2.1'
   gem 'guard-rspec', require: false
   gem 'listen', '~> 3.8'
   gem 'mock_redis'

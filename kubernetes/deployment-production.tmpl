@@ -262,7 +262,7 @@ spec:
           secret:
             secretName: panoptes-doorkeeper-jwt-production
 ---
-apiVersion: autoscaling/v1
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: panoptes-production-app
@@ -273,7 +273,19 @@ spec:
     name: panoptes-production-app
   minReplicas: 3
   maxReplicas: 16
-  targetCPUUtilizationPercentage: 80
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 80
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 80
 ---
 apiVersion: policy/v1
 kind: PodDisruptionBudget
