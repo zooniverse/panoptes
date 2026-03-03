@@ -296,10 +296,13 @@ describe Api::V1::OrganizationsController, type: :controller do
       let(:test_relation_ids) { [ linked_resource.id.to_s ] }
 
       describe "linking a project" do
-        let!(:linked_resource) { create(:project) }
-        let!(:pre_existing_link) { resource.projects << linked_resource }
+        let(:linked_resource) { create(:project) }
         let(:test_relation) { :projects }
         let(:expected_copies_count) { 1 }
+
+        before do
+          resource.projects << linked_resource
+        end
 
         it_behaves_like "supports update_links"
       end
