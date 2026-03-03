@@ -297,6 +297,7 @@ describe Api::V1::OrganizationsController, type: :controller do
 
       describe "linking a project" do
         let!(:linked_resource) { create(:project) }
+        let!(:pre_existing_link) { resource.projects << linked_resource }
         let(:test_relation) { :projects }
         let(:expected_copies_count) { 1 }
 
