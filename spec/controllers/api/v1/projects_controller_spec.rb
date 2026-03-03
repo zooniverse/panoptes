@@ -795,7 +795,7 @@ describe Api::V1::ProjectsController, type: :controller do
     end
 
     describe 'linking a subject_set' do
-      let(:linked_resource) { create(:subject_set_with_subjects, project: resource) }
+      let!(:linked_resource) { create(:subject_set_with_subjects, project: resource) }
       let(:test_relation) { :subject_sets }
       let(:expected_copies_count) { linked_resource.subjects.count }
 
