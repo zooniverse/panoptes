@@ -345,6 +345,8 @@ class User < ApplicationRecord
   end
 
   def increment_subjects_count_cache
+    return nil unless Rails.cache.exist?(subjects_count_cache_key)
+
     Rails.cache.increment(subjects_count_cache_key)
   end
 
