@@ -2,7 +2,7 @@ GIT
   remote: https://github.com/zooniverse/restpack_serializer.git
   revision: 100e3e3fd17924d2e6edbb5f2e096437fd8b285b
   ref: 100e3e3
-  branch: panoptes-rails-7-1
+  branch: panoptes-api-version
   specs:
     restpack_serializer (0.5.9)
       activerecord (>= 5.2, < 7.2)
