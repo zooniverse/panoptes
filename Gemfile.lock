@@ -1,7 +1,7 @@
 GIT
   remote: https://github.com/zooniverse/restpack_serializer.git
-  revision: 100e3e3fd17924d2e6edbb5f2e096437fd8b285b
-  ref: 100e3e3
+  revision: 8689af2494d3782a6d4faef80948af26045c0417
+  ref: 8689af2
   branch: panoptes-api-version
   specs:
     restpack_serializer (0.5.9)
@@ -640,6 +640,7 @@ DEPENDENCIES
   spring (~> 4.2.1)
   spring-commands-rspec
   sprockets (~> 3.7)
+  sprockets-rails (~> 3.5)
   standby
   stringex (~> 2.8)
   strong_migrations
