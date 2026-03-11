@@ -761,6 +761,38 @@ ALTER SEQUENCE public.organization_pages_id_seq OWNED BY public.organization_pag
 
 
 --
+-- Name: organization_projects; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.organization_projects (
+    id bigint NOT NULL,
+    organization_id bigint NOT NULL,
+    project_id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: organization_projects_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.organization_projects_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_projects_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.organization_projects_id_seq OWNED BY public.organization_projects.id;
+
+
+--
 -- Name: organization_versions; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2027,6 +2059,13 @@ ALTER TABLE ONLY public.organization_pages ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
+-- Name: organization_projects id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_projects ALTER COLUMN id SET DEFAULT nextval('public.organization_projects_id_seq'::regclass);
+
+
+--
 -- Name: organization_versions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2387,6 +2426,14 @@ ALTER TABLE ONLY public.organization_page_versions
 
 ALTER TABLE ONLY public.organization_pages
     ADD CONSTRAINT organization_pages_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: organization_projects organization_projects_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_projects
+    ADD CONSTRAINT organization_projects_pkey PRIMARY KEY (id);
 
 
 --
@@ -2934,6 +2981,27 @@ CREATE INDEX index_organization_pages_on_language ON public.organization_pages U
 --
 
 CREATE INDEX index_organization_pages_on_organization_id ON public.organization_pages USING btree (organization_id);
+
+
+--
+-- Name: index_organization_projects_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_projects_on_organization_id ON public.organization_projects USING btree (organization_id);
+
+
+--
+-- Name: index_organization_projects_on_organization_id_and_project_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_organization_projects_on_organization_id_and_project_id ON public.organization_projects USING btree (organization_id, project_id);
+
+
+--
+-- Name: index_organization_projects_on_project_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_projects_on_project_id ON public.organization_projects USING btree (project_id);
 
 
 --
@@ -4064,6 +4132,14 @@ ALTER TABLE ONLY public.collections_subjects
 
 
 --
+-- Name: organization_projects fk_rails_e612101b95; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_projects
+    ADD CONSTRAINT fk_rails_e612101b95 FOREIGN KEY (project_id) REFERENCES public.projects(id);
+
+
+--
 -- Name: user_seen_subjects fk_rails_e881fca299; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4077,6 +4153,14 @@ ALTER TABLE ONLY public.user_seen_subjects
 
 ALTER TABLE ONLY public.collections_subjects
     ADD CONSTRAINT fk_rails_e9323f2e30 FOREIGN KEY (subject_id) REFERENCES public.subjects(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: organization_projects fk_rails_ece07c98f6; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_projects
+    ADD CONSTRAINT fk_rails_ece07c98f6 FOREIGN KEY (organization_id) REFERENCES public.organizations(id);
 
 
 --
@@ -4406,6 +4490,7 @@ INSERT INTO "schema_migrations" (version) VALUES
 ('20250530191528'),
 ('20251027120000'),
 ('20251113172303'),
-('20260122212801');
+('20260122212801'),
+('20260209120000');
 
 
