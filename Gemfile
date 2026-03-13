@@ -40,8 +40,13 @@ gem 'puma', '~> 6.4.3'
 gem 'pundit', '~> 2.4.0'
 gem 'rack-attack'
 gem 'rack-cors', '~> 1.0', require: 'rack/cors'
-gem 'rails', '7.1.6'
-gem 'restpack_serializer', git: 'https://github.com/zooniverse/restpack_serializer.git', branch: 'panoptes-api-version', ref: '8689af2'
+if next?
+  gem 'rails', '7.2.3'
+  gem 'restpack_serializer', git: 'https://github.com/zooniverse/restpack_serializer.git', branch: 'panoptes-rails-7.2', ref: '8a62972'
+else
+  gem 'rails', '7.1.6'
+  gem 'restpack_serializer', git: 'https://github.com/zooniverse/restpack_serializer.git', branch: 'panoptes-api-version', ref: '8689af2'
+end
 gem 'ranked-model', '~> 0.4.8'
 gem 'scientist', '~> 1.6.4'
 gem 'sidekiq', '< 7'
