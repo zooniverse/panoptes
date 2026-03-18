@@ -550,3 +550,23 @@ Response will be an HTTP 204
   + subject_ids (optional, array(integer)) ... array of integer ids of the subjects one wishes to unretire
   + subject_set_id (optional, integer) ... integer id of the subject_set with subjects that one wishes to unretire
   + subject_set_ids (optional, array(integer)) ... integer ids of the subject_sets with subjects that one wishes to unretire
+
+## Request Classification Export by Workflow
+
+```http
+POST /api/workflows/123/classifications_export HTTP/1.1
+Accept: application/vnd.api+json; version=1
+Content-Type: application/json
+```
+A user can request a classification export by workflow of a project they own or have proper permissions.
+
+<aside class="notice">
+<b>Please wait at least 24 hours for your export to be generated.</b> <br>
+
+When Panoptes receives this request, it runs a background job to create the csv export. <br>
+ Once your csv has been generated, you should receive an email from <i>no-reply@zooniverse.org</i> titled <i>Classification Data is Ready</i> which will contain a link to the project's lab data exports page where you can download the generated export.
+</aside>
+
+See: <a href="https://help.zooniverse.org/next-steps/data-exports/" target="_blank"><b>Data Exports Section on Next Steps</b></a> to parse the resulting csv.
+
+Response will be an HTTP 201

@@ -84,7 +84,7 @@ Accept: application/vnd.api+json; version=1
 Content-Type: application/json
 ```
 
-When a fetch request includes an `?include` query parameter (a comma-separated list of related resources for the requested resource) the response will contain a *linked* field with those linked resources. This avoids any extra requests since everything will come back in one response.
+When a fetch request includes an `?include` query parameter (a comma-separated list of related resources of the requested resource) the response will contain a *linked* field with those linked resources. This avoids any extra requests since everything will come back in one response.
 
 ```json
 {
