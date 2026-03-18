@@ -20,6 +20,7 @@ includes:
   - collection_preferences
   - collection_roles
   - collections
+  - field_guides
   - memberships
   - organizations
   - project_preferences
@@ -30,6 +31,8 @@ includes:
   - subject_sets
   - subject_workflow_statuses
   - subjects
+  - translations
+  - tutorials
   - user_groups
   - users
   - workflows
