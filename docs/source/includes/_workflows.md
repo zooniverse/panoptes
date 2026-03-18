@@ -386,6 +386,92 @@ destroy the subject set models.
   + id (required, integer) ... id of workflow to update
   + subject_set_ids (required, string) ... comma separated list of ids to destroy
 
+## Retire Subjects by Workflow
+```http
+POST /api/workflows/123/retired_subjects HTTP/1.1
+Accept: application/vnd.api+json; version=1
+Content-Type: application/json
+
+{
+    "subject_ids": [9],
+    "retirement_reason": "other"
+}
+```
+
+A user may fast track retirement of a subject/multiple subjects on a workflow if they have proper permissions on the workflow's project.
+
+One can retire a subject (using `subject_id` key request body) or multiple subjects (using `subject_ids` in request body).
+
+Response will be an HTTP 204
+
++ Parameters
+  + workflow_id (required, integer) ... integer id of the workflow resource
+  + subject_id (optional, integer) ... integer id of the subject one wishes to retire
+  + subject_ids (optional, array(integer)) ... array of integer ids of the subjects one wishes to retire
+  + retirement_reason (optional, string) ... reason for retirement (defaults to 'other'). (See [<b>SubjectWorkflowStatuses Retirement Reason Types</b>](#retirement-reason-types))
+
+
+## Un-retire Subjects by Workflow
+```http
+POST /api/workflows/123/unretire_subjects HTTP/1.1
+Accept: application/vnd.api+json; version=1
+Content-Type: application/json
+
+{
+    "subject_ids": [9]
+}
+```
+
+A user may unretire a subject/multiple subjects on a workflow if they have proper permissions on the workflow's project.
+
+```http
+# Eg of unretiring all subjects within multiple subject sets
+POST /api/workflows/123/unretire_subjects HTTP/1.1
+Accept: application/vnd.api+json; version=1
+Content-Type: application/json
+
+{
+    "subject_set_ids": [9, 10]
+}
+```
+
+
+One can unretire:
+
++ a subject (using `subject_id` key request body)
++ multiple subjects (using `subject_ids` in request body)
++ all subjects in a subject_set (using `subject_set_id` in request body).
++ all subjects in multiple subject_sets (using `subject_set_ids` in request body)
+
+Response will be an HTTP 204
+
++ Parameters
+  + workflow_id (required, integer) ... integer id of the workflow resource
+  + subject_id (optional, integer) ... integer id of the subject one wishes to unretire
+  + subject_ids (optional, array(integer)) ... array of integer ids of the subjects one wishes to unretire
+  + subject_set_id (optional, integer) ... integer id of the subject_set with subjects that one wishes to unretire
+  + subject_set_ids (optional, array(integer)) ... integer ids of the subject_sets with subjects that one wishes to unretire
+
+## Request Classification Export by Workflow
+
+```http
+POST /api/workflows/123/classifications_export HTTP/1.1
+Accept: application/vnd.api+json; version=1
+Content-Type: application/json
+```
+A user can request a classification export by workflow of a project they own or have proper permissions.
+
+<aside class="notice">
+<b>Please wait at least 24 hours for your export to be generated.</b> <br>
+
+When Panoptes receives this request, it runs a background job to create the csv export. <br>
+ Once your csv has been generated, you should receive an email from <i>no-reply@zooniverse.org</i> titled <i>Classification Data is Ready</i> which will contain a link to the project's lab data exports page where you can download the generated export.
+</aside>
+
+See: <a href="https://help.zooniverse.org/next-steps/data-exports/" target="_blank"><b>Data Exports Section on Next Steps</b></a> to parse the resulting csv.
+
+Response will be an HTTP 201
+
 ## Workflow Versions
 ```json
 {
@@ -648,89 +734,3 @@ Content-Type: application/json
 
 + Parameters
   + id (required, integer) ... integer id of the version to retrieve
-
-## Retire Subjects by Workflow
-```http
-POST /api/workflows/123/retired_subjects HTTP/1.1
-Accept: application/vnd.api+json; version=1
-Content-Type: application/json
-
-{
-    "subject_ids": [9],
-    "retirement_reason": "other"
-}
-```
-
-A user may fast track retirement of a subject/multiple subjects on a workflow if they have proper permissions on the workflow's project.
-
-One can retire a subject (using `subject_id` key request body) or multiple subjects (using `subject_ids` in request body).
-
-Response will be an HTTP 204
-
-+ Parameters
-  + workflow_id (required, integer) ... integer id of the workflow resource
-  + subject_id (optional, integer) ... integer id of the subject one wishes to retire
-  + subject_ids (optional, array(integer)) ... array of integer ids of the subjects one wishes to retire
-  + retirement_reason (optional, string) ... reason for retirement (defaults to 'other'). (See [<b>SubjectWorkflowStatuses Retirement Reason Types</b>](#retirement-reason-types))
-
-
-## Un-retire Subjects by Workflow
-```http
-POST /api/workflows/123/unretire_subjects HTTP/1.1
-Accept: application/vnd.api+json; version=1
-Content-Type: application/json
-
-{
-    "subject_ids": [9]
-}
-```
-
-A user may unretire a subject/multiple subjects on a workflow if they have proper permissions on the workflow's project.
-
-```http
-# Eg of unretiring all subjects within multiple subject sets
-POST /api/workflows/123/unretire_subjects HTTP/1.1
-Accept: application/vnd.api+json; version=1
-Content-Type: application/json
-
-{
-    "subject_set_ids": [9, 10]
-}
-```
-
-
-One can unretire:
-
-+ a subject (using `subject_id` key request body)
-+ multiple subjects (using `subject_ids` in request body)
-+ all subjects in a subject_set (using `subject_set_id` in request body).
-+ all subjects in multiple subject_sets (using `subject_set_ids` in request body)
-
-Response will be an HTTP 204
-
-+ Parameters
-  + workflow_id (required, integer) ... integer id of the workflow resource
-  + subject_id (optional, integer) ... integer id of the subject one wishes to unretire
-  + subject_ids (optional, array(integer)) ... array of integer ids of the subjects one wishes to unretire
-  + subject_set_id (optional, integer) ... integer id of the subject_set with subjects that one wishes to unretire
-  + subject_set_ids (optional, array(integer)) ... integer ids of the subject_sets with subjects that one wishes to unretire
-
-## Request Classification Export by Workflow
-
-```http
-POST /api/workflows/123/classifications_export HTTP/1.1
-Accept: application/vnd.api+json; version=1
-Content-Type: application/json
-```
-A user can request a classification export by workflow of a project they own or have proper permissions.
-
-<aside class="notice">
-<b>Please wait at least 24 hours for your export to be generated.</b> <br>
-
-When Panoptes receives this request, it runs a background job to create the csv export. <br>
- Once your csv has been generated, you should receive an email from <i>no-reply@zooniverse.org</i> titled <i>Classification Data is Ready</i> which will contain a link to the project's lab data exports page where you can download the generated export.
-</aside>
-
-See: <a href="https://help.zooniverse.org/next-steps/data-exports/" target="_blank"><b>Data Exports Section on Next Steps</b></a> to parse the resulting csv.
-
-Response will be an HTTP 201
