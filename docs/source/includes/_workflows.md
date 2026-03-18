@@ -521,6 +521,8 @@ Content-Type: application/json
 }
 ```
 
+A user may unretire a subject/multiple subjects on a workflow if they have proper permissions on the workflow's project.
+
 ```http
 # Eg of unretiring all subjects within multiple subject sets
 POST /api/workflows/123/unretire_subjects HTTP/1.1
@@ -532,9 +534,9 @@ Content-Type: application/json
 }
 ```
 
-A user may unretire a subject/multiple subjects on a workflow if they have proper permissions on the workflow's project.
 
 One can unretire:
+
 + a subject (using `subject_id` key request body)
 + multiple subjects (using `subject_ids` in request body)
 + all subjects in a subject_set (using `subject_set_id` in request body).
