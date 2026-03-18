@@ -365,6 +365,29 @@
               </ul>
           </li>
           <li>
+            <a href="#field-guides" class="toc-h1 toc-link" data-title="Field Guides">Field Guides</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#field-guide-links" class="toc-h2 toc-link" data-title="Field Guides">Field Guide Links</a>
+                  </li>
+                  <li>
+                    <a href="#list-field-guides" class="toc-h2 toc-link" data-title="Field Guides">List Field Guides</a>
+                  </li>
+                  <li>
+                    <a href="#retrieve-a-single-field-guide" class="toc-h2 toc-link" data-title="Field Guides">Retrieve a single Field Guide</a>
+                  </li>
+                  <li>
+                    <a href="#create-a-field-guide" class="toc-h2 toc-link" data-title="Field Guides">Create a Field Guide</a>
+                  </li>
+                  <li>
+                    <a href="#edit-a-single-field-guide" class="toc-h2 toc-link" data-title="Field Guides">Edit a single Field Guide</a>
+                  </li>
+                  <li>
+                    <a href="#destroy-a-single-field-guide" class="toc-h2 toc-link" data-title="Field Guides">Destroy a single Field Guide</a>
+                  </li>
+              </ul>
+          </li>
+          <li>
             <a href="#memberships" class="toc-h1 toc-link" data-title="Memberships">Memberships</a>
               <ul class="toc-list-h2">
                   <li>
@@ -467,6 +490,9 @@
                   </li>
                   <li>
                     <a href="#destroy-a-single-project" class="toc-h2 toc-link" data-title="Projects">Destroy a single Project</a>
+                  </li>
+                  <li>
+                    <a href="#copy-a-project" class="toc-h2 toc-link" data-title="Projects">Copy a Project</a>
                   </li>
               </ul>
           </li>
@@ -573,6 +599,52 @@
                   </li>
                   <li>
                     <a href="#retrieve-subjects-to-classify" class="toc-h2 toc-link" data-title="Subjects">Retrieve subjects to classify</a>
+                  </li>
+                  <li>
+                    <a href="#retrieve-grouped-subjects-to-classify" class="toc-h2 toc-link" data-title="Subjects">Retrieve grouped subjects to classify</a>
+                  </li>
+                  <li>
+                    <a href="#retrieve-specific-subjects-to-classify" class="toc-h2 toc-link" data-title="Subjects">Retrieve specific subjects to classify</a>
+                  </li>
+              </ul>
+          </li>
+          <li>
+            <a href="#translations" class="toc-h1 toc-link" data-title="Translations">Translations</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#list-translations" class="toc-h2 toc-link" data-title="Translations">List Translations</a>
+                  </li>
+                  <li>
+                    <a href="#retrieve-a-single-translation" class="toc-h2 toc-link" data-title="Translations">Retrieve a single Translation</a>
+                  </li>
+                  <li>
+                    <a href="#create-a-translation" class="toc-h2 toc-link" data-title="Translations">Create a Translation</a>
+                  </li>
+                  <li>
+                    <a href="#edit-a-single-translation" class="toc-h2 toc-link" data-title="Translations">Edit a single Translation</a>
+                  </li>
+              </ul>
+          </li>
+          <li>
+            <a href="#tutorials" class="toc-h1 toc-link" data-title="Tutorials">Tutorials</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#tutorial-links" class="toc-h2 toc-link" data-title="Tutorials">Tutorial Links</a>
+                  </li>
+                  <li>
+                    <a href="#list-tutorials" class="toc-h2 toc-link" data-title="Tutorials">List Tutorials</a>
+                  </li>
+                  <li>
+                    <a href="#retrieve-a-single-tutorial" class="toc-h2 toc-link" data-title="Tutorials">Retrieve a single Tutorial</a>
+                  </li>
+                  <li>
+                    <a href="#create-a-tutorial" class="toc-h2 toc-link" data-title="Tutorials">Create a Tutorial</a>
+                  </li>
+                  <li>
+                    <a href="#edit-a-single-tutorial" class="toc-h2 toc-link" data-title="Tutorials">Edit a single Tutorial</a>
+                  </li>
+                  <li>
+                    <a href="#destroy-a-single-tutorial" class="toc-h2 toc-link" data-title="Tutorials">Destroy a single Tutorial</a>
                   </li>
               </ul>
           </li>
@@ -1708,7 +1780,220 @@ subject in the linked list instead.</p>
 
 <p>A user is permitted to add a default subject if they are the collection
 owner or have edit permissions.</p>
-<h1 id='memberships'>Memberships</h1><div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+<h1 id='field-guides'>Field Guides</h1><div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"field_guides"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w">
+    </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"language"</span><span class="p">:</span><span class="w"> </span><span class="s2">"en"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"items"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Example Guide Entry"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"content"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Example field guide content."</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">],</span><span class="w">
+    </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/field_guides/123"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:00:00.000Z"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:05:00.000Z"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"project"</span><span class="p">:</span><span class="w"> </span><span class="s2">"456"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"attached_images"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/field_guides/123/attached_images"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"attached_images"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"ids"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}],</span><span class="w">
+  </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"field_guides.project"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/projects/{field_guides.project}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"projects"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"field_guides.attached_images"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/field_guides/{field_guides.id}/attached_images"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"media"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p>A Field Guide stores reference material for a project.</p>
+
+<table><thead>
+<tr>
+<th>Attribute</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>id</td>
+<td>integer</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>language</td>
+<td>string</td>
+<td></td>
+</tr>
+<tr>
+<td>items</td>
+<td>array(object)</td>
+<td></td>
+</tr>
+<tr>
+<td>href</td>
+<td>string</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>datetime</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>updated_at</td>
+<td>datetime</td>
+<td>read-only</td>
+</tr>
+</tbody></table>
+<h3 id='field-guide-links'>Field Guide Links</h3>
+<ul>
+<li>project</li>
+<li>attached_images</li>
+</ul>
+<h2 id='list-field-guides'>List Field Guides</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/field_guides</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div>
+<p>Example query:</p>
+<div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/field_guides?project_id=456</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div>
+<ul>
+<li>Parameters
+
+<ul>
+<li>page (optional, integer) ... the index of the page to retrieve, default is 1</li>
+<li>page_size (optional, integer) ... number of items to include on a page, default is 20</li>
+<li>sort (optional, string) ... field to sort by</li>
+<li>project_id (optional, integer) ... return field guides linked to the identified project</li>
+<li>language (optional, string) ... filter field guides by language, defaults to <code>en</code></li>
+<li>include (optional, string) ... comma separated list of linked resources to include in the response</li>
+</ul></li>
+</ul>
+<h2 id='retrieve-a-single-field-guide'>Retrieve a single Field Guide</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/field_guides/1</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div>
+<ul>
+<li>Parameters
+
+<ul>
+<li>id (required, integer) ... integer id of the field guide to retrieve</li>
+<li>include (optional, string) ... comma separated list of linked resources to include in the response</li>
+</ul></li>
+</ul>
+<h2 id='create-a-field-guide'>Create a Field Guide</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/field_guides</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+  </span><span class="s2">"field_guides"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"language"</span><span class="p">:</span><span class="w"> </span><span class="s2">"en"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"items"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+    </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"project"</span><span class="p">:</span><span class="w"> </span><span class="s2">"456"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p>The create schema accepts:</p>
+
+<ul>
+<li><code>language</code></li>
+<li><code>items</code></li>
+<li><code>links.project</code></li>
+</ul>
+
+<p>Each item may include:</p>
+
+<ul>
+<li><code>icon</code></li>
+<li><code>title</code></li>
+<li><code>content</code></li>
+</ul>
+
+<p>Example response:</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"field_guides"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"124"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"items"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+      </span><span class="s2">"language"</span><span class="p">:</span><span class="w"> </span><span class="s2">"en"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/field_guides/124"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:10:00.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:10:00.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"project"</span><span class="p">:</span><span class="w"> </span><span class="s2">"456"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"attached_images"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/field_guides/124/attached_images"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"attached_images"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"ids"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">],</span><span class="w">
+  </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"field_guides.project"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/projects/{field_guides.project}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"projects"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"field_guides.attached_images"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/field_guides/{field_guides.id}/attached_images"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"media"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="s2">"meta"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"field_guides"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"page"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"page_size"</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"count"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"include"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+      </span><span class="s2">"page_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"previous_page"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"next_page"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"first_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/field_guides"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"previous_href"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"next_href"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"last_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/field_guides"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div><h2 id='edit-a-single-field-guide'>Edit a single Field Guide</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">PUT</span> <span class="nn">/api/field_guides/1</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+  </span><span class="s2">"field_guides"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"items"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Updated Guide Page"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"content"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Updated reference material."</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"icon"</span><span class="p">:</span><span class="w"> </span><span class="s2">"654321"</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div><h2 id='destroy-a-single-field-guide'>Destroy a single Field Guide</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">DELETE</span> <span class="nn">/api/field_guides/1</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div>
+<p>Response will be an HTTP 204.</p>
+
+<p>Example request:</p>
+<div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">DELETE</span> <span class="nn">/api/field_guides/124</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div><h1 id='memberships'>Memberships</h1><div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
     </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
         </span><span class="s2">"memberships.user_group"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
             </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/user_groups/{memberships.user_group}"</span><span class="p">,</span><span class="w">
@@ -2876,7 +3161,159 @@ recommended. Instead, use the link endpoints explained below.</p>
 <p>A user may destroy a project they own or have destroy permissions for.</p>
 
 <p>Response will be an HTTP 204.</p>
-<h1 id='subjectsetimports'>SubjectSetImports</h1><h2 id='feature-description'>Feature Description</h2>
+<h2 id='copy-a-project'>Copy a Project</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/projects/123/copy</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+</code></pre></div>
+<p>Creates a new project by copying an existing template project.</p>
+
+<p>The source project must:</p>
+
+<ul>
+<li>have <code>configuration.template</code> set</li>
+<li>not be live</li>
+</ul>
+
+<p>If <code>create_subject_set</code> is provided, the copied project will also get a new
+empty subject set with that display name.</p>
+
+<ul>
+<li>Parameters
+
+<ul>
+<li>project_id (required, integer) ... integer id of the template project to copy</li>
+<li>create_subject_set (optional, string) ... display name for a new empty subject set on the copied project</li>
+</ul></li>
+</ul>
+
+<p>Example request:</p>
+<div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/projects/123/copy</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div>
+<p>Example request with <code>create_subject_set</code>:</p>
+<div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/projects/123/copy</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+  </span><span class="s2">"create_subject_set"</span><span class="p">:</span><span class="w"> </span><span class="s2">"New Subject Set"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p>Example response:</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"projects"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"124"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"display_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Example Project (copy: 2026-01-01 12:00:00)"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"classifications_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"subjects_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:00:00.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:00:00.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"available_languages"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="s2">"en"</span><span class="w">
+      </span><span class="p">],</span><span class="w">
+      </span><span class="s2">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Example Project (copy: 2026-01-01 12:00:00)"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"An example project description."</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"introduction"</span><span class="p">:</span><span class="w"> </span><span class="s2">"An example project introduction."</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"private"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"retired_subjects_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"configuration"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"source_project_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">123</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="s2">"live"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"urls"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+      </span><span class="s2">"migrated"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"classifiers_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"slug"</span><span class="p">:</span><span class="w"> </span><span class="s2">"example-user/example-project-copy-2026-01-01-12-00-00"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"redirect"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"beta_requested"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"beta_approved"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"launch_requested"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"launch_approved"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"launch_date"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/projects/124"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"workflow_description"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"primary_language"</span><span class="p">:</span><span class="w"> </span><span class="s2">"en"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"tags"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+      </span><span class="s2">"experimental_tools"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+      </span><span class="s2">"completeness"</span><span class="p">:</span><span class="w"> </span><span class="mf">0.0</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"activity"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"development"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"researcher_quote"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"mobile_friendly"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"featured"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"run_subject_set_completion_events"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"workflows"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+          </span><span class="s2">"321"</span><span class="w">
+        </span><span class="p">],</span><span class="w">
+        </span><span class="s2">"active_workflows"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+          </span><span class="s2">"321"</span><span class="w">
+        </span><span class="p">],</span><span class="w">
+        </span><span class="s2">"subject_sets"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+        </span><span class="s2">"owner"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"789"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"display_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"example-user"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"users"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/users/789"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="s2">"project_roles"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+          </span><span class="s2">"654"</span><span class="w">
+        </span><span class="p">],</span><span class="w">
+        </span><span class="s2">"pages"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+        </span><span class="s2">"organization"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"avatar"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/projects/124/avatar"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"avatars"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"9001"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="s2">"background"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/projects/124/background"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"backgrounds"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"9002"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="s2">"attached_images"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/projects/124/attached_images"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"attached_images"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"ids"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="s2">"classifications_export"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/projects/124/classifications_export"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"classifications_exports"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="s2">"subjects_export"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/projects/124/subjects_export"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"subjects_exports"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">],</span><span class="w">
+  </span><span class="s2">"linked"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"owners"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"789"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"login"</span><span class="p">:</span><span class="w"> </span><span class="s2">"example-user"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"display_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"example-user"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"credited_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Example Researcher"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2025-12-01T08:30:00.000Z"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T11:45:00.000Z"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"users"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/users/789"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"private_profile"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"avatar_src"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://panoptes-uploads.example.org/user_avatar/example-avatar.jpeg"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="s2">"meta"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"projects"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"include"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="s2">"owners"</span><span class="w">
+      </span><span class="p">]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div><h1 id='subjectsetimports'>SubjectSetImports</h1><h2 id='feature-description'>Feature Description</h2>
 <p>This resource is useful when a researcher has a large batch to add. The upload process goes as follows:</p>
 
 <ol>
@@ -3815,21 +4252,884 @@ information.</p>
 </ul></li>
 </ul>
 <h2 id='retrieve-subjects-to-classify'>Retrieve subjects to classify</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="err">
-</span><span class="nf">GET</span> <span class="nn">/api/v1/subjects/queued</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+</span><span class="nf">GET</span> <span class="nn">/api/subjects/queued</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 </code></pre></div>
-<p>While the normal GET on the subjects resource will return a list of subjects in a project, there is a special API for getting some subjects that need classifications: <code>GET /api/v1/subjects/queued</code>. This special API is optimized specifically for serving a selection of subjects that should be shown to the user in the classify interface.</p>
+<p>While the normal <code>GET /api/subjects</code> request returns a list of subjects, the
+selection endpoints below return subjects chosen for classification.</p>
 
 <ul>
 <li>Parameters
 
 <ul>
-<li>workflow_id (required, integer) ... filter to subjects belonging to a specific workflow</li>
-<li>subject_set_id (optional, integer) ... return subjects belonging to the identified subject_set, it is required when the workflow is grouped.</li>
+<li>workflow_id (required, integer)</li>
+<li>subject_set_id (optional, integer) ... required when the workflow is grouped</li>
+<li>page_size (optional, integer) ... if omitted, the selector fills this in from workflow configuration or a default</li>
 </ul></li>
 </ul>
-<h1 id='usergroups'>UserGroups</h1><div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+
+<p>Example request:</p>
+<div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/subjects/queued?workflow_id=321</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div>
+<p>Example response:</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"subjects"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1001"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"metadata"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"Filename"</span><span class="p">:</span><span class="w"> </span><span class="s2">"example-1.jpg"</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="s2">"locations"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="s2">"image/jpeg"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://panoptes-uploads.example.org/subject_location/example-1.jpeg"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">],</span><span class="w">
+      </span><span class="s2">"zooniverse_id"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:00:00.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:00:00.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/subjects/1001"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"selected_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-02T09:30:00.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"retired"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"already_seen"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"finished_workflow"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"user_has_finished_workflow"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"favorite"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"selection_state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"failover_fallback"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1002"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"metadata"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"Filename"</span><span class="p">:</span><span class="w"> </span><span class="s2">"example-2.jpg"</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="s2">"locations"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="s2">"image/jpeg"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://panoptes-uploads.example.org/subject_location/example-2.jpeg"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">],</span><span class="w">
+      </span><span class="s2">"zooniverse_id"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:01:00.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:01:00.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/subjects/1002"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"selected_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-02T09:30:00.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"retired"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"already_seen"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"finished_workflow"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"user_has_finished_workflow"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"favorite"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"selection_state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"failover_fallback"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">],</span><span class="w">
+  </span><span class="s2">"meta"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"subjects"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"page"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"page_size"</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"count"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"include"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+      </span><span class="s2">"page_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"previous_page"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"next_page"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"first_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/subjects"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"previous_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/subjects?page=0"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"next_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/subjects?page=2"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"last_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/subjects?page=0"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p>If the workflow has no linked subject sets, the selector raises <code>no subject set
+is associated with this workflow</code>.</p>
+
+<p>If the workflow has no selectable subjects, the selector raises <code>No data
+available for selection</code>.</p>
+
+<p>For grouped workflows, <code>subject_set_id</code> is required and the selector raises
+<code>subject_set_id parameter missing for grouped workflow</code> if it is omitted.</p>
+<h2 id='retrieve-grouped-subjects-to-classify'>Retrieve grouped subjects to classify</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/subjects/grouped</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div>
+<p>Returns virtual subject groups serialized under the top-level <code>subjects</code> key.</p>
+
+<ul>
+<li>Parameters
+
+<ul>
+<li>workflow_id (required, integer)</li>
+<li>num_rows (required, integer) ... must be between 1 and 9 inclusive</li>
+<li>num_columns (required, integer) ... must be between 1 and 9 inclusive</li>
+<li>subject_set_id (optional, integer)</li>
+</ul></li>
+</ul>
+
+<p>Example request:</p>
+<div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/subjects/grouped?workflow_id=321&amp;num_rows=5&amp;num_columns=5</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div>
+<p>Example response:</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"subjects"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"-1"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"metadata"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"#subject_group_id"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"#group_subject_ids"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1001-1002-1003-1004-1005"</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="s2">"locations"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="s2">"image/png"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://panoptes-uploads.example.org/subject_location/example-1.png"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="s2">"image/png"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://panoptes-uploads.example.org/subject_location/example-2.png"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="s2">"image/png"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://panoptes-uploads.example.org/subject_location/example-3.png"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">],</span><span class="w">
+      </span><span class="s2">"zooniverse_id"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:00:00.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:00:00.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"selected_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:00:05.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"retired"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"already_seen"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"finished_workflow"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"user_has_finished_workflow"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"favorite"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"selection_state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"internal_fallback"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"-2"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"metadata"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"#subject_group_id"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"#group_subject_ids"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1006-1007-1008-1009-1010"</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="s2">"locations"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="s2">"image/png"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://panoptes-uploads.example.org/subject_location/example-4.png"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="s2">"image/png"</span><span class="p">:</span><span class="w"> </span><span class="s2">"https://panoptes-uploads.example.org/subject_location/example-5.png"</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">],</span><span class="w">
+      </span><span class="s2">"zooniverse_id"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:00:01.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:00:01.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"selected_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:00:05.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"retired"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"already_seen"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"finished_workflow"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"user_has_finished_workflow"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"favorite"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"selection_state"</span><span class="p">:</span><span class="w"> </span><span class="s2">"internal_fallback"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">],</span><span class="w">
+  </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span><span class="w">
+  </span><span class="s2">"meta"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"subjects"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"page"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"page_size"</span><span class="p">:</span><span class="w"> </span><span class="mi">75</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"count"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"include"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+      </span><span class="s2">"page_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"previous_page"</span><span class="p">:</span><span class="w"> </span><span class="mi">0</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"next_page"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"first_href"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"previous_href"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"next_href"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"last_href"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p>If <code>num_rows</code> or <code>num_columns</code> are missing or invalid, the API returns HTTP 422.</p>
+
+<ul>
+<li>missing <code>num_rows</code> and <code>num_columns</code></li>
+<li>non-integer <code>num_columns</code></li>
+<li>array <code>num_rows</code> parameter rejected as unpermitted</li>
+</ul>
+<h2 id='retrieve-specific-subjects-to-classify'>Retrieve specific subjects to classify</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/subjects/selection</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div>
+<p>Returns specific subjects by id for a workflow.</p>
+
+<ul>
+<li>Parameters
+
+<ul>
+<li>workflow_id (required, integer)</li>
+<li>ids (required, string) ... comma-separated list of digits, maximum 10 ids</li>
+</ul></li>
+</ul>
+
+<p>If <code>ids</code> is missing, the API returns HTTP 422 with <code>Ids is required</code>.</p>
+<h1 id='translations'>Translations</h1>
+<p>A Translation stores translated strings for another Panoptes resource.</p>
+
+<table><thead>
+<tr>
+<th>Attribute</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>id</td>
+<td>integer</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>translated_id</td>
+<td>integer</td>
+<td>read-only id of the translated resource, for example the project id returned in <code>links.project</code></td>
+</tr>
+<tr>
+<td>translated_type</td>
+<td>string</td>
+<td>read-only type of the translated resource, for example <code>Project</code></td>
+</tr>
+<tr>
+<td>language</td>
+<td>string</td>
+<td></td>
+</tr>
+<tr>
+<td>strings</td>
+<td>object</td>
+<td></td>
+</tr>
+<tr>
+<td>string_versions</td>
+<td>object</td>
+<td></td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>datetime</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>updated_at</td>
+<td>datetime</td>
+<td>read-only</td>
+</tr>
+</tbody></table>
+
+<p>Translations can include a link to the translated resource and, where
+applicable, a <code>published_version</code>.</p>
+<h2 id='list-translations'>List Translations</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/translations?translated_type=project&amp;translated_id=456&amp;language=en</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div>
+<p>Example request:</p>
+
+<p>Example response:</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"translations"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1234"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"translated_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">456</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"translated_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Project"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"language"</span><span class="p">:</span><span class="w"> </span><span class="s2">"en"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"strings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Example Project"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"url_labels"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"An example translated description."</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"display_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Example Project"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"introduction"</span><span class="p">:</span><span class="w"> </span><span class="s2">"An example translated introduction."</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"researcher_quote"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"workflow_description"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="s2">"string_versions"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"example title version"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"url_labels"</span><span class="p">:</span><span class="w"> </span><span class="s2">"example url_labels version"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"example description version"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"display_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"example display_name version"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"introduction"</span><span class="p">:</span><span class="w"> </span><span class="s2">"example introduction version"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"researcher_quote"</span><span class="p">:</span><span class="w"> </span><span class="s2">"example researcher_quote version"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"workflow_description"</span><span class="p">:</span><span class="w"> </span><span class="s2">"example workflow_description version"</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/translations/1234"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:00:00.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:00:00.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"published_version"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"project"</span><span class="p">:</span><span class="w"> </span><span class="s2">"456"</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">],</span><span class="w">
+  </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"translations.published_version"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/translation_versions/{translations.published_version}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"published_versions"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"translations.project"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/projects/{translations.project}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"projects"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"translations.project_page"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/project_pages/{translations.project_page}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"project_pages"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"translations.organization"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/organizations/{translations.organization}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"organizations"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"translations.organization_page"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/organization_pages/{translations.organization_page}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"organization_pages"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"translations.field_guide"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/field_guides/{translations.field_guide}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"field_guides"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"translations.tutorial"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/tutorials/{translations.tutorial}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tutorials"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"translations.workflow"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/workflows/{translations.workflow}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"workflows"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="s2">"meta"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"translations"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"page"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"page_size"</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"count"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"include"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+      </span><span class="s2">"page_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"previous_page"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"next_page"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"first_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/translations?language=en&amp;translated_id=456"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"previous_href"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"next_href"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"last_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/translations?language=en&amp;translated_id=456"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<ul>
+<li>Parameters
+
+<ul>
+<li>page (optional, integer) ... the index of the page to retrieve, default is 1</li>
+<li>page_size (optional, integer) ... number of items to include on a page, default is 20</li>
+<li>sort (optional, string) ... field to sort by</li>
+<li>language (optional, string) ... filter translations by language</li>
+<li>translated_type (optional, string) ... filter by the translated resource type, for example <code>project</code></li>
+<li>translated_id (optional, integer) ... filter by the translated resource id, for example the project id</li>
+<li>include (optional, string) ... comma separated list of linked resources to include in the response</li>
+</ul></li>
+</ul>
+<h2 id='retrieve-a-single-translation'>Retrieve a single Translation</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/translations/1</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div>
+<ul>
+<li>Parameters
+
+<ul>
+<li>id (required, integer) ... integer id of the translation to retrieve</li>
+<li>include (optional, string) ... comma separated list of linked resources to include in the response</li>
+</ul></li>
+</ul>
+<h2 id='create-a-translation'>Create a Translation</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/translations?translated_type=project&amp;translated_id=456</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+  </span><span class="s2">"translations"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"language"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xx"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"strings"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span><span class="w">
+    </span><span class="s2">"string_versions"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p>Translations may only be created for non-primary languages.</p>
+
+<p>Example request:</p>
+
+<p>Example response:</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"translations"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1235"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"translated_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">456</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"translated_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Project"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"language"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xx"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"strings"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span><span class="w">
+      </span><span class="s2">"string_versions"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/translations/1235"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:10:00.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:10:00.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"published_version"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"project"</span><span class="p">:</span><span class="w"> </span><span class="s2">"456"</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">],</span><span class="w">
+  </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"translations.published_version"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/translation_versions/{translations.published_version}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"published_versions"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"translations.project"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/projects/{translations.project}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"projects"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"translations.project_page"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/project_pages/{translations.project_page}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"project_pages"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"translations.organization"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/organizations/{translations.organization}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"organizations"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"translations.organization_page"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/organization_pages/{translations.organization_page}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"organization_pages"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"translations.field_guide"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/field_guides/{translations.field_guide}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"field_guides"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"translations.tutorial"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/tutorials/{translations.tutorial}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tutorials"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"translations.workflow"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/workflows/{translations.workflow}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"workflows"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="s2">"meta"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"translations"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"page"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"page_size"</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"count"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"include"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+      </span><span class="s2">"page_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"previous_page"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"next_page"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"first_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/translations"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"previous_href"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"next_href"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"last_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/translations"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div><h2 id='edit-a-single-translation'>Edit a single Translation</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">PUT</span> <span class="nn">/api/translations/1234?translated_type=project&amp;translated_id=456</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+  </span><span class="s2">"translations"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"strings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Example Translated Title"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"url_labels"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"display_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Example Translated Display Name"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"introduction"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"researcher_quote"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"workflow_description"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"string_versions"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"example title version"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"display_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"example display_name version"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p>Translations may only be updated for non-primary languages.</p>
+
+<p>Example request:</p>
+
+<p>Example response:</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"translations"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"1234"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"translated_id"</span><span class="p">:</span><span class="w"> </span><span class="mi">456</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"translated_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Project"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"language"</span><span class="p">:</span><span class="w"> </span><span class="s2">"xx"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"strings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Example Translated Title"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"url_labels"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"description"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"display_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Example Translated Display Name"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"introduction"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"researcher_quote"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"workflow_description"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="s2">"string_versions"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"title"</span><span class="p">:</span><span class="w"> </span><span class="s2">"example title version"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"display_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"example display_name version"</span><span class="w">
+      </span><span class="p">},</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/translations/1234"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:00:00.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:05:00.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"published_version"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"project"</span><span class="p">:</span><span class="w"> </span><span class="s2">"456"</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">],</span><span class="w">
+  </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"translations.published_version"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/translation_versions/{translations.published_version}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"published_versions"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"translations.project"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/projects/{translations.project}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"projects"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"translations.project_page"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/project_pages/{translations.project_page}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"project_pages"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"translations.organization"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/organizations/{translations.organization}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"organizations"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"translations.organization_page"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/organization_pages/{translations.organization_page}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"organization_pages"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"translations.field_guide"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/field_guides/{translations.field_guide}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"field_guides"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"translations.tutorial"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/tutorials/{translations.tutorial}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tutorials"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"translations.workflow"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/workflows/{translations.workflow}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"workflows"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="s2">"meta"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"translations"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"page"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"page_size"</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"count"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"include"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+      </span><span class="s2">"page_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"previous_page"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"next_page"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"first_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/translations"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"previous_href"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"next_href"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"last_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/translations"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div><h1 id='tutorials'>Tutorials</h1>
+<p>A Tutorial stores instructional content that can be linked to a project and one
+or more workflows.</p>
+
+<table><thead>
+<tr>
+<th>Attribute</th>
+<th>Type</th>
+<th>Description</th>
+</tr>
+</thead><tbody>
+<tr>
+<td>id</td>
+<td>integer</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>display_name</td>
+<td>string</td>
+<td></td>
+</tr>
+<tr>
+<td>language</td>
+<td>string</td>
+<td></td>
+</tr>
+<tr>
+<td>kind</td>
+<td>string</td>
+<td></td>
+</tr>
+<tr>
+<td>steps</td>
+<td>array(object)</td>
+<td></td>
+</tr>
+<tr>
+<td>configuration</td>
+<td>object</td>
+<td></td>
+</tr>
+<tr>
+<td>created_at</td>
+<td>datetime</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>updated_at</td>
+<td>datetime</td>
+<td>read-only</td>
+</tr>
+</tbody></table>
+<h3 id='tutorial-links'>Tutorial Links</h3>
+<ul>
+<li>project</li>
+<li>workflows</li>
+<li>attached_images</li>
+</ul>
+<h2 id='list-tutorials'>List Tutorials</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/tutorials</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div>
+<ul>
+<li>Parameters
+
+<ul>
+<li>page (optional, integer) ... the index of the page to retrieve, default is 1</li>
+<li>page_size (optional, integer) ... number of items to include on a page, default is 20</li>
+<li>sort (optional, string) ... field to sort by</li>
+<li>project_id (optional, integer) ... return tutorials linked to the identified project</li>
+<li>language (optional, string) ... filter tutorials by language, defaults to <code>en</code></li>
+<li>workflow_id (optional, integer) ... return tutorials linked to the identified workflow</li>
+<li>kind (optional, string) ... filter tutorials by kind</li>
+<li>include (optional, string) ... comma separated list of linked resources to include in the response</li>
+</ul></li>
+</ul>
+<h2 id='retrieve-a-single-tutorial'>Retrieve a single Tutorial</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/tutorials/1</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div>
+<ul>
+<li>Parameters
+
+<ul>
+<li>id (required, integer) ... integer id of the tutorial to retrieve</li>
+<li>include (optional, string) ... comma separated list of linked resources to include in the response</li>
+</ul></li>
+</ul>
+
+<p>Example response:</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"tutorials"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"steps"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/tutorials/123"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:00:00.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:00:00.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"language"</span><span class="p">:</span><span class="w"> </span><span class="s2">"en"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"kind"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tutorial"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"display_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Example Tutorial Title"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"configuration"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span><span class="w">
+      </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"project"</span><span class="p">:</span><span class="w"> </span><span class="s2">"456"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"workflows"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+        </span><span class="s2">"attached_images"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/tutorials/123/attached_images"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"attached_images"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"ids"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">],</span><span class="w">
+  </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"tutorials.project"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/projects/{tutorials.project}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"projects"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"tutorials.workflows"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/workflows?tutorial_id={tutorials.id}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"workflows"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"tutorials.attached_images"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/tutorials/{tutorials.id}/attached_images"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"media"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="s2">"meta"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"tutorials"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"page"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"page_size"</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"count"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"include"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+      </span><span class="s2">"page_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"previous_page"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"next_page"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"first_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/tutorials?id=123"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"previous_href"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"next_href"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"last_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/tutorials?id=123"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div><h2 id='create-a-tutorial'>Create a Tutorial</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/tutorials</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+  </span><span class="s2">"tutorials"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"display_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Example Tutorial Title"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"language"</span><span class="p">:</span><span class="w"> </span><span class="s2">"en"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"kind"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tutorial"</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"steps"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+    </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"project"</span><span class="p">:</span><span class="w"> </span><span class="s2">"456"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"configuration"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p>Example response:</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"tutorials"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"steps"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/tutorials/123"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:00:00.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:00:00.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"language"</span><span class="p">:</span><span class="w"> </span><span class="s2">"en"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"kind"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tutorial"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"display_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Example Tutorial Title"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"configuration"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span><span class="w">
+      </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"project"</span><span class="p">:</span><span class="w"> </span><span class="s2">"456"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"workflows"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+        </span><span class="s2">"attached_images"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/tutorials/123/attached_images"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"attached_images"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"ids"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">],</span><span class="w">
+  </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"tutorials.project"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/projects/{tutorials.project}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"projects"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"tutorials.workflows"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/workflows?tutorial_id={tutorials.id}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"workflows"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"tutorials.attached_images"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/tutorials/{tutorials.id}/attached_images"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"media"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="s2">"meta"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"tutorials"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"page"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"page_size"</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"count"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"include"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+      </span><span class="s2">"page_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"previous_page"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"next_page"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"first_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/tutorials"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"previous_href"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"next_href"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"last_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/tutorials"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div><h2 id='edit-a-single-tutorial'>Edit a single Tutorial</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">PUT</span> <span class="nn">/api/tutorials/1</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+  </span><span class="s2">"tutorials"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"steps"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+      </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"media"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"content"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">]</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p>Example response:</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"tutorials"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"steps"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+          </span><span class="s2">"media"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"content"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">],</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/tutorials/123"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:00:00.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-01-01T12:05:00.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"language"</span><span class="p">:</span><span class="w"> </span><span class="s2">"en"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"kind"</span><span class="p">:</span><span class="w"> </span><span class="s2">"tutorial"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"display_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Example Tutorial Title"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"configuration"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span><span class="w">
+      </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"project"</span><span class="p">:</span><span class="w"> </span><span class="s2">"456"</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"workflows"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+        </span><span class="s2">"attached_images"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/tutorials/123/attached_images"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"attached_images"</span><span class="p">,</span><span class="w">
+          </span><span class="s2">"ids"</span><span class="p">:</span><span class="w"> </span><span class="p">[]</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">],</span><span class="w">
+  </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"tutorials.project"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/projects/{tutorials.project}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"projects"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"tutorials.workflows"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/workflows?tutorial_id={tutorials.id}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"workflows"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"tutorials.attached_images"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/tutorials/{tutorials.id}/attached_images"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"media"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="s2">"meta"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"tutorials"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"page"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"page_size"</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"count"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"include"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+      </span><span class="s2">"page_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"previous_page"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"next_page"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"first_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/tutorials"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"previous_href"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"next_href"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"last_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/tutorials"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div><h2 id='destroy-a-single-tutorial'>Destroy a single Tutorial</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">DELETE</span> <span class="nn">/api/tutorials/1</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div>
+<p>Response will be an HTTP 204.</p>
+
+<p>Example request:</p>
+<div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">DELETE</span> <span class="nn">/api/tutorials/123</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div><h1 id='usergroups'>UserGroups</h1><div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
         </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
         </span><span class="s2">"user_groups.projects"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
             </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/projects?owner={user_groups.owner_name}"</span><span class="p">,</span><span class="w">
