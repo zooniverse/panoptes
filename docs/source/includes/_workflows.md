@@ -389,56 +389,214 @@ destroy the subject set models.
 ## Workflow Versions
 ```json
 {
-    "meta": {
-        "versions": {
-            "page": 1,
-            "page_size": 2,
-            "count": 28,
-            "include": [],
-            "page_count": 14,
-            "previous_page": 14,
-            "next_page": 2,
-            "first_href": "/workflows/101/versions?page_size=2",
-            "previous_href": "/workflows/101/versions?page=14page_size=2",
-            "next_href": "/workflows/101/versions/?page=2&page_size=2",
-            "last_href": "/workflows/101/versions?page=14&page_size=2"
+    "workflow_versions": [
+        {
+            "id": "7106287",
+            "href": "/workflow_versions/7106287",
+            "created_at": "2026-03-18T20:34:31.593Z",
+            "updated_at": "2026-03-18T20:34:31.593Z",
+            "major_number": 1,
+            "minor_number": 1,
+            "grouped": false,
+            "pairwise": false,
+            "prioritized": false,
+            "tasks": {},
+            "first_task": "",
+            "strings": {},
+            "links": {
+                "workflow": "31444"
+            }
+        },
+        {
+            "id": "7106288",
+            "href": "/workflow_versions/7106288",
+            "created_at": "2026-03-18T20:35:05.137Z",
+            "updated_at": "2026-03-18T20:35:05.137Z",
+            "major_number": 2,
+            "minor_number": 2,
+            "grouped": false,
+            "pairwise": false,
+            "prioritized": false,
+            "tasks": {
+                "T0": {
+                    "help": "T0.help",
+                    "type": "single",
+                    "answers": [],
+                    "question": "T0.question",
+                    "required": false
+                }
+            },
+            "first_task": "T0",
+            "strings": {
+                "T0.help": "",
+                "T0.question": "Yes or No"
+            },
+            "links": {
+                "workflow": "31444"
+            }
+        },
+        {
+            "id": "7106289",
+            "href": "/workflow_versions/7106289",
+            "created_at": "2026-03-18T20:35:05.299Z",
+            "updated_at": "2026-03-18T20:35:05.299Z",
+            "major_number": 3,
+            "minor_number": 3,
+            "grouped": false,
+            "pairwise": false,
+            "prioritized": false,
+            "tasks": {
+                "T0": {
+                    "help": "T0.help",
+                    "type": "single",
+                    "answers": [
+                        {
+                            "label": "T0.answers.0.label"
+                        }
+                    ],
+                    "question": "T0.question",
+                    "required": false
+                }
+            },
+            "first_task": "T0",
+            "strings": {
+                "T0.help": "",
+                "T0.question": "Yes or No",
+                "T0.answers.0.label": "Enter an answer"
+            },
+            "links": {
+                "workflow": "31444"
+            }
+        },
+        {
+            "id": "7106290",
+            "href": "/workflow_versions/7106290",
+            "created_at": "2026-03-18T20:35:11.118Z",
+            "updated_at": "2026-03-18T20:35:11.118Z",
+            "major_number": 3,
+            "minor_number": 4,
+            "grouped": false,
+            "pairwise": false,
+            "prioritized": false,
+            "tasks": {
+                "T0": {
+                    "help": "T0.help",
+                    "type": "single",
+                    "answers": [
+                        {
+                            "label": "T0.answers.0.label"
+                        }
+                    ],
+                    "question": "T0.question",
+                    "required": false
+                }
+            },
+            "first_task": "T0",
+            "strings": {
+                "T0.help": "",
+                "T0.question": "Yes or No",
+                "T0.answers.0.label": "Yes"
+            },
+            "links": {
+                "workflow": "31444"
+            }
+        },
+        {
+            "id": "7106291",
+            "href": "/workflow_versions/7106291",
+            "created_at": "2026-03-18T20:35:11.277Z",
+            "updated_at": "2026-03-18T20:35:11.277Z",
+            "major_number": 4,
+            "minor_number": 5,
+            "grouped": false,
+            "pairwise": false,
+            "prioritized": false,
+            "tasks": {
+                "T0": {
+                    "help": "T0.help",
+                    "type": "single",
+                    "answers": [
+                        {
+                            "label": "T0.answers.0.label"
+                        },
+                        {
+                            "label": "T0.answers.1.label"
+                        }
+                    ],
+                    "question": "T0.question",
+                    "required": false
+                }
+            },
+            "first_task": "T0",
+            "strings": {
+                "T0.help": "",
+                "T0.question": "Yes or No",
+                "T0.answers.0.label": "Yes",
+                "T0.answers.1.label": "Enter an answer"
+            },
+            "links": {
+                "workflow": "31444"
+            }
+        },
+        {
+            "id": "7106292",
+            "href": "/workflow_versions/7106292",
+            "created_at": "2026-03-18T20:35:16.785Z",
+            "updated_at": "2026-03-18T20:35:16.785Z",
+            "major_number": 4,
+            "minor_number": 6,
+            "grouped": false,
+            "pairwise": false,
+            "prioritized": false,
+            "tasks": {
+                "T0": {
+                    "help": "T0.help",
+                    "type": "single",
+                    "answers": [
+                        {
+                            "label": "T0.answers.0.label"
+                        },
+                        {
+                            "label": "T0.answers.1.label"
+                        }
+                    ],
+                    "question": "T0.question",
+                    "required": false
+                }
+            },
+            "first_task": "T0",
+            "strings": {
+                "T0.help": "",
+                "T0.question": "Yes or No",
+                "T0.answers.0.label": "Yes",
+                "T0.answers.1.label": "No"
+            },
+            "links": {
+                "workflow": "31444"
+            }
+        }
+    ],
+    "links": {
+        "workflow_versions.workflow": {
+            "href": "/workflows/{workflow_versions.workflow}",
+            "type": "workflows"
         }
     },
-    "versions":  [{
-        "id": "42",
-        "changeset": {
-            "grouped": [
-                true,
-                false
-            ]
-        },
-        "whodunnit": "stuartlynn",
-        "created_at": "2014-03-20T06:23:12Z",
-        "links": {
-            "item": {
-                "id": "101",
-                "href": "/workflows/101",
-                "type": "workflows"
-            }
+    "meta": {
+        "workflow_versions": {
+            "page": 1,
+            "page_size": 20,
+            "count": 6,
+            "include": [],
+            "page_count": 1,
+            "previous_page": null,
+            "next_page": null,
+            "first_href": "/workflow_versions?workflow_id=31444",
+            "previous_href": null,
+            "next_href": null,
+            "last_href": "/workflow_versions?workflow_id=31444"
         }
-    },{
-        "id": "43",
-        "changeset": {
-            "prioritized": [
-                false,
-                true
-            ]
-        },
-        "whodunnit": "stuartlynn",
-        "created_at": "2014-03-20T06:23:12Z",
-        "links": {
-            "item": {
-                "id": "101",
-                "href": "/workflows/101",
-                "type": "workflows"
-            }
-        }
-    }]
+    }
 }
 ```
 
@@ -450,16 +608,23 @@ It has the following attributes:
 Attribute | Type | Description
 --------- | ---- | -----------
 id | integer | read-only
-changeset | hash | read-only
-whodunnit | string | read-only
 created_at | datetime | read-only
+updated_at | datetime | read-only
+major_number | integer | read-only
+minor_number | integer | read-only
+grouped | boolean | read-only
+pairwise | boolean | read-only
+prioritized | boolean | read-only
+tasks | jsonb | read-only
+first_task | string | read-only
+strings | jsonb | read-only
 
 
 **It is NOT editable.**
 
 ## List All Workflow Versions
 ```http
-GET /api/workflows/123/versions HTTP/1.1
+GET /api/workflow_versions?workflow_id=123 HTTP/1.1
 Accept: application/vnd.api+json; version=1
 Content-Type: application/json
 ```
@@ -472,17 +637,16 @@ Content-Type: application/json
 Response will have a meta attribute hash containing paging
 information.
 
-Workflow Versions are returned as an array under *versions*.
+Workflow Versions are returned as an array under *workflow_versions*.
 
 ## Retrieve a Single Version
 ```http
-GET /api/workflows/123/versions/1 HTTP/1.1
+GET /api/workflow_versions/123 HTTP/1.1
 Accept: application/vnd.api+json; version=1
 Content-Type: application/json
 ```
 
 + Parameters
-  + workflow_id (required, integer) ... integer id of the workflow resource
   + id (required, integer) ... integer id of the version to retrieve
 
 ## Retire Subjects by Workflow
