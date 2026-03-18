@@ -240,7 +240,6 @@ empty subject set with that display name.
   + project_id (required, integer) ... integer id of the template project to copy
   + create_subject_set (optional, string) ... display name for a new empty subject set on the copied project
 
-Example request:
 
 ```http
 POST /api/projects/123/copy HTTP/1.1
@@ -248,9 +247,8 @@ Accept: application/vnd.api+json; version=1
 Content-Type: application/json
 ```
 
-Example request with `create_subject_set`:
-
 ```http
+# Eg request with `create_subject_set`:
 POST /api/projects/123/copy HTTP/1.1
 Accept: application/vnd.api+json; version=1
 Content-Type: application/json
@@ -259,8 +257,6 @@ Content-Type: application/json
   "create_subject_set": "New Subject Set"
 }
 ```
-
-Example response:
 
 ```json
 {
@@ -377,3 +373,64 @@ Example response:
   }
 }
 ```
+
+## Request a Classifications Export for a Project
+
+```http
+POST /api/projects/123/classifications_export HTTP/1.1
+Accept: application/vnd.api+json; version=1
+Content-Type: application/json
+```
+A user can request a classification export of a project they own or have proper permissions.
+
+<aside class="notice">
+<b>Please wait at least 24 hours for your export to be generated.</b> <br>
+
+When Panoptes receives this request, it runs a background job to create the csv export. <br>
+ Once your csv has been generated, you should receive an email from <i>no-reply@zooniverse.org</i> titled <i>Classification Data is Ready</i> which will contain a link to the project's lab data exports page where you can download the generated export.
+</aside>
+
+See: <a href="https://help.zooniverse.org/next-steps/data-exports/" target="_blank"><b>Data Exports Section on Next Steps</b></a> to parse the resulting csv.
+
+Response will be an HTTP 201
+
+## Request a Subjects Export for a Project
+
+```http
+POST /api/projects/123/subjects_export HTTP/1.1
+Accept: application/vnd.api+json; version=1
+Content-Type: application/json
+```
+A user can request a subjects export of a project they own or have proper permissions.
+
+<aside class="notice">
+<b>Please wait at least 24 hours for your export to be generated.</b> <br>
+
+When Panoptes receives this request, it runs a background job to create the csv export. <br>
+ Once your csv has been generated, you should receive an email from <i>no-reply@zooniverse.org</i> titled <i>Subject Data is Ready</i> which will contain a link to the project's lab data exports page where you can download the generated export.
+</aside>
+
+See: <a href="https://help.zooniverse.org/next-steps/data-exports/" target="_blank"><b>Data Exports Section on Next Steps</b></a> to parse the resulting csv.
+
+Response will be an HTTP 201
+
+## Request a Workflows Export for a Project
+
+```http
+POST /api/projects/123/workflows_export HTTP/1.1
+Accept: application/vnd.api+json; version=1
+Content-Type: application/json
+```
+A user can request a workflows export of a project they own or have proper permissions.
+
+<aside class="notice">
+<b>Please wait at least 24 hours for your export to be generated.</b> <br>
+
+When Panoptes receives this request, it runs a background job to create the csv export. <br>
+ Once your csv has been generated, you should receive an email from <i>no-reply@zooniverse.org</i> titled <i>Workflow Data is Ready</i> which will contain a link to the project's lab data exports page where you can download the generated export.
+</aside>
+
+See: <a href="https://help.zooniverse.org/next-steps/data-exports/" target="_blank"><b>Data Exports Section on Next Steps</b></a> to parse the resulting csv.
+
+Response will be an HTTP 201
+
