@@ -218,3 +218,162 @@ Content-Type: application/json
 A user may destroy a project they own or have destroy permissions for.
 
 Response will be an HTTP 204.
+
+## Copy a Project
+
+```http
+POST /api/projects/123/copy HTTP/1.1
+Accept: application/vnd.api+json; version=1
+```
+
+Creates a new project by copying an existing template project.
+
+The source project must:
+
+- have `configuration.template` set
+- not be live
+
+If `create_subject_set` is provided, the copied project will also get a new
+empty subject set with that display name.
+
++ Parameters
+  + project_id (required, integer) ... integer id of the template project to copy
+  + create_subject_set (optional, string) ... display name for a new empty subject set on the copied project
+
+Example request:
+
+```http
+POST /api/projects/123/copy HTTP/1.1
+Accept: application/vnd.api+json; version=1
+Content-Type: application/json
+```
+
+Example request with `create_subject_set`:
+
+```http
+POST /api/projects/123/copy HTTP/1.1
+Accept: application/vnd.api+json; version=1
+Content-Type: application/json
+
+{
+  "create_subject_set": "New Subject Set"
+}
+```
+
+Example response:
+
+```json
+{
+  "projects": [
+    {
+      "id": "124",
+      "display_name": "Example Project (copy: 2026-01-01 12:00:00)",
+      "classifications_count": 0,
+      "subjects_count": 0,
+      "created_at": "2026-01-01T12:00:00.000Z",
+      "updated_at": "2026-01-01T12:00:00.000Z",
+      "available_languages": [
+        "en"
+      ],
+      "title": "Example Project (copy: 2026-01-01 12:00:00)",
+      "description": "An example project description.",
+      "introduction": "An example project introduction.",
+      "private": false,
+      "retired_subjects_count": 0,
+      "configuration": {
+        "source_project_id": 123
+      },
+      "live": false,
+      "urls": [],
+      "migrated": false,
+      "classifiers_count": 0,
+      "slug": "example-user/example-project-copy-2026-01-01-12-00-00",
+      "redirect": "",
+      "beta_requested": false,
+      "beta_approved": false,
+      "launch_requested": false,
+      "launch_approved": false,
+      "launch_date": null,
+      "href": "/projects/124",
+      "workflow_description": null,
+      "primary_language": "en",
+      "tags": [],
+      "experimental_tools": [],
+      "completeness": 0.0,
+      "activity": 0,
+      "state": "development",
+      "researcher_quote": null,
+      "mobile_friendly": false,
+      "featured": false,
+      "run_subject_set_completion_events": false,
+      "links": {
+        "workflows": [
+          "321"
+        ],
+        "active_workflows": [
+          "321"
+        ],
+        "subject_sets": [],
+        "owner": {
+          "id": "789",
+          "display_name": "example-user",
+          "type": "users",
+          "href": "/users/789"
+        },
+        "project_roles": [
+          "654"
+        ],
+        "pages": [],
+        "organization": null,
+        "avatar": {
+          "href": "/projects/124/avatar",
+          "type": "avatars",
+          "id": "9001"
+        },
+        "background": {
+          "href": "/projects/124/background",
+          "type": "backgrounds",
+          "id": "9002"
+        },
+        "attached_images": {
+          "href": "/projects/124/attached_images",
+          "type": "attached_images",
+          "ids": []
+        },
+        "classifications_export": {
+          "href": "/projects/124/classifications_export",
+          "type": "classifications_exports"
+        },
+        "subjects_export": {
+          "href": "/projects/124/subjects_export",
+          "type": "subjects_exports"
+        }
+      }
+    }
+  ],
+  "linked": {
+    "owners": [
+      {
+        "id": "789",
+        "login": "example-user",
+        "display_name": "example-user",
+        "credited_name": "Example Researcher",
+        "created_at": "2025-12-01T08:30:00.000Z",
+        "updated_at": "2026-01-01T11:45:00.000Z",
+        "type": "users",
+        "href": "/users/789",
+        "private_profile": true,
+        "avatar_src": "https://panoptes-uploads.example.org/user_avatar/example-avatar.jpeg",
+        "links": {}
+      }
+    ]
+  },
+  "meta": {
+    "projects": {
+      "include": [
+        "owners"
+      ]
+    }
+  }
+}
+```
