@@ -519,9 +519,10 @@ Content-Type: application/json
 {
     "subject_ids": [9]
 }
+```
 
-# (Eg of unretiring all subjects within multiple subject sets)
-
+```http
+# Eg of unretiring all subjects within multiple subject sets
 POST /api/workflows/123/unretire_subjects HTTP/1.1
 Accept: application/vnd.api+json; version=1
 Content-Type: application/json
