@@ -485,3 +485,65 @@ Content-Type: application/json
   + workflow_id (required, integer) ... integer id of the workflow resource
   + id (required, integer) ... integer id of the version to retrieve
 
+## Retire Subjects by Workflow
+```http
+POST /api/workflows/123/retired_subjects HTTP/1.1
+Accept: application/vnd.api+json; version=1
+Content-Type: application/json
+
+{
+    "subject_ids": ["9"],
+    "retirement_reason": "other"
+}
+```
+
+A user may fast track retirement of a subject/multiple subjects on a workflow if they have proper permissions on the workflow's project.
+
+One can retire a subject (using `subject_id` key request body) or multiple subjects (using `subject_ids` in request body).
+
+Response will be an HTTP 204
+
++ Parameters
+  + workflow_id (required, integer) ... integer id of the workflow resource
+  + subject_id (optional, integer) ... integer id of the subject one wishes to retire
+  + subject_ids (optional, array(integer)) ... array of integer ids of the subjects one wishes to retire
+  + retirement_reason (optional, string) ... reason for retirement (defaults to 'other'). (See [<b>SubjectWorkflowStatuses Retirement Reason Types</b>](#retirement-reason-types))
+
+
+## Un-retire Subjects by Workflow
+```http
+POST /api/workflows/123/unretire_subjects HTTP/1.1
+Accept: application/vnd.api+json; version=1
+Content-Type: application/json
+
+{
+    "subject_ids": [9]
+}
+
+# (Eg of unretiring all subjects within multiple subject sets)
+
+POST /api/workflows/123/unretire_subjects HTTP/1.1
+Accept: application/vnd.api+json; version=1
+Content-Type: application/json
+
+{
+    "subject_set_ids": [9, 10]
+}
+```
+
+A user may unretire a subject/multiple subjects on a workflow if they have proper permissions on the workflow's project.
+
+One can unretire:
++ a subject (using `subject_id` key request body)
++ multiple subjects (using `subject_ids` in request body)
++ all subjects in a subject_set (using `subject_set_id` in request body).
++ all subjects in multiple subject_sets (using `subject_set_ids` in request body)
+
+Response will be an HTTP 204
+
++ Parameters
+  + workflow_id (required, integer) ... integer id of the workflow resource
+  + subject_id (optional, integer) ... integer id of the subject one wishes to unretire
+  + subject_ids (optional, array(integer)) ... array of integer ids of the subjects one wishes to unretire
+  + subject_set_id (optional, integer) ... integer id of the subject_set with subjects that one wishes to unretire
+  + subject_set_ids (optional, array(integer)) ... integer ids of the subject_sets with subjects that one wishes to unretire
