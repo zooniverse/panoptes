@@ -75,6 +75,40 @@ response will include a top-level `meta` key. For performance reasons, results
 are returned in pages. You can use the data under the `meta` key to
 automatically navigate these paginated results.
 
-## Including linked resources
+## Including Linked Resources
 
-TODO
+```http
+# Eg. request using the ?include parameter
+GET /api/projects?include=avatar HTTP/1.1
+Accept: application/vnd.api+json; version=1
+Content-Type: application/json
+```
+
+When a fetch request includes an `?include` query parameter (a comma-separated list of related resources for the requested resource) the response will contain a *linked* field with those linked resources. This avoids any extra requests since everything will come back in one response.
+
+```json
+{
+  "projects": [{
+    ...,
+    "links": {
+      "workflows": [123],
+      "avatar": {"href": "/projects/123/avatar", "type": "avatars"},
+      ...
+    }
+  }],
+  "linked": {
+    "avatars": [{
+        ...,
+        "links": {
+          "linked": {
+            "href": "/projects/123",
+            "id": "123",
+            "type": "projects"
+          }
+        }
+      }]
+  },
+  ...
+}
+
+```

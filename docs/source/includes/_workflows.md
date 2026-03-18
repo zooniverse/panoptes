@@ -492,7 +492,7 @@ Accept: application/vnd.api+json; version=1
 Content-Type: application/json
 
 {
-    "subject_ids": ["9"],
+    "subject_ids": [9],
     "retirement_reason": "other"
 }
 ```
