@@ -24,17 +24,19 @@ class SubjectMetadataWorker
   end
 
   def run_update
-    update_sms_priority_sql = ActiveRecord::Base.sanitize_sql_array([
-      <<-SQL.squish,
-        UPDATE set_member_subjects
-        SET    priority = CAST(subjects.metadata->>'#priority' AS NUMERIC)
-        FROM   subjects
-        WHERE  subjects.id = set_member_subjects.subject_id
-        AND    subjects.metadata ? '#priority'
-        AND    set_member_subjects.id IN (:sms_ids)
-      SQL
-      { sms_ids: sms_ids }
-    ])
+    update_sms_priority_sql = ActiveRecord::Base.sanitize_sql_array(
+      [
+        <<-SQL.squish,
+          UPDATE set_member_subjects
+          SET    priority = CAST(subjects.metadata->>'#priority' AS NUMERIC)
+          FROM   subjects
+          WHERE  subjects.id = set_member_subjects.subject_id
+          AND    subjects.metadata ? '#priority'
+          AND    set_member_subjects.id IN (:sms_ids)
+        SQL
+        { sms_ids: sms_ids }
+      ]
+    )
     ActiveRecord::Base.connection.exec_update(
       update_sms_priority_sql,
       'SubjectMetadataUpdate',
