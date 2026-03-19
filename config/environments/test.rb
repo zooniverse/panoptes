@@ -1,5 +1,9 @@
 Rails.application.configure do
-  ActiveSupport::Deprecation.silenced = ENV.fetch('DEPRECATION_WARNINGS_SILENCED', nil).present?
+  if ENV.fetch('DEPRECATION_WARNINGS_SILENCED', nil).present?
+    config.active_support.report_deprecations = false
+  else
+    config.active_support.deprecation = :stderr
+  end
   # Settings specified here will take precedence over those in config/application.rb.
 
   # The test environment is used exclusively to run your application's
@@ -33,9 +37,6 @@ Rails.application.configure do
   config.action_mailer.delivery_method = :test
   config.action_mailer.default_url_options = { protocol: 'https',
                                                host: 'panoptes_test.zooniverse.org' }
-
-  # Print deprecation notices to the stderr.
-  config.active_support.deprecation = :stderr
 
   #turn off the rails cache store
   config.cache_store = :null_store
