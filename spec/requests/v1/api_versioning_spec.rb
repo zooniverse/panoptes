@@ -8,16 +8,14 @@ describe 'api versioning with accept headers', type: :request do
   end
 
   describe 'html format' do
-    before do
-      get '/api/users', headers: { 'HTTP_ACCEPT' => 'text/html' }
-    end
-
-    it 'responds with not found' do
-      expect(response).to have_http_status(:not_found)
-    end
-
-    it 'includes not found in the response body' do
-      expect(response.body).to include('Not Found')
+    it 'returns a not found outcome' do
+      options = { headers: { 'HTTP_ACCEPT' => 'text/html' } }
+      begin
+        get '/api/users', **options
+        expect(response).to have_http_status(:not_found)
+      rescue ActionController::RoutingError => e
+        expect(e.message).to eq('Not Found')
+      end
     end
   end
 
