@@ -1,3 +1,5 @@
+# frozen_string_literal: true
+
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
 
@@ -6,26 +8,27 @@ namespace :organization_projects do
   task backfill_from_projects: :environment do
     scope = Project.where.not(organization_id: nil)
     total = scope.count
-    before_count = OrganizationProject.count
+    inserted = 0
+    processed = 0
 
     puts "Backfilling organization_projects from #{total} project rows..."
 
     scope.find_in_batches(batch_size: 1_000).with_index do |batch, batch_index|
-      now = Time.current
-      rows = batch.map do |project|
-        {
+      batch.each do |project|
+        processed += 1
+        organization_project = OrganizationProject.find_or_initialize_by(
           organization_id: project.organization_id,
-          project_id: project.id,
-          created_at: now,
-          updated_at: now
-        }
-      end
+          project_id: project.id
+        )
+        next unless organization_project.new_record?
 
-      OrganizationProject.insert_all(rows, unique_by: :index_organization_projects_on_organization_id_and_project_id)
-      puts "Processed batch #{batch_index + 1}"
+        organization_project.save!
+        inserted += 1
+      end
+      puts "Processed batch #{batch_index + 1} (#{processed}/#{total})"
     end
 
-    inserted = OrganizationProject.count - before_count
     puts "Done. Inserted #{inserted} organization_project rows."
   end
+
 end
