@@ -29,4 +29,16 @@ describe OrganizationProject, type: :model do
 
     expect(duplicate.errors[:organization_id]).to include('has already been taken')
   end
+
+  it 'destroys organization_projects when an organization is destroyed' do
+    organization_project = create(:organization_project)
+
+    expect { organization_project.organization.destroy }.to change(described_class, :count).by(-1)
+  end
+
+  it 'destroys organization_projects when a project is destroyed' do
+    organization_project = create(:organization_project)
+
+    expect { organization_project.project.destroy }.to change(described_class, :count).by(-1)
+  end
 end
