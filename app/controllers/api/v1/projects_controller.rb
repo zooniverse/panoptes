@@ -209,11 +209,10 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def filter_by_organization_ids
     organization_ids = params.delete(:organization_id)&.split(',')
-    return unless organization_ids.present?
+    return if organization_ids.blank?
 
-    @controlled_resources = controlled_resources
-      .joins(:organizations)
-      .where(organizations: { id: organization_ids })
-      .distinct
+    @controlled_resources = controlled_resources.joins(:organizations).where(
+      organizations: { id: organization_ids }
+    ).distinct
   end
 end
