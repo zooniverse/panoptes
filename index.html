@@ -251,7 +251,7 @@
                     <a href="#pagination" class="toc-h2 toc-link" data-title="JSON-API conventions">Pagination</a>
                   </li>
                   <li>
-                    <a href="#including-linked-resources" class="toc-h2 toc-link" data-title="JSON-API conventions">Including linked resources</a>
+                    <a href="#including-linked-resources" class="toc-h2 toc-link" data-title="JSON-API conventions">Including Linked Resources</a>
                   </li>
               </ul>
           </li>
@@ -494,6 +494,15 @@
                   <li>
                     <a href="#copy-a-project" class="toc-h2 toc-link" data-title="Projects">Copy a Project</a>
                   </li>
+                  <li>
+                    <a href="#request-a-classifications-export-for-a-project" class="toc-h2 toc-link" data-title="Projects">Request a Classifications Export for a Project</a>
+                  </li>
+                  <li>
+                    <a href="#request-a-subjects-export-for-a-project" class="toc-h2 toc-link" data-title="Projects">Request a Subjects Export for a Project</a>
+                  </li>
+                  <li>
+                    <a href="#request-a-workflows-export-for-a-project" class="toc-h2 toc-link" data-title="Projects">Request a Workflows Export for a Project</a>
+                  </li>
               </ul>
           </li>
           <li>
@@ -563,6 +572,9 @@
             <a href="#subjectworkflowstatuses" class="toc-h1 toc-link" data-title="SubjectWorkflowStatuses">SubjectWorkflowStatuses</a>
               <ul class="toc-list-h2">
                   <li>
+                    <a href="#retirement-reason-types" class="toc-h2 toc-link" data-title="SubjectWorkflowStatuses">Retirement Reason Types</a>
+                  </li>
+                  <li>
                     <a href="#list-all-subjectworkflowstatuses" class="toc-h2 toc-link" data-title="SubjectWorkflowStatuses">List all SubjectWorkflowStatuses</a>
                   </li>
                   <li>
@@ -587,15 +599,6 @@
                   </li>
                   <li>
                     <a href="#destroy-a-single-subject" class="toc-h2 toc-link" data-title="Subjects">Destroy a single subject</a>
-                  </li>
-                  <li>
-                    <a href="#subject-versions" class="toc-h2 toc-link" data-title="Subjects">Subject Versions</a>
-                  </li>
-                  <li>
-                    <a href="#list-all-subject-versions" class="toc-h2 toc-link" data-title="Subjects">List all Subject Versions</a>
-                  </li>
-                  <li>
-                    <a href="#retrieve-a-single-subject-version" class="toc-h2 toc-link" data-title="Subjects">Retrieve a Single Subject Version</a>
                   </li>
                   <li>
                     <a href="#retrieve-subjects-to-classify" class="toc-h2 toc-link" data-title="Subjects">Retrieve subjects to classify</a>
@@ -720,6 +723,15 @@
                   </li>
                   <li>
                     <a href="#destroy-workflow-39-s-subject-set-links" class="toc-h2 toc-link" data-title="Workflows">Destroy Workflow's Subject Set Links</a>
+                  </li>
+                  <li>
+                    <a href="#retire-subjects-by-workflow" class="toc-h2 toc-link" data-title="Workflows">Retire Subjects by Workflow</a>
+                  </li>
+                  <li>
+                    <a href="#un-retire-subjects-by-workflow" class="toc-h2 toc-link" data-title="Workflows">Un-retire Subjects by Workflow</a>
+                  </li>
+                  <li>
+                    <a href="#request-classification-export-by-workflow" class="toc-h2 toc-link" data-title="Workflows">Request Classification Export by Workflow</a>
                   </li>
                   <li>
                     <a href="#workflow-versions" class="toc-h2 toc-link" data-title="Workflows">Workflow Versions</a>
@@ -954,9 +966,37 @@ under the top-level <code>links</code> key (as opposed to the per-resource <code
 response will include a top-level <code>meta</code> key. For performance reasons, results
 are returned in pages. You can use the data under the <code>meta</code> key to
 automatically navigate these paginated results.</p>
-<h2 id='including-linked-resources'>Including linked resources</h2>
-<p>TODO</p>
-<h1 id='headers'>Headers</h1>
+<h2 id='including-linked-resources'>Including Linked Resources</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="err"># Eg. request using the ?include parameter
+</span><span class="nf">GET</span> <span class="nn">/api/projects?include=avatar</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div>
+<p>When a fetch request includes an <code>?include</code> query parameter (a comma-separated list of related resources of the requested resource) the response will contain a <em>linked</em> field with those linked resources. This avoids any extra requests since everything will come back in one response.</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"projects"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w">
+    </span><span class="err">...</span><span class="p">,</span><span class="w">
+    </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"workflows"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">123</span><span class="p">],</span><span class="w">
+      </span><span class="s2">"avatar"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/projects/123/avatar"</span><span class="p">,</span><span class="w"> </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"avatars"</span><span class="p">},</span><span class="w">
+      </span><span class="err">...</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}],</span><span class="w">
+  </span><span class="s2">"linked"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"avatars"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w">
+        </span><span class="err">...</span><span class="p">,</span><span class="w">
+        </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+          </span><span class="s2">"linked"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/projects/123"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"123"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"projects"</span><span class="w">
+          </span><span class="p">}</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+      </span><span class="p">}]</span><span class="w">
+  </span><span class="p">},</span><span class="w">
+  </span><span class="err">...</span><span class="w">
+</span><span class="p">}</span><span class="w">
+
+</span></code></pre></div><h1 id='headers'>Headers</h1>
 <p>Panoptes API sometime requires specific headers to be sent as part of requests.</p>
 
 <p>All requests should set <code>Accept: application/vnd.api+json; version=1</code>. You will receive a <code>404 Not Found</code> without it.</p>
@@ -3184,23 +3224,18 @@ empty subject set with that display name.</p>
 <li>create_subject_set (optional, string) ... display name for a new empty subject set on the copied project</li>
 </ul></li>
 </ul>
-
-<p>Example request:</p>
 <div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/projects/123/copy</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
-</code></pre></div>
-<p>Example request with <code>create_subject_set</code>:</p>
-<div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/projects/123/copy</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+</code></pre></div><div class="highlight"><pre class="highlight http tab-http"><code><span class="err"># Eg request with `create_subject_set`:
+</span><span class="nf">POST</span> <span class="nn">/api/projects/123/copy</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 
 <span class="p">{</span><span class="w">
   </span><span class="s2">"create_subject_set"</span><span class="p">:</span><span class="w"> </span><span class="s2">"New Subject Set"</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre></div>
-<p>Example response:</p>
-<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+</span></code></pre></div><div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
   </span><span class="s2">"projects"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
     </span><span class="p">{</span><span class="w">
       </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"124"</span><span class="p">,</span><span class="w">
@@ -3313,7 +3348,55 @@ empty subject set with that display name.</p>
     </span><span class="p">}</span><span class="w">
   </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span><span class="w">
-</span></code></pre></div><h1 id='subjectsetimports'>SubjectSetImports</h1><h2 id='feature-description'>Feature Description</h2>
+</span></code></pre></div><h2 id='request-a-classifications-export-for-a-project'>Request a Classifications Export for a Project</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/projects/123/classifications_export</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div>
+<p>A user can request a classification export of a project they own or have proper permissions.</p>
+
+<aside class="notice">
+<b>Please wait at least 24 hours for your export to be generated.</b> <br>
+
+When Panoptes receives this request, it runs a background job to create the csv export. <br>
+ Once your csv has been generated, you should receive an email from <i>no-reply@zooniverse.org</i> titled <i>Classification Data is Ready</i> which will contain a link to the project's lab data exports page where you can download the generated export.
+</aside>
+
+<p>See: <a href="https://help.zooniverse.org/next-steps/data-exports/" target="_blank"><b>Data Exports Section on Next Steps</b></a> to parse the resulting csv.</p>
+
+<p>Response will be an HTTP 201</p>
+<h2 id='request-a-subjects-export-for-a-project'>Request a Subjects Export for a Project</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/projects/123/subjects_export</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div>
+<p>A user can request a subjects export of a project they own or have proper permissions.</p>
+
+<aside class="notice">
+<b>Please wait at least 24 hours for your export to be generated.</b> <br>
+
+When Panoptes receives this request, it runs a background job to create the csv export. <br>
+ Once your csv has been generated, you should receive an email from <i>no-reply@zooniverse.org</i> titled <i>Subject Data is Ready</i> which will contain a link to the project's lab data exports page where you can download the generated export.
+</aside>
+
+<p>See: <a href="https://help.zooniverse.org/next-steps/data-exports/" target="_blank"><b>Data Exports Section on Next Steps</b></a> to parse the resulting csv.</p>
+
+<p>Response will be an HTTP 201</p>
+<h2 id='request-a-workflows-export-for-a-project'>Request a Workflows Export for a Project</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/projects/123/workflows_export</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div>
+<p>A user can request a workflows export of a project they own or have proper permissions.</p>
+
+<aside class="notice">
+<b>Please wait at least 24 hours for your export to be generated.</b> <br>
+
+When Panoptes receives this request, it runs a background job to create the csv export. <br>
+ Once your csv has been generated, you should receive an email from <i>no-reply@zooniverse.org</i> titled <i>Workflow Data is Ready</i> which will contain a link to the project's lab data exports page where you can download the generated export.
+</aside>
+
+<p>See: <a href="https://help.zooniverse.org/next-steps/data-exports/" target="_blank"><b>Data Exports Section on Next Steps</b></a> to parse the resulting csv.</p>
+
+<p>Response will be an HTTP 201</p>
+<h1 id='subjectsetimports'>SubjectSetImports</h1><h2 id='feature-description'>Feature Description</h2>
 <p>This resource is useful when a researcher has a large batch to add. The upload process goes as follows:</p>
 
 <ol>
@@ -3890,6 +3973,17 @@ This status includes the classification count and the retirement state and reaso
 
 <p>SubjectWorkflowStatuses are
 only visible to users with rights on the workflow&#39;s associated project.</p>
+<h2 id='retirement-reason-types'>Retirement Reason Types</h2>
+<p>The types of retirement reasons are:</p>
+
+<ul>
+<li>classification_count</li>
+<li>flagged</li>
+<li>nothing_here</li>
+<li>consensus</li>
+<li>other</li>
+<li>human</li>
+</ul>
 <h2 id='list-all-subjectworkflowstatuses'>List all SubjectWorkflowStatuses</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/subject_workflow_statuses</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
@@ -4127,130 +4221,6 @@ representation of the attribute.</p>
 </code></pre></div>
 <p>Users are permitted to destroy a subjects they own or
 subjects belongs to a project a user has destroy permissions for.</p>
-<h2 id='subject-versions'>Subject Versions</h2><div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
-    </span><span class="s2">"meta"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-        </span><span class="s2">"versions"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-            </span><span class="s2">"page"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"page_size"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"count"</span><span class="p">:</span><span class="w"> </span><span class="mi">28</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"include"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
-            </span><span class="s2">"page_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">14</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"previous_page"</span><span class="p">:</span><span class="w"> </span><span class="mi">14</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"next_page"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"first_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/subjects/101/versions?page_size=2"</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"previous_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/subjects/101/versions?page=14page_size=2"</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"next_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/subjects/101/versions/?page=2&amp;page_size=2"</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"last_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/subjects/101/versions?page=14&amp;page_size=2"</span><span class="w">
-        </span><span class="p">}</span><span class="w">
-    </span><span class="p">},</span><span class="w">
-    </span><span class="s2">"versions"</span><span class="p">:</span><span class="w">  </span><span class="p">[{</span><span class="w">
-        </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"42"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"changeset"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-            </span><span class="s2">"metadata"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w">
-                </span><span class="s2">"ra"</span><span class="p">:</span><span class="w"> </span><span class="s2">"120.2"</span><span class="p">,</span><span class="w">
-                </span><span class="s2">"dec"</span><span class="p">:</span><span class="w"> </span><span class="s2">"-12.4"</span><span class="w">
-            </span><span class="p">},{</span><span class="w">
-                </span><span class="s2">"ra"</span><span class="p">:</span><span class="w"> </span><span class="s2">"121.1"</span><span class="p">,</span><span class="w">
-                </span><span class="s2">"dec"</span><span class="p">:</span><span class="w"> </span><span class="s2">"-11.1"</span><span class="w">
-            </span><span class="p">}]</span><span class="w">
-        </span><span class="p">},</span><span class="w">
-        </span><span class="s2">"whodunnit"</span><span class="p">:</span><span class="w"> </span><span class="s2">"stuartlynn"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2014-03-20T06:23:12Z"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-            </span><span class="s2">"item"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-                </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"101"</span><span class="p">,</span><span class="w">
-                </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/subject/101"</span><span class="p">,</span><span class="w">
-                </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"subjects"</span><span class="w">
-            </span><span class="p">}</span><span class="w">
-        </span><span class="p">}</span><span class="w">
-    </span><span class="p">},{</span><span class="w">
-        </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"43"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"changeset"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-            </span><span class="s2">"metadata"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w">
-                </span><span class="s2">"ra"</span><span class="p">:</span><span class="w"> </span><span class="s2">"20.2"</span><span class="p">,</span><span class="w">
-                </span><span class="s2">"dec"</span><span class="p">:</span><span class="w"> </span><span class="s2">"12.4"</span><span class="w">
-            </span><span class="p">},{</span><span class="w">
-                </span><span class="s2">"ra"</span><span class="p">:</span><span class="w"> </span><span class="s2">"21.1"</span><span class="p">,</span><span class="w">
-                </span><span class="s2">"dec"</span><span class="p">:</span><span class="w"> </span><span class="s2">"11.1"</span><span class="w">
-            </span><span class="p">}]</span><span class="w">
-        </span><span class="p">},</span><span class="w">
-        </span><span class="s2">"whodunnit"</span><span class="p">:</span><span class="w"> </span><span class="s2">"stuartlynn"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2014-03-20T06:23:12Z"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-            </span><span class="s2">"item"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-                </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"101"</span><span class="p">,</span><span class="w">
-                </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/subject/101"</span><span class="p">,</span><span class="w">
-                </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"subjects"</span><span class="w">
-            </span><span class="p">}</span><span class="w">
-        </span><span class="p">}</span><span class="w">
-    </span><span class="p">}]</span><span class="w">
-</span><span class="p">}</span><span class="w">
-</span></code></pre></div>
-<p>A Subject Version resource represents a set of changes made to
-a Subject resource.</p>
-
-<p>It has the following attributes:</p>
-
-<table><thead>
-<tr>
-<th>Attribute</th>
-<th>Type</th>
-<th>Description</th>
-</tr>
-</thead><tbody>
-<tr>
-<td>id</td>
-<td>integer</td>
-<td>read-only</td>
-</tr>
-<tr>
-<td>changeset</td>
-<td>jsonb</td>
-<td>read-only</td>
-</tr>
-<tr>
-<td>whodunnit</td>
-<td>string</td>
-<td>read-only</td>
-</tr>
-<tr>
-<td>created_at</td>
-<td>datetime</td>
-<td>read-only</td>
-</tr>
-</tbody></table>
-
-<p><strong>It is NOT editable.</strong></p>
-<h2 id='list-all-subject-versions'>List all Subject Versions</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/subjects/123/versions</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
-<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
-<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
-</code></pre></div>
-<ul>
-<li>Parameters
-
-<ul>
-<li>subject_id (required, integer) ... id of the subject to retreive versions for</li>
-<li>page (optional, integer) ... the index of the page to retrieve default is 1</li>
-<li>page_size (optional, integer) ... number of items to include on a page default is 20</li>
-</ul></li>
-</ul>
-
-<p>Response will have a meta attribute hash containing paging
-information.</p>
-
-<p>Subject Versions are returned as an array under <em>versions</em>.</p>
-<h2 id='retrieve-a-single-subject-version'>Retrieve a Single Subject Version</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/subjects/123/versions/2</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
-<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
-<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
-</code></pre></div>
-<ul>
-<li>Parameters
-
-<ul>
-<li>subject_id (required, integer) ... id of the subject to retreive versions for</li>
-<li>id (required, integer) ... integer id of the version to load</li>
-</ul></li>
-</ul>
 <h2 id='retrieve-subjects-to-classify'>Retrieve subjects to classify</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="err">
 </span><span class="nf">GET</span> <span class="nn">/api/subjects/queued</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
@@ -6009,57 +5979,296 @@ destroy the subject set models.</p>
 <li>subject_set_ids (required, string) ... comma separated list of ids to destroy</li>
 </ul></li>
 </ul>
+<h2 id='retire-subjects-by-workflow'>Retire Subjects by Workflow</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/workflows/123/retired_subjects</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+    </span><span class="s2">"subject_ids"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">9</span><span class="p">],</span><span class="w">
+    </span><span class="s2">"retirement_reason"</span><span class="p">:</span><span class="w"> </span><span class="s2">"other"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p>A user may fast track retirement of a subject/multiple subjects on a workflow if they have proper permissions on the workflow&#39;s project.</p>
+
+<p>One can retire a subject (using <code>subject_id</code> key request body) or multiple subjects (using <code>subject_ids</code> in request body).</p>
+
+<p>Response will be an HTTP 204</p>
+
+<ul>
+<li>Parameters
+
+<ul>
+<li>workflow_id (required, integer) ... integer id of the workflow resource</li>
+<li>subject_id (optional, integer) ... integer id of the subject one wishes to retire</li>
+<li>subject_ids (optional, array(integer)) ... array of integer ids of the subjects one wishes to retire</li>
+<li>retirement_reason (optional, string) ... reason for retirement (defaults to &#39;other&#39;). (See <a href="#retirement-reason-types"><b>SubjectWorkflowStatuses Retirement Reason Types</b></a>)</li>
+</ul></li>
+</ul>
+<h2 id='un-retire-subjects-by-workflow'>Un-retire Subjects by Workflow</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/workflows/123/unretire_subjects</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+    </span><span class="s2">"subject_ids"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">9</span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p>A user may unretire a subject/multiple subjects on a workflow if they have proper permissions on the workflow&#39;s project.</p>
+<div class="highlight"><pre class="highlight http tab-http"><code><span class="err"># Eg of unretiring all subjects within multiple subject sets
+</span><span class="nf">POST</span> <span class="nn">/api/workflows/123/unretire_subjects</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+    </span><span class="s2">"subject_set_ids"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="mi">9</span><span class="p">,</span><span class="w"> </span><span class="mi">10</span><span class="p">]</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p>One can unretire:</p>
+
+<ul>
+<li>a subject (using <code>subject_id</code> key request body)</li>
+<li>multiple subjects (using <code>subject_ids</code> in request body)</li>
+<li>all subjects in a subject_set (using <code>subject_set_id</code> in request body).</li>
+<li>all subjects in multiple subject_sets (using <code>subject_set_ids</code> in request body)</li>
+</ul>
+
+<p>Response will be an HTTP 204</p>
+
+<ul>
+<li>Parameters
+
+<ul>
+<li>workflow_id (required, integer) ... integer id of the workflow resource</li>
+<li>subject_id (optional, integer) ... integer id of the subject one wishes to unretire</li>
+<li>subject_ids (optional, array(integer)) ... array of integer ids of the subjects one wishes to unretire</li>
+<li>subject_set_id (optional, integer) ... integer id of the subject_set with subjects that one wishes to unretire</li>
+<li>subject_set_ids (optional, array(integer)) ... integer ids of the subject_sets with subjects that one wishes to unretire</li>
+</ul></li>
+</ul>
+<h2 id='request-classification-export-by-workflow'>Request Classification Export by Workflow</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/workflows/123/classifications_export</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+</code></pre></div>
+<p>A user can request a classification export by workflow of a project they own or have proper permissions.</p>
+
+<aside class="notice">
+<b>Please wait at least 24 hours for your export to be generated.</b> <br>
+
+When Panoptes receives this request, it runs a background job to create the csv export. <br>
+ Once your csv has been generated, you should receive an email from <i>no-reply@zooniverse.org</i> titled <i>Classification Data is Ready</i> which will contain a link to the project's lab data exports page where you can download the generated export.
+</aside>
+
+<p>See: <a href="https://help.zooniverse.org/next-steps/data-exports/" target="_blank"><b>Data Exports Section on Next Steps</b></a> to parse the resulting csv.</p>
+
+<p>Response will be an HTTP 201</p>
 <h2 id='workflow-versions'>Workflow Versions</h2><div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
-    </span><span class="s2">"meta"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-        </span><span class="s2">"versions"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-            </span><span class="s2">"page"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"page_size"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"count"</span><span class="p">:</span><span class="w"> </span><span class="mi">28</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"include"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
-            </span><span class="s2">"page_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">14</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"previous_page"</span><span class="p">:</span><span class="w"> </span><span class="mi">14</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"next_page"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"first_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/workflows/101/versions?page_size=2"</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"previous_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/workflows/101/versions?page=14page_size=2"</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"next_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/workflows/101/versions/?page=2&amp;page_size=2"</span><span class="p">,</span><span class="w">
-            </span><span class="s2">"last_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/workflows/101/versions?page=14&amp;page_size=2"</span><span class="w">
+    </span><span class="s2">"workflow_versions"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"7106287"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/workflow_versions/7106287"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-18T20:34:31.593Z"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-18T20:34:31.593Z"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"major_number"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"minor_number"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"grouped"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"pairwise"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"prioritized"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"tasks"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span><span class="w">
+            </span><span class="s2">"first_task"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"strings"</span><span class="p">:</span><span class="w"> </span><span class="p">{},</span><span class="w">
+            </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                </span><span class="s2">"workflow"</span><span class="p">:</span><span class="w"> </span><span class="s2">"31444"</span><span class="w">
+            </span><span class="p">}</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"7106288"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/workflow_versions/7106288"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-18T20:35:05.137Z"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-18T20:35:05.137Z"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"major_number"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"minor_number"</span><span class="p">:</span><span class="w"> </span><span class="mi">2</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"grouped"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"pairwise"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"prioritized"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"tasks"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                </span><span class="s2">"T0"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                    </span><span class="s2">"help"</span><span class="p">:</span><span class="w"> </span><span class="s2">"T0.help"</span><span class="p">,</span><span class="w">
+                    </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"single"</span><span class="p">,</span><span class="w">
+                    </span><span class="s2">"answers"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+                    </span><span class="s2">"question"</span><span class="p">:</span><span class="w"> </span><span class="s2">"T0.question"</span><span class="p">,</span><span class="w">
+                    </span><span class="s2">"required"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+                </span><span class="p">}</span><span class="w">
+            </span><span class="p">},</span><span class="w">
+            </span><span class="s2">"first_task"</span><span class="p">:</span><span class="w"> </span><span class="s2">"T0"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"strings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                </span><span class="s2">"T0.help"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+                </span><span class="s2">"T0.question"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Yes or No"</span><span class="w">
+            </span><span class="p">},</span><span class="w">
+            </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                </span><span class="s2">"workflow"</span><span class="p">:</span><span class="w"> </span><span class="s2">"31444"</span><span class="w">
+            </span><span class="p">}</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"7106289"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/workflow_versions/7106289"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-18T20:35:05.299Z"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-18T20:35:05.299Z"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"major_number"</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"minor_number"</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"grouped"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"pairwise"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"prioritized"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"tasks"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                </span><span class="s2">"T0"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                    </span><span class="s2">"help"</span><span class="p">:</span><span class="w"> </span><span class="s2">"T0.help"</span><span class="p">,</span><span class="w">
+                    </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"single"</span><span class="p">,</span><span class="w">
+                    </span><span class="s2">"answers"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+                        </span><span class="p">{</span><span class="w">
+                            </span><span class="s2">"label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"T0.answers.0.label"</span><span class="w">
+                        </span><span class="p">}</span><span class="w">
+                    </span><span class="p">],</span><span class="w">
+                    </span><span class="s2">"question"</span><span class="p">:</span><span class="w"> </span><span class="s2">"T0.question"</span><span class="p">,</span><span class="w">
+                    </span><span class="s2">"required"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+                </span><span class="p">}</span><span class="w">
+            </span><span class="p">},</span><span class="w">
+            </span><span class="s2">"first_task"</span><span class="p">:</span><span class="w"> </span><span class="s2">"T0"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"strings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                </span><span class="s2">"T0.help"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+                </span><span class="s2">"T0.question"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Yes or No"</span><span class="p">,</span><span class="w">
+                </span><span class="s2">"T0.answers.0.label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Enter an answer"</span><span class="w">
+            </span><span class="p">},</span><span class="w">
+            </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                </span><span class="s2">"workflow"</span><span class="p">:</span><span class="w"> </span><span class="s2">"31444"</span><span class="w">
+            </span><span class="p">}</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"7106290"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/workflow_versions/7106290"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-18T20:35:11.118Z"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-18T20:35:11.118Z"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"major_number"</span><span class="p">:</span><span class="w"> </span><span class="mi">3</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"minor_number"</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"grouped"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"pairwise"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"prioritized"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"tasks"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                </span><span class="s2">"T0"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                    </span><span class="s2">"help"</span><span class="p">:</span><span class="w"> </span><span class="s2">"T0.help"</span><span class="p">,</span><span class="w">
+                    </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"single"</span><span class="p">,</span><span class="w">
+                    </span><span class="s2">"answers"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+                        </span><span class="p">{</span><span class="w">
+                            </span><span class="s2">"label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"T0.answers.0.label"</span><span class="w">
+                        </span><span class="p">}</span><span class="w">
+                    </span><span class="p">],</span><span class="w">
+                    </span><span class="s2">"question"</span><span class="p">:</span><span class="w"> </span><span class="s2">"T0.question"</span><span class="p">,</span><span class="w">
+                    </span><span class="s2">"required"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+                </span><span class="p">}</span><span class="w">
+            </span><span class="p">},</span><span class="w">
+            </span><span class="s2">"first_task"</span><span class="p">:</span><span class="w"> </span><span class="s2">"T0"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"strings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                </span><span class="s2">"T0.help"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+                </span><span class="s2">"T0.question"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Yes or No"</span><span class="p">,</span><span class="w">
+                </span><span class="s2">"T0.answers.0.label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Yes"</span><span class="w">
+            </span><span class="p">},</span><span class="w">
+            </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                </span><span class="s2">"workflow"</span><span class="p">:</span><span class="w"> </span><span class="s2">"31444"</span><span class="w">
+            </span><span class="p">}</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"7106291"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/workflow_versions/7106291"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-18T20:35:11.277Z"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-18T20:35:11.277Z"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"major_number"</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"minor_number"</span><span class="p">:</span><span class="w"> </span><span class="mi">5</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"grouped"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"pairwise"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"prioritized"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"tasks"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                </span><span class="s2">"T0"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                    </span><span class="s2">"help"</span><span class="p">:</span><span class="w"> </span><span class="s2">"T0.help"</span><span class="p">,</span><span class="w">
+                    </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"single"</span><span class="p">,</span><span class="w">
+                    </span><span class="s2">"answers"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+                        </span><span class="p">{</span><span class="w">
+                            </span><span class="s2">"label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"T0.answers.0.label"</span><span class="w">
+                        </span><span class="p">},</span><span class="w">
+                        </span><span class="p">{</span><span class="w">
+                            </span><span class="s2">"label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"T0.answers.1.label"</span><span class="w">
+                        </span><span class="p">}</span><span class="w">
+                    </span><span class="p">],</span><span class="w">
+                    </span><span class="s2">"question"</span><span class="p">:</span><span class="w"> </span><span class="s2">"T0.question"</span><span class="p">,</span><span class="w">
+                    </span><span class="s2">"required"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+                </span><span class="p">}</span><span class="w">
+            </span><span class="p">},</span><span class="w">
+            </span><span class="s2">"first_task"</span><span class="p">:</span><span class="w"> </span><span class="s2">"T0"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"strings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                </span><span class="s2">"T0.help"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+                </span><span class="s2">"T0.question"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Yes or No"</span><span class="p">,</span><span class="w">
+                </span><span class="s2">"T0.answers.0.label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Yes"</span><span class="p">,</span><span class="w">
+                </span><span class="s2">"T0.answers.1.label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Enter an answer"</span><span class="w">
+            </span><span class="p">},</span><span class="w">
+            </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                </span><span class="s2">"workflow"</span><span class="p">:</span><span class="w"> </span><span class="s2">"31444"</span><span class="w">
+            </span><span class="p">}</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"7106292"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/workflow_versions/7106292"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-18T20:35:16.785Z"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-18T20:35:16.785Z"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"major_number"</span><span class="p">:</span><span class="w"> </span><span class="mi">4</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"minor_number"</span><span class="p">:</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"grouped"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"pairwise"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"prioritized"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"tasks"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                </span><span class="s2">"T0"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                    </span><span class="s2">"help"</span><span class="p">:</span><span class="w"> </span><span class="s2">"T0.help"</span><span class="p">,</span><span class="w">
+                    </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"single"</span><span class="p">,</span><span class="w">
+                    </span><span class="s2">"answers"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+                        </span><span class="p">{</span><span class="w">
+                            </span><span class="s2">"label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"T0.answers.0.label"</span><span class="w">
+                        </span><span class="p">},</span><span class="w">
+                        </span><span class="p">{</span><span class="w">
+                            </span><span class="s2">"label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"T0.answers.1.label"</span><span class="w">
+                        </span><span class="p">}</span><span class="w">
+                    </span><span class="p">],</span><span class="w">
+                    </span><span class="s2">"question"</span><span class="p">:</span><span class="w"> </span><span class="s2">"T0.question"</span><span class="p">,</span><span class="w">
+                    </span><span class="s2">"required"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="w">
+                </span><span class="p">}</span><span class="w">
+            </span><span class="p">},</span><span class="w">
+            </span><span class="s2">"first_task"</span><span class="p">:</span><span class="w"> </span><span class="s2">"T0"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"strings"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                </span><span class="s2">"T0.help"</span><span class="p">:</span><span class="w"> </span><span class="s2">""</span><span class="p">,</span><span class="w">
+                </span><span class="s2">"T0.question"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Yes or No"</span><span class="p">,</span><span class="w">
+                </span><span class="s2">"T0.answers.0.label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Yes"</span><span class="p">,</span><span class="w">
+                </span><span class="s2">"T0.answers.1.label"</span><span class="p">:</span><span class="w"> </span><span class="s2">"No"</span><span class="w">
+            </span><span class="p">},</span><span class="w">
+            </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+                </span><span class="s2">"workflow"</span><span class="p">:</span><span class="w"> </span><span class="s2">"31444"</span><span class="w">
+            </span><span class="p">}</span><span class="w">
+        </span><span class="p">}</span><span class="w">
+    </span><span class="p">],</span><span class="w">
+    </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"workflow_versions.workflow"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/workflows/{workflow_versions.workflow}"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"workflows"</span><span class="w">
         </span><span class="p">}</span><span class="w">
     </span><span class="p">},</span><span class="w">
-    </span><span class="s2">"versions"</span><span class="p">:</span><span class="w">  </span><span class="p">[{</span><span class="w">
-        </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"42"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"changeset"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-            </span><span class="s2">"grouped"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
-                </span><span class="kc">true</span><span class="p">,</span><span class="w">
-                </span><span class="kc">false</span><span class="w">
-            </span><span class="p">]</span><span class="w">
-        </span><span class="p">},</span><span class="w">
-        </span><span class="s2">"whodunnit"</span><span class="p">:</span><span class="w"> </span><span class="s2">"stuartlynn"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2014-03-20T06:23:12Z"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-            </span><span class="s2">"item"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-                </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"101"</span><span class="p">,</span><span class="w">
-                </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/workflows/101"</span><span class="p">,</span><span class="w">
-                </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"workflows"</span><span class="w">
-            </span><span class="p">}</span><span class="w">
+    </span><span class="s2">"meta"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+        </span><span class="s2">"workflow_versions"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"page"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"page_size"</span><span class="p">:</span><span class="w"> </span><span class="mi">20</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"count"</span><span class="p">:</span><span class="w"> </span><span class="mi">6</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"include"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+            </span><span class="s2">"page_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">1</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"previous_page"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"next_page"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"first_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/workflow_versions?workflow_id=31444"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"previous_href"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"next_href"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"last_href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/workflow_versions?workflow_id=31444"</span><span class="w">
         </span><span class="p">}</span><span class="w">
-    </span><span class="p">},{</span><span class="w">
-        </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"43"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"changeset"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-            </span><span class="s2">"prioritized"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
-                </span><span class="kc">false</span><span class="p">,</span><span class="w">
-                </span><span class="kc">true</span><span class="w">
-            </span><span class="p">]</span><span class="w">
-        </span><span class="p">},</span><span class="w">
-        </span><span class="s2">"whodunnit"</span><span class="p">:</span><span class="w"> </span><span class="s2">"stuartlynn"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2014-03-20T06:23:12Z"</span><span class="p">,</span><span class="w">
-        </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-            </span><span class="s2">"item"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
-                </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"101"</span><span class="p">,</span><span class="w">
-                </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/workflows/101"</span><span class="p">,</span><span class="w">
-                </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"workflows"</span><span class="w">
-            </span><span class="p">}</span><span class="w">
-        </span><span class="p">}</span><span class="w">
-    </span><span class="p">}]</span><span class="w">
+    </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre></div>
 <p>A Workflow  Version resource represents a set of changes made to
@@ -6080,24 +6289,59 @@ a Workflow  resource.</p>
 <td>read-only</td>
 </tr>
 <tr>
-<td>changeset</td>
-<td>hash</td>
+<td>created_at</td>
+<td>datetime</td>
 <td>read-only</td>
 </tr>
 <tr>
-<td>whodunnit</td>
+<td>updated_at</td>
+<td>datetime</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>major_number</td>
+<td>integer</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>minor_number</td>
+<td>integer</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>grouped</td>
+<td>boolean</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>pairwise</td>
+<td>boolean</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>prioritized</td>
+<td>boolean</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>tasks</td>
+<td>jsonb</td>
+<td>read-only</td>
+</tr>
+<tr>
+<td>first_task</td>
 <td>string</td>
 <td>read-only</td>
 </tr>
 <tr>
-<td>created_at</td>
-<td>datetime</td>
+<td>strings</td>
+<td>jsonb</td>
 <td>read-only</td>
 </tr>
 </tbody></table>
 
 <p><strong>It is NOT editable.</strong></p>
-<h2 id='list-all-workflow-versions'>List All Workflow Versions</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/workflows/123/versions</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<h2 id='list-all-workflow-versions'>List All Workflow Versions</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/workflow_versions?workflow_id=123</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 </code></pre></div>
@@ -6114,8 +6358,8 @@ a Workflow  resource.</p>
 <p>Response will have a meta attribute hash containing paging
 information.</p>
 
-<p>Workflow Versions are returned as an array under <em>versions</em>.</p>
-<h2 id='retrieve-a-single-version'>Retrieve a Single Version</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/workflows/123/versions/1</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<p>Workflow Versions are returned as an array under <em>workflow_versions</em>.</p>
+<h2 id='retrieve-a-single-version'>Retrieve a Single Version</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/workflow_versions/123</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
 </code></pre></div>
@@ -6123,7 +6367,6 @@ information.</p>
 <li>Parameters
 
 <ul>
-<li>workflow_id (required, integer) ... integer id of the workflow resource</li>
 <li>id (required, integer) ... integer id of the version to retrieve</li>
 </ul></li>
 </ul>
