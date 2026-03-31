@@ -57,13 +57,6 @@ class ProjectSerializer
           :subjects_export
 
   def self.page(params = {}, scope = nil, context = {})
-    organization_ids = params.delete('organization_id') || params.delete(:organization_id)
-    if organization_ids.present?
-      scope = scope.joins(:organizations).where(
-        organizations: { id: organization_ids.to_s.split(',') }
-      ).distinct
-    end
-
     if Project.states.include?(params["state"])
       params["state"] = Project.states[params["state"]]
     elsif params["state"] == "live"
