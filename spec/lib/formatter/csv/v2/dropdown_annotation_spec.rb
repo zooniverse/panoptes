@@ -26,7 +26,8 @@ RSpec.describe Formatter::Csv::V2::DropdownAnnotation do
       'value' => {
         'select_label' => 'Country',
         'option' => true,
-        'value' => 2,
+        'option_index' => 2,
+        'value' => '3844fc24a3df7',
         'label' => 'US'
       }
     }
