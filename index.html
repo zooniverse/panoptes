@@ -239,6 +239,23 @@
               </ul>
           </li>
           <li>
+            <a href="#selected-authentication-routes" class="toc-h1 toc-link" data-title="Selected authentication routes">Selected authentication routes</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#get-a-token-via-client-credentials" class="toc-h2 toc-link" data-title="Selected authentication routes">Get a token via client credentials</a>
+                  </li>
+                  <li>
+                    <a href="#get-a-token-via-password" class="toc-h2 toc-link" data-title="Selected authentication routes">Get a token via password</a>
+                  </li>
+                  <li>
+                    <a href="#get-logged-in-user-information" class="toc-h2 toc-link" data-title="Selected authentication routes">Get logged in user information</a>
+                  </li>
+                  <li>
+                    <a href="#unsubscribe-a-user-from-all-emails" class="toc-h2 toc-link" data-title="Selected authentication routes">Unsubscribe a user from all emails</a>
+                  </li>
+              </ul>
+          </li>
+          <li>
             <a href="#json-api-conventions" class="toc-h1 toc-link" data-title="JSON-API conventions">JSON-API conventions</a>
               <ul class="toc-list-h2">
                   <li>
@@ -789,8 +806,9 @@
 images or other media, to <em>volunteers</em> and asking them to <em>classify</em>
 the <em>subject</em> based on a defined <em>workflow</em> for the <em>subject</em> type.</p>
 <h1 id='authentication'>Authentication</h1>
-<p>Panoptes API provides an OAuth 2.0 authentication mechanism. (TODO: Describe
-Authentication Workflow).</p>
+<p>The Zooniverse API, Panoptes, provides an OAuth 2.0 authentication mechanism. It uses <a href="https://github.com/heartcombo/devise">Devise</a> and <a href="https://github.com/doorkeeper-gem/doorkeeper">Doorkeeper</a> for authentication and authorization.</p>
+
+<p>This is a introductory guide to authenticating with Panoptes and performing a few typical requests.</p>
 <h2 id='how-do-i-authenticate-with-the-zooniverse-api'>How do I authenticate with the Zooniverse API?</h2>
 <p>Some requests to the Zooniverse API will respond without supplied authentication details as they are public but most require an authentication token to be supplied to access our systems as a known user.</p>
 
@@ -850,10 +868,10 @@ Authentication Workflow).</p>
 <p>Tick all the resource scopes you&#39;ll be needing access to (start with all). Once setup note your client ID and secret for that app and that this app will be linked to your user account. It is <strong>imperative that you do not share the OAuth application secret</strong> as it can gain access to your Zooniverse account as if you were using the system.</p>
 
 <p>There are other OAuth flows that can be used to get bearer tokens, please <a href="mailto:contact@zooniverse.org">email contact@zooniverse.org</a> to find out more.</p>
-<h3 id='setup-postman-to-use-the-client-credentials-to-get-api-bearer-tokens'>Setup postman to use the client credentials to get API bearer tokens</h3>
-<p>I won’t go into details on how to setup postman, there are lots of <a href="https://www.getpostman.com/docs/v6/">docs that help with this</a>.</p>
+<h3 id='setup-postman-to-use-the-client-credentials-to-get-api-bearer-tokens'>Setup Postman to use the client credentials to get API bearer tokens</h3>
+<p>This short guide will explain how to use Postman to interact with the Panoptes API.</p>
 
-<p>You will need to setup a request to <code>https://signin.zooniverse.org/api/me</code> and under the authorization tab, select OAuth 2.0, and click the ‘Get New Access Token’ button. Complete the forms like the images below:</p>
+<p>First, set up a request to <code>https://signin.zooniverse.org/api/me</code> and under the authorization tab, select OAuth 2.0, and click the ‘Get New Access Token’ button. Complete the forms like the images below:</p>
 
 <p><img src="images/authentication/initial_postman_req.png" alt="initial postman req" /></p>
 
@@ -914,6 +932,128 @@ Authentication Workflow).</p>
   + Ensure the scopes match exactly, OAuth app has user selected, scopes should be ‘user public’
 0. Get a 404 on /api/* endpoints request
   + Ensure the extra Accept and content-type headers are set on the requests, without them the API won’t route requests properly.</p>
+<h1 id='selected-authentication-routes'>Selected authentication routes</h1>
+<p>This is a list of useful API endpoints provided by the Devise and Doorkeeper gems. For more details about the implementation of OAuth in Panoptes, please see their documentation.</p>
+<h2 id='get-a-token-via-client-credentials'>Get a token via client credentials</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/oauth/token</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+  </span><span class="s2">"grant_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"client_credentials"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"client_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"YOUR_CLIENT_ID"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"client_secret"</span><span class="p">:</span><span class="w"> </span><span class="s2">"YOUR_CLIENT_SECRET"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p>Obtain a new token via a client ID and secret.</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"access_token"</span><span class="p">:</span><span class="w"> </span><span class="s2">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"token_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Bearer"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"expires_in"</span><span class="p">:</span><span class="w"> </span><span class="mi">7200</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"refresh_token"</span><span class="p">:</span><span class="w"> </span><span class="s2">"re-freshtokenakjsdfdsfw334rsefdjfh"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"scope"</span><span class="p">:</span><span class="w"> </span><span class="s2">"user project group collection classification subject medium organization translation public"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="mi">5573462601</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div><h2 id='get-a-token-via-password'>Get a token via password</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/oauth/token</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+  </span><span class="s2">"grant_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"password"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"client_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"f79cf5ea821bb161d8cbb52d061ab9a2321d7cb169007003af66b43f7b79ce2a"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"login"</span><span class="p">:</span><span class="w"> </span><span class="s2">"username"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"password"</span><span class="p">:</span><span class="w"> </span><span class="s2">"password"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p>Obtain a new token using a login and password. A client ID is required for logging in, but the corresponding secret is not. The client ID below is used by our various clients (JS, python, ruby) and can be used directly with the production API.</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"access_token"</span><span class="p">:</span><span class="w"> </span><span class="s2">"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"token_type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Bearer"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"expires_in"</span><span class="p">:</span><span class="w"> </span><span class="mi">7200</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"refresh_token"</span><span class="p">:</span><span class="w"> </span><span class="s2">"re-freshtokenakjsdfdsfw334rsefdjfh"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"scope"</span><span class="p">:</span><span class="w"> </span><span class="s2">"user project group collection classification subject medium organization translation public"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="mi">5573462601</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div><h2 id='get-logged-in-user-information'>Get logged in user information</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/me</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Authorization</span><span class="p">:</span> <span class="s">Bearer eyTokenTokenTokenasdfasdf</span>
+</code></pre></div>
+<p>Retrieve user information via valid token.</p>
+<div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
+  </span><span class="s2">"users"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="w">
+    </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"9999999"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"login"</span><span class="p">:</span><span class="w"> </span><span class="s2">"username"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"display_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Username"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"credited_name"</span><span class="p">:</span><span class="w"> </span><span class="s2">"Username Usernamerson"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"email@example.org"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"languages"</span><span class="p">:</span><span class="w"> </span><span class="p">[],</span><span class="w">
+      </span><span class="s2">"created_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2016-04-18T19:12:22.343Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"updated_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-02T19:51:04.868Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"users"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"global_email_communication"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"project_email_communication"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"beta_email_communication"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"nasa_email_communication"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"subject_limit"</span><span class="p">:</span><span class="w"> </span><span class="mi">1000000</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"uploaded_subjects_count"</span><span class="p">:</span><span class="w"> </span><span class="mi">258663</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"admin"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/users/9999999"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"login_prompt"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"private_profile"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"zooniverse_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"panoptes-9999999"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"upload_whitelist"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"avatar_src"</span><span class="p">:</span><span class="w"> </span><span class="kc">null</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"valid_email"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"ux_testing_email_communication"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"intervention_notifications"</span><span class="p">:</span><span class="w"> </span><span class="kc">true</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"banned"</span><span class="p">:</span><span class="w"> </span><span class="kc">false</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"confirmed_at"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2024-01-25T17:33:01.000Z"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{}</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">],</span><span class="w">
+  </span><span class="s2">"links"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+    </span><span class="s2">"users.classifications"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/classifications?user_id={users.id}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"classifications"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"users.project_preferences"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/project_preferences?user_id={users.id}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"project_preferences"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"users.collection_preferences"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/collection_preferences?user_id={users.id}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"collection_preferences"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"users.projects"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/projects?owner={users.login}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"projects"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"users.collections"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/collections?owner={users.login}"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"collections"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"users.recents"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/users/{users.id}/recents"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"recents"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"users.avatar"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/users/{users.id}/avatar"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"media"</span><span class="w">
+    </span><span class="p">},</span><span class="w">
+    </span><span class="s2">"users.profile_header"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+      </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/users/{users.id}/profile_header"</span><span class="p">,</span><span class="w">
+      </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"media"</span><span class="w">
+    </span><span class="p">}</span><span class="w">
+  </span><span class="p">}</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div><h2 id='unsubscribe-a-user-from-all-emails'>Unsubscribe a user from all emails</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/unsubscribe</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+  </span><span class="s2">"email"</span><span class="p">:</span><span class="w"> </span><span class="s2">"user@example.org"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p>Unsubscribes a user from receiving Zooniverse newsletters. Returns an empty 200 when successful.</p>
 <h1 id='json-api-conventions'>JSON-API conventions</h1><h2 id='resource-s-themselves'>Resource(s) themselves</h2><div class="highlight"><pre class="highlight json tab-json"><code><span class="p">{</span><span class="w">
   </span><span class="s2">"users"</span><span class="p">:</span><span class="w"> </span><span class="p">[{</span><span class="w">
     </span><span class="s2">"id"</span><span class="p">:</span><span class="w"> </span><span class="mi">123</span><span class="p">,</span><span class="w">
