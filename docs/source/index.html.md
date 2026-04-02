@@ -37,6 +37,7 @@ includes:
   - users
   - workflows
   - media_resources
+  - inaturalist
 
 search: true
 ---
