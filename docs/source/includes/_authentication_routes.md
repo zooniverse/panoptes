@@ -140,14 +140,12 @@ Retrieve user information via valid token.
 ## Unsubscribe a user from all emails
 
 ```http
-POST /users/password HTTP/1.1
+POST /unsubscribe HTTP/1.1
 Content-Type: application/json
 Accept: application/json
 
 {
-  "user": {
-    "email": "user@example.org"
-  }
+  "email": "user@example.org"
 }
 ```
 
