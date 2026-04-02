@@ -767,6 +767,14 @@
                   </li>
               </ul>
           </li>
+          <li>
+            <a href="#inaturalist-importing" class="toc-h1 toc-link" data-title="iNaturalist Importing">iNaturalist Importing</a>
+              <ul class="toc-list-h2">
+                  <li>
+                    <a href="#import-inaturalist-observations" class="toc-h2 toc-link" data-title="iNaturalist Importing">Import iNaturalist Observations</a>
+                  </li>
+              </ul>
+          </li>
       </div>
         <ul class="toc-footer">
             <li><a href='https://github.com/zooniverse/panoptes/tree/master/docs/source/'>Modify documentation</a></li>
@@ -6641,7 +6649,30 @@ the API.</p>
 </span><span class="nf">DELETE</span> <span class="nn">/api/subjects/123/attached_images/345</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
 <span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
-</code></pre></div>
+</code></pre></div><h1 id='inaturalist-importing'>iNaturalist Importing</h1>
+<p>This endpoint interacts with the Panoptes&#39; iNaturalist functionality. Currently, this includes a single route that allows the importing of iNaturalist Observations as Zooniverse Subjects.</p>
+<h2 id='import-inaturalist-observations'>Import iNaturalist Observations</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">POST</span> <span class="nn">/api/inaturalist/import</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
+<span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
+<span class="na">Content-Type</span><span class="p">:</span> <span class="s">application/json</span>
+
+<span class="p">{</span><span class="w">
+  </span><span class="s2">"taxon_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"36202"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"subject_set_id"</span><span class="p">:</span><span class="w"> </span><span class="s2">"134916"</span><span class="p">,</span><span class="w">
+  </span><span class="s2">"updated_since"</span><span class="p">:</span><span class="w"> </span><span class="s2">"2026-03-15"</span><span class="w">
+</span><span class="p">}</span><span class="w">
+</span></code></pre></div>
+<p>Begins an import of iNaturalist Observations as Zooniverse Subjects.
+Response is an empty 200 if Panoptes begins the import successfully.
+Requires owner or collaborator access to the subject set&#39;s linked project.</p>
+
+<p>When the import job is finished, the user that made the request will get an email reporting the job&#39;s status how many subjects were imported, and if there were any failures.</p>
+<h3 id='parameters'>Parameters</h3>
+<ul>
+<li>taxon_id (required, integer) ... the iNat taxon ID of a particular species</li>
+<li>subject_set_id (required, integer) ... the Zoo subject set id subjects should be imported into. Updated observations will upsert their respective subjects.</li>
+<li>updated_since (optional, string) ... a date range limiter on the iNat Observations query. <strong>Warning</strong>: defaults to nil and will import ALL Observations by default. This will likely be <strong>a lot</strong> (hundreds of thousands) and take a long time. Test with a recent date before importing a full taxon.</li>
+</ul>
+
       </div>
       <div class="dark-box">
           <div class="lang-selector">
