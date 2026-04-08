@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 class AddTsvToOrganizations < ActiveRecord::Migration[6.1]
   def up
     add_column :organizations, :tsv, :tsvector
 
     safety_assured do
-      execute <<~SQL
+      execute <<~SQL.squish
         UPDATE organizations
         SET tsv = to_tsvector('pg_catalog.english', coalesce(display_name, ''))
         WHERE tsv IS NULL;

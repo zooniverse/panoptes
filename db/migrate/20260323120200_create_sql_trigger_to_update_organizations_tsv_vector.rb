@@ -4,7 +4,7 @@ class CreateSqlTriggerToUpdateOrganizationsTsvVector < ActiveRecord::Migration[6
   disable_ddl_transaction!
 
   def up
-    safety_assured {
+    safety_assured do
       execute <<~SQL.squish
         CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE
         ON organizations FOR EACH ROW EXECUTE PROCEDURE
@@ -12,15 +12,15 @@ class CreateSqlTriggerToUpdateOrganizationsTsvVector < ActiveRecord::Migration[6
           tsv, 'pg_catalog.english', display_name
         );
       SQL
-    }
+    end
   end
 
   def down
-    safety_assured {
+    safety_assured do
       execute <<~SQL.squish
         DROP TRIGGER tsvectorupdate
         ON organizations;
       SQL
-    }
+    end
   end
 end

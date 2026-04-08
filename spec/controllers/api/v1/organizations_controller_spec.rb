@@ -65,19 +65,19 @@ describe Api::V1::OrganizationsController, type: :controller do
         it "matches display name case-insensitively" do
           get :index, params: { search: exact_match.display_name.upcase }
 
-          expect(json_response["organizations"].first["id"]).to eq(exact_match.id.to_s)
+          expect(json_response['organizations'].first['id']).to eq(exact_match.id.to_s)
         end
 
         it "supports fuzzy display name search for queries of length three or more" do
-          get :index, params: { search: "Alpha Bet" }
+          get :index, params: { search: 'Alpha Bet' }
 
-          expect(json_response["organizations"].map { |o| o["id"] }).to include(exact_match.id.to_s, similar_match.id.to_s)
+          expect(json_response['organizations'].map { |o| o['id'] }).to include(exact_match.id.to_s, similar_match.id.to_s)
         end
 
         it "does not perform fuzzy matching for short non-exact queries" do
-          get :index, params: { search: "Al" }
+          get :index, params: { search: 'Al' }
 
-          expect(json_response["organizations"]).to be_empty
+          expect(json_response['organizations']).to be_empty
         end
       end
 
@@ -105,14 +105,14 @@ describe Api::V1::OrganizationsController, type: :controller do
           default_request scopes: scopes, user_id: authorized_user.id
           get :index, params: { search: owned_unlisted_organization.display_name }
 
-          expect(json_response["organizations"].map { |o| o["id"] }).to include(owned_unlisted_organization.id.to_s)
+          expect(json_response['organizations'].map { |o| o['id'] }).to include(owned_unlisted_organization.id.to_s)
         end
 
         it "doesn't return unlisted organizations for unauthorized users when searching" do
           default_request scopes: scopes, user_id: unauthorized_user.id
           get :index, params: { search: owned_unlisted_organization.display_name }
 
-          expect(json_response["organizations"]).to be_empty
+          expect(json_response['organizations']).to be_empty
         end
       end
 
