@@ -30,12 +30,12 @@ class Organization < ApplicationRecord
     against: :display_name,
     using: {
       tsearch: {
-        dictionary: "english",
-        tsvector_column: "tsv"
+        dictionary: 'english',
+        tsvector_column: 'tsv'
       },
       trigram: {}
     },
-    ranked_by: ":tsearch + (0.25 * :trigram)"
+    ranked_by: ':tsearch + (0.25 * :trigram)'
 
   def self.translatable_attributes
     %i(display_name title description introduction announcement url_labels)

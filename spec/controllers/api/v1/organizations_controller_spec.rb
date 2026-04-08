@@ -55,7 +55,6 @@ describe Api::V1::OrganizationsController, type: :controller do
       describe "search" do
         let!(:exact_match) { create(:organization, display_name: "Alpha Beta Society", owner: authorized_user) }
         let!(:similar_match) { create(:organization, display_name: "Alpha Beta Science", owner: authorized_user) }
-        let!(:slug_match) { create(:organization, display_name: "Completely Different Name", slug: "precise-org-slug", owner: authorized_user) }
 
         it "returns an exact display name match first" do
           get :index, params: { search: exact_match.display_name }
@@ -73,18 +72,6 @@ describe Api::V1::OrganizationsController, type: :controller do
           get :index, params: { search: "Alpha Bet" }
 
           expect(json_response["organizations"].map { |o| o["id"] }).to include(exact_match.id.to_s, similar_match.id.to_s)
-        end
-
-        it "returns an exact slug match" do
-          get :index, params: { search: slug_match.slug }
-
-          expect(json_response["organizations"].first["id"]).to eq(slug_match.id.to_s)
-        end
-
-        it "matches slug case-insensitively" do
-          get :index, params: { search: slug_match.slug.upcase }
-
-          expect(json_response["organizations"].first["id"]).to eq(slug_match.id.to_s)
         end
 
         it "does not perform fuzzy matching for short non-exact queries" do

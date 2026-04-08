@@ -20,21 +20,15 @@ class Api::V1::OrganizationsController < Api::ApiController
   @search_handlers[:default] = []
 
   search_by do |name, query|
-    search_names = name.join(" ").downcase
-    slug_search = query.where("lower(slug) = ?", search_names)
+    search_names = name.join(' ').downcase
+    display_name_search = query.where('lower(display_name) = ?', search_names)
 
-    if slug_search.exists?
-      slug_search
+    if display_name_search.exists?
+      display_name_search
+    elsif search_names.present? && search_names.length >= 3
+      query.search_display_name(search_names)
     else
-      display_name_search = query.where("lower(display_name) = ?", search_names)
-
-      if display_name_search.exists?
-        display_name_search
-      elsif search_names.present? && search_names.length >= 3
-        query.search_display_name(search_names)
-      else
-        query.none
-      end
+      query.none
     end
   end
 

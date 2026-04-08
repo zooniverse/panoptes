@@ -148,6 +148,7 @@ Content-Type: application/json
   + page_size (optional, integer) ... number of items to include on a page default is 20
   + sort (optional, string) ... field to sort by
   + owner (optional, string) ... string owner name of either a user or a user group to filter by.
+  + search (optional, string) ... searches organizations by exact display name or fuzzy display name. Fuzzy matching is only applied for queries with 3 or more characters.
   + include (optional, string) ... comma separated list of linked resources to include in the response
 
 Response a *meta* attribute hash containing

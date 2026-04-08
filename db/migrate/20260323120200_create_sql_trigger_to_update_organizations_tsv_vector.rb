@@ -1,9 +1,11 @@
+# frozen_string_literal: true
+
 class CreateSqlTriggerToUpdateOrganizationsTsvVector < ActiveRecord::Migration[6.1]
   disable_ddl_transaction!
 
   def up
     safety_assured {
-      execute <<~SQL
+      execute <<~SQL.squish
         CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE
         ON organizations FOR EACH ROW EXECUTE PROCEDURE
         tsvector_update_trigger(
@@ -15,7 +17,7 @@ class CreateSqlTriggerToUpdateOrganizationsTsvVector < ActiveRecord::Migration[6
 
   def down
     safety_assured {
-      execute <<~SQL
+      execute <<~SQL.squish
         DROP TRIGGER tsvectorupdate
         ON organizations;
       SQL
