@@ -3,6 +3,7 @@
 class Organization < ApplicationRecord
   include RoleControl::Owned
   include Activatable
+  include PgSearch::Model
   include SluggedName
   include Translatable
   include Versioning
@@ -24,6 +25,17 @@ class Organization < ApplicationRecord
   validates :primary_language, format: {with: LanguageValidation.lang_regex}
 
   alias_attribute :title, :display_name
+
+  pg_search_scope :search_display_name,
+    against: :display_name,
+    using: {
+      tsearch: {
+        dictionary: "english",
+        tsvector_column: "tsv"
+      },
+      trigram: {}
+    },
+    ranked_by: ":tsearch + (0.25 * :trigram)"
 
   def self.translatable_attributes
     %i(display_name title description introduction announcement url_labels)
