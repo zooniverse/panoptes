@@ -27,15 +27,15 @@ class Organization < ApplicationRecord
   alias_attribute :title, :display_name
 
   pg_search_scope :search_display_name,
-    against: :display_name,
-    using: {
-      tsearch: {
-        dictionary: 'english',
-        tsvector_column: 'tsv'
-      },
-      trigram: {}
-    },
-    ranked_by: ':tsearch + (0.25 * :trigram)'
+                  against: :display_name,
+                  using: {
+                    tsearch: {
+                      dictionary: 'english',
+                      tsvector_column: 'tsv'
+                    },
+                    trigram: {}
+                  },
+                  ranked_by: ':tsearch + (0.25 * :trigram)'
 
   def self.translatable_attributes
     %i(display_name title description introduction announcement url_labels)
