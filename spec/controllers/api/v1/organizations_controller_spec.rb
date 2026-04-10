@@ -74,6 +74,12 @@ describe Api::V1::OrganizationsController, type: :controller do
           expect(json_response['organizations'].map { |o| o['id'] }).to include(exact_match.id.to_s, similar_match.id.to_s)
         end
 
+        it 'supports word similarity matches against longer display names' do
+          get :index, params: { search: 'Societ' }
+
+          expect(json_response['organizations'].map { |o| o['id'] }).to include(exact_match.id.to_s)
+        end
+
         it 'does not perform fuzzy matching for short non-exact queries' do
           get :index, params: { search: 'Al' }
 

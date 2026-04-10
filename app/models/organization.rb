@@ -33,7 +33,9 @@ class Organization < ApplicationRecord
                       dictionary: 'english',
                       tsvector_column: 'tsv'
                     },
-                    trigram: {}
+                    trigram: {
+                      word_similarity: true
+                    }
                   },
                   ranked_by: ':tsearch + (0.25 * :trigram)'
 
