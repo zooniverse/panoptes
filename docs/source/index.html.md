@@ -13,6 +13,7 @@ toc_footers:
 
 includes:
   - authentication
+  - authentication_routes
   - json_api
   - headers
   - aggregations
@@ -37,6 +38,7 @@ includes:
   - users
   - workflows
   - media_resources
+  - inaturalist
 
 search: true
 ---
