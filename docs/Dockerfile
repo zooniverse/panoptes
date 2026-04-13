@@ -1,4 +1,4 @@
-FROM ruby:2.7-slim
+FROM ruby:3.0-bullseye
 
 EXPOSE 4567
 WORKDIR /usr/src/docs
