@@ -67,6 +67,9 @@ describe Api::V1::ProjectsController, type: :controller do
         let(:new_project) do
           create(:full_project, display_name: 'Non-test project', owner: owner)
         end
+        let(:longer_substring_project) do
+          create(:full_project, display_name: 'Longer Display Name', owner: owner)
+        end
         let(:resource) { new_project }
         let(:ids) { json_response['projects'].map { |p| p['id'] } }
         let(:index_request) do
@@ -80,12 +83,23 @@ describe Api::V1::ProjectsController, type: :controller do
         describe 'search' do
           it_behaves_like 'filter by display_name'
 
-          describe 'filter by display_name substring' do
+          describe 'filter by display_name tsv substring' do
             let(:index_options) { { search: resource.display_name[0..2] } }
 
             it 'responds with the most relevant item first' do
               index_request
               expect(json_response[api_resource_name].length).to eq(1)
+              expect(ids[0].to_i).to eq(resource.id)
+            end
+          end
+
+          describe 'filter by display_name substring' do
+            let(:index_options) { { search: longer_substring_project.display_name[0..2] } }
+
+            it 'responds with the most relevant item first' do
+              index_request
+              expect(json_response[api_resource_name].length).to eq(1)
+              expect(ids[0].to_i).to eq(longer_substring_project.id)
             end
           end
         end
