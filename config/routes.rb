@@ -150,8 +150,6 @@ Rails.application.routes.draw do
         constraints: Routes::Constraints::TranslationsConstraint.new,
         except: %i(new edit destroy)
       })
-
-      json_api_resources :subject_groups, only: %w[index show]
     end
   end
 

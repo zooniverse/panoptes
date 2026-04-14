@@ -1,6 +1,8 @@
 require 'spec_helper'
 
 describe PasswordsController, type: [ :controller, :mailer ] do
+  include ActiveJob::TestHelper
+
   before(:each) do
     request.env["devise.mapping"] = Devise.mappings[:user]
   end
@@ -65,9 +67,9 @@ describe PasswordsController, type: [ :controller, :mailer ] do
         it "should queue the email for delayed sending" do
           prev_mailer = Devise.mailer.to_s
           Devise.mailer = 'Devise::BackgroundMailer'
-          expect { post :create, params: user_email_attrs }
-            .to change { Sidekiq::Extensions::DelayedMailer.jobs.size }
-            .from(0).to(1)
+          expect {
+            post :create, params: user_email_attrs
+          }.to have_enqueued_mail(Devise::Mailer, :reset_password_instructions)
           Devise.mailer = prev_mailer
         end
 

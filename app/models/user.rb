@@ -182,6 +182,12 @@ class User < ApplicationRecord
     recoverable
   end
 
+  def send_devise_notification(notification, *args)
+    return unless valid_email
+
+    super
+  end
+
   def self.find_by_lower_login(login)
     find_by("lower(login) = ?", login.downcase)
   end
@@ -339,6 +345,8 @@ class User < ApplicationRecord
   end
 
   def increment_subjects_count_cache
+    return nil unless Rails.cache.exist?(subjects_count_cache_key)
+
     Rails.cache.increment(subjects_count_cache_key)
   end
 
