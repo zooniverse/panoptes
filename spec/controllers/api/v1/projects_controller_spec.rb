@@ -281,6 +281,38 @@ describe Api::V1::ProjectsController, type: :controller do
               expect(project_ids).to contain_exactly(multi_translated_project.id, translated_project.id)
             end
           end
+
+          describe 'filter by organization_id' do
+            let(:organization) { create(:organization, owner: owner) }
+            let(:other_organization) { create(:organization, owner: owner) }
+            let!(:project_for_organization) { create(:project, owner: owner) }
+            let!(:project_for_other_organization) { create(:project, owner: owner) }
+            let(:index_options) { { organization_id: organization.id.to_s } }
+
+            before do
+              create(:organization_project, organization: organization, project: project_for_organization)
+              create(:organization_project, organization: other_organization, project: project_for_other_organization)
+            end
+
+            it 'returns projects linked to the requested organization' do
+              index_request
+              expect(ids).to include(project_for_organization.id.to_s)
+            end
+
+            it 'does not return projects linked to other organizations' do
+              index_request
+              expect(ids).not_to include(project_for_other_organization.id.to_s)
+            end
+
+            context 'with sorting' do
+              let(:index_options) { { organization_id: organization.id.to_s, sort: 'display_name' } }
+
+              it 'returns projects linked to the requested organization' do
+                index_request
+                expect(ids).to include(project_for_organization.id.to_s)
+              end
+            end
+          end
         end
       end
 
