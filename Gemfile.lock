@@ -98,8 +98,8 @@ GEM
       minitest (>= 5.1)
       securerandom (>= 0.3)
       tzinfo (~> 2.0, >= 2.0.5)
-    addressable (2.8.1)
-      public_suffix (>= 2.0.2, < 6.0)
+    addressable (2.9.0)
+      public_suffix (>= 2.0.2, < 8.0)
     aggregate (0.2.3)
     ast (2.4.2)
     aws-eventstream (1.2.0)
@@ -364,7 +364,7 @@ GEM
     psych (5.3.1)
       date
       stringio
-    public_suffix (5.0.0)
+    public_suffix (7.0.5)
     puma (6.4.3)
       nio4r (~> 2.0)
     pundit (2.4.0)
