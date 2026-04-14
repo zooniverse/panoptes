@@ -1,6 +1,6 @@
 class ApplicationController < ActionController::Base
-  include JSONApiRender
-  include JSONApiResponses
+  include JsonApiRender
+  include JsonApiResponses
 
   protect_from_forgery with: :null_session
 
@@ -8,7 +8,7 @@ class ApplicationController < ActionController::Base
 
   def unknown_route
     exception = ActionController::RoutingError.new("Not Found")
-    response_body = JSONApiRender::JSONApiResponse.format_response_body(exception)
+    response_body = JsonApiRender::JSONApiResponse.format_response_body(exception)
     respond_to do |format|
       format.html { raise exception }
       format.json { render status: :not_found, json: response_body }

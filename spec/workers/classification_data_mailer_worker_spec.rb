@@ -5,7 +5,7 @@ RSpec.describe ClassificationDataMailerWorker do
 
   shared_examples 'is a classification data mailer' do
     it 'should deliver the mail' do
-      expect{ subject.perform(resource.id, resource.class.to_s.downcase, url, ["zach@zooniverse.org"]) }.to change{ ActionMailer::Base.deliveries.count }.by(1)
+      expect{ subject.perform(resource.id, resource.class.to_s.downcase, url, ["zach@zooniverse.org"]) }.to change{ 'ActionMailer::Base'.constantize.deliveries.count }.by(1)
     end
 
     context 'when there are no recipients'  do

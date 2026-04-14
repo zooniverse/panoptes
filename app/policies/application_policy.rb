@@ -83,7 +83,8 @@ class ApplicationPolicy
 
     def public_flag
       return false unless respond_to?(:public_scope)
-      !public_scope.is_a?(ActiveRecord::NullRelation)
+      scope = public_scope
+      scope.respond_to?(:none?) && !scope.none?
     end
 
     def user_can_access_scope(private_query)
