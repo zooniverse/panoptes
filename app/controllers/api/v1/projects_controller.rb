@@ -33,6 +33,7 @@ class Api::V1::ProjectsController < Api::ApiController
     :create_subjects_export, :create_workflows_export, :create_workflow_contents_export]
 
   def index
+    filter_by_organization_ids
     filter_by_languages
     unless params.has_key?(:sort)
       @controlled_resources = case
@@ -204,5 +205,14 @@ class Api::V1::ProjectsController < Api::ApiController
     languages = params.delete(:languages)&.split(',')&.map(&:downcase)
 
     @controlled_resources = controlled_resources.where("configuration->'languages' @> ?", languages.to_json) if languages.present?
+  end
+
+  def filter_by_organization_ids
+    organization_ids = params.delete(:organization_id)&.split(',')
+    return if organization_ids.blank?
+
+    @controlled_resources = controlled_resources.joins(:organizations).where(
+      organizations: { id: organization_ids }
+    ).distinct
   end
 end
