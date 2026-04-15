@@ -211,9 +211,8 @@ class Api::V1::ProjectsController < Api::ApiController
     organization_ids = params.delete(:organization_id)&.split(',')
     return if organization_ids.blank?
 
-    project_ids = OrganizationProject
-      .where(organization_id: organization_ids)
-      .select(:project_id)
+    project_ids = OrganizationProject.where(organization_id: organization_ids)
+                                     .select(:project_id)
 
     @controlled_resources = controlled_resources.where(id: project_ids)
   end
