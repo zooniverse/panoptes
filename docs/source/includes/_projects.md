@@ -63,6 +63,10 @@
         "projects.owner": {
             "href": "/{projects.owner.href}",
             "type": "owners"
+        },
+        "projects.organizations": {
+            "href": "/organizations/{projects.organizations}",
+            "type": "organizations"
         }
     }
 }
@@ -70,7 +74,8 @@
 
 A Project is a collection of subjects and task workflows that a
 volunteer performs on subjects. The project also holds supplementary
-text describing the tasks volunteers perform.
+text describing the tasks volunteers perform. A project can be linked to
+multiple organizations.
 
 It has the following attributes:
 
@@ -114,6 +119,8 @@ live | boolean |
 - subjects (read-only)
 - classifications (read-only)
 - owner (read-only)
+- `organizations` (read-only) - Projects may be linked to multiple organizations.
+  Add or remove these links through the organization project link endpoints.
 
 ## List All Projects
 
@@ -132,6 +139,7 @@ Content-Type: application/json
   + page_size (optional, integer) ... number of items to include on a page default is 20
   + sort (optional, string) ... field to sort by
   + owner (optional, string) ... string owner name of either a user or a user group to filter by.
+  + organization_id (optional, integer or comma-separated integers) ... return projects linked to one or more organizations.
   + include (optional, string) ... comma separated list of linked resources to include in the response
 
 ## Retrieve a single Project
