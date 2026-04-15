@@ -7,7 +7,8 @@ class Organization < ApplicationRecord
   include Translatable
   include Versioning
 
-  has_many :projects
+  has_many :organization_projects, dependent: :destroy
+  has_many :projects, through: :organization_projects
   has_many :acls, class_name: "AccessControlList", as: :resource, dependent: :destroy
   has_one :avatar, -> { where(type: "organization_avatar") }, class_name: "Medium", as: :linked
   has_one :background, -> { where(type: "organization_background") }, class_name: "Medium", as: :linked
