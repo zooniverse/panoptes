@@ -303,6 +303,15 @@ describe Api::V1::ProjectsController, type: :controller do
               index_request
               expect(ids).not_to include(project_for_other_organization.id.to_s)
             end
+
+            context 'with sorting' do
+              let(:index_options) { { organization_id: organization.id.to_s, sort: 'display_name' } }
+
+              it 'returns projects linked to the requested organization' do
+                index_request
+                expect(ids).to include(project_for_organization.id.to_s)
+              end
+            end
           end
         end
       end
