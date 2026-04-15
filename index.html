@@ -2463,7 +2463,8 @@ user group may destroy membership for that group.</p>
   </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre></div>
-<p>An Organization is a collection of projects that are related by dicipline, research group</p>
+<p>An Organization is a collection of projects that are related by dicipline or
+research group. Projects can be linked to multiple organizations.</p>
 
 <p>It has the following attributes:</p>
 
@@ -2642,7 +2643,9 @@ recommended. Instead, use the link endpoints explained below.</p>
   </span><span class="s2">"projects"</span><span class="p">:</span><span class="w"> </span><span class="p">[</span><span class="s2">"1"</span><span class="p">,</span><span class="w"> </span><span class="s2">"2"</span><span class="p">]</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre></div>
-<p>The body key must match the link_type parameter.</p>
+<p>The body key must match the link_type parameter.
+Use this endpoint to link one or more projects to an organization. A project may
+be linked to multiple organizations.</p>
 
 <ul>
 <li>Parameters
@@ -2667,7 +2670,7 @@ the name of the link to edit
 </code></pre></div>
 <p>The recommended way to destroy Organization links.
 Will destroy the comma separated list of link ids for the given link
-type. </p>
+type.</p>
 
 <ul>
 <li>Parameters
@@ -3109,13 +3112,18 @@ their own roles.</p>
         </span><span class="s2">"projects.owner"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
             </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/{projects.owner.href}"</span><span class="p">,</span><span class="w">
             </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"owners"</span><span class="w">
+        </span><span class="p">},</span><span class="w">
+        </span><span class="s2">"projects.organizations"</span><span class="p">:</span><span class="w"> </span><span class="p">{</span><span class="w">
+            </span><span class="s2">"href"</span><span class="p">:</span><span class="w"> </span><span class="s2">"/organizations/{projects.organizations}"</span><span class="p">,</span><span class="w">
+            </span><span class="s2">"type"</span><span class="p">:</span><span class="w"> </span><span class="s2">"organizations"</span><span class="w">
         </span><span class="p">}</span><span class="w">
     </span><span class="p">}</span><span class="w">
 </span><span class="p">}</span><span class="w">
 </span></code></pre></div>
 <p>A Project is a collection of subjects and task workflows that a
 volunteer performs on subjects. The project also holds supplementary
-text describing the tasks volunteers perform.</p>
+text describing the tasks volunteers perform. A project can be linked to
+multiple organizations.</p>
 
 <p>It has the following attributes:</p>
 
@@ -3260,6 +3268,8 @@ are a collaborator on.</li>
 <li>subjects (read-only)</li>
 <li>classifications (read-only)</li>
 <li>owner (read-only)</li>
+<li><code>organizations</code> (read-only) - Projects may be linked to multiple organizations.
+Add or remove these links through the organization project link endpoints.</li>
 </ul>
 <h2 id='list-all-projects'>List All Projects</h2><div class="highlight"><pre class="highlight http tab-http"><code><span class="nf">GET</span> <span class="nn">/api/projects</span> <span class="k">HTTP</span><span class="o">/</span><span class="m">1.1</span>
 <span class="na">Accept</span><span class="p">:</span> <span class="s">application/vnd.api+json; version=1</span>
@@ -3277,6 +3287,7 @@ are a collaborator on.</li>
 <li>page_size (optional, integer) ... number of items to include on a page default is 20</li>
 <li>sort (optional, string) ... field to sort by</li>
 <li>owner (optional, string) ... string owner name of either a user or a user group to filter by.</li>
+<li>organization_id (optional, integer or comma-separated integers) ... return projects linked to one or more organizations.</li>
 <li>include (optional, string) ... comma separated list of linked resources to include in the response</li>
 </ul></li>
 </ul>
