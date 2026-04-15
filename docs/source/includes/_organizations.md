@@ -113,7 +113,8 @@
 }
 ```
 
-An Organization is a collection of projects that are related by dicipline, research group
+An Organization is a collection of projects that are related by dicipline or
+research group. Projects can be linked to multiple organizations.
 
 It has the following attributes:
 
@@ -234,6 +235,8 @@ Content-Type: application/json
 }
 ```
 The body key must match the link_type parameter.
+Use this endpoint to link one or more projects to an organization. A project may
+be linked to multiple organizations.
 
 + Parameters
   + id (required, integer) - the id of the project to add
@@ -251,7 +254,7 @@ Content-Type: application/json
 ```
 The recommended way to destroy Organization links.
 Will destroy the comma separated list of link ids for the given link
-type. 
+type.
 
 + Parameters
   + id (required, integer) ... the id of the project to modify
