@@ -848,7 +848,8 @@ CREATE TABLE public.organizations (
     description character varying,
     introduction text,
     url_labels jsonb,
-    announcement character varying
+    announcement character varying,
+    tsv tsvector
 );
 
 
@@ -3047,6 +3048,13 @@ CREATE UNIQUE INDEX index_organizations_on_slug ON public.organizations USING bt
 
 
 --
+-- Name: index_organizations_on_tsv; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organizations_on_tsv ON public.organizations USING gin (tsv);
+
+
+--
 -- Name: index_organizations_on_updated_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3663,6 +3671,13 @@ CREATE INDEX users_idx_trgm_login ON public.users USING gin (COALESCE((login)::t
 
 
 --
+-- Name: organizations tsvectorupdate; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE ON public.organizations FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('tsv', 'pg_catalog.english', 'display_name');
+
+
+--
 -- Name: projects tsvectorupdate; Type: TRIGGER; Schema: public; Owner: -
 --
 
@@ -4218,6 +4233,9 @@ ALTER TABLE ONLY public.users
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260323120200'),
+('20260323120100'),
+('20260323120000'),
 ('20260209120000'),
 ('20260122212801'),
 ('20251113172303'),
