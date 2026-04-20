@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AddTsvToOrganizations < ActiveRecord::Migration[6.1]
+class AddTsvToOrganizations < ActiveRecord::Migration[7.2]
   def up
     add_column :organizations, :tsv, :tsvector
 

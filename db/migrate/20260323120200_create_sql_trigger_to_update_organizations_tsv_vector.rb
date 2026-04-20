@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class CreateSqlTriggerToUpdateOrganizationsTsvVector < ActiveRecord::Migration[6.1]
+class CreateSqlTriggerToUpdateOrganizationsTsvVector < ActiveRecord::Migration[7.2]
   disable_ddl_transaction!
 
   def up

@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-class AddIndexTsvToOrganizations < ActiveRecord::Migration[6.1]
+class AddIndexTsvToOrganizations < ActiveRecord::Migration[7.2]
   disable_ddl_transaction!
 
   def up

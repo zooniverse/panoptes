@@ -54,25 +54,9 @@ describe Api::V1::OrganizationsController, type: :controller do
 
       describe 'search' do
         let!(:exact_match) { create(:organization, display_name: 'Alpha Beta Society', owner: authorized_user) }
-        let!(:similar_match) { create(:organization, display_name: 'Alpha Beta Science', owner: authorized_user) }
+        let(:resource) { exact_match }
 
-        it 'returns an exact display name match first' do
-          get :index, params: { search: exact_match.display_name }
-
-          expect(json_response['organizations'].first['id']).to eq(exact_match.id.to_s)
-        end
-
-        it 'matches display name case-insensitively' do
-          get :index, params: { search: exact_match.display_name.upcase }
-
-          expect(json_response['organizations'].first['id']).to eq(exact_match.id.to_s)
-        end
-
-        it 'supports fuzzy display name search for queries of length three or more' do
-          get :index, params: { search: 'Alpha Bet' }
-
-          expect(json_response['organizations'].map { |o| o['id'] }).to include(exact_match.id.to_s, similar_match.id.to_s)
-        end
+        it_behaves_like 'filter by display_name'
 
         it 'supports word similarity matches against longer display names' do
           get :index, params: { search: 'Societ' }
