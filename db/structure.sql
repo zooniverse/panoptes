@@ -3013,6 +3013,13 @@ CREATE INDEX index_organization_versions_on_organization_id ON public.organizati
 
 
 --
+-- Name: index_organizations_display_name_trgrm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organizations_display_name_trgrm ON public.organizations USING gin (COALESCE((display_name)::text, ''::text) public.gin_trgm_ops);
+
+
+--
 -- Name: index_organizations_on_activated_state; Type: INDEX; Schema: public; Owner: -
 --
 
