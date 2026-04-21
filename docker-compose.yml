@@ -6,7 +6,7 @@ services:
       - "POSTGRES_USER=panoptes"
       - "POSTGRES_PASSWORD=panoptes"
     ports:
-      - "5432:5432"
+      - "${PG_PORT:-5432}:5432"
 
   redis:
     image: redis
@@ -21,7 +21,7 @@ services:
       - ./:/rails_app
       - gem_cache:/usr/local/bundle
     ports:
-      - "3000:3000"
+      - "${PANOPTES_PORT:-3000}:3000"
     environment:
       - "RAILS_ENV=development"
       - "DATABASE_URL=postgresql://panoptes:panoptes@pg"

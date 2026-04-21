@@ -21,6 +21,8 @@ Rails.application.routes.draw do
                 applications: 'applications'
   end
 
+  use_doorkeeper_openid_connect
+
   devise_for :users,
     controllers: { confirmations: 'confirmations', passwords: 'passwords' },
     skip: [ :sessions, :registrations ]

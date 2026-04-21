@@ -25,7 +25,7 @@ Doorkeeper.configure do
   enable_application_owner :confirmation => true
 
   default_scopes  :public
-  optional_scopes *Doorkeeper::Panoptes::Scopes.optional
+  optional_scopes :openid, *Doorkeeper::Panoptes::Scopes.optional
 
   realm "Panoptes"
 
@@ -100,5 +100,5 @@ Doorkeeper::JWT.configure do
   secret_key_path Rails.root.join("config", "keys", "doorkeeper-jwt-#{Rails.env}.pem")
 
   # Sign using RSA SHA-512
-  encryption_method :rs512
+  signing_method :rs512
 end
