@@ -203,6 +203,16 @@ describe Project, type: :model do
     end
   end
 
+  describe '#organizations' do
+    let(:organization) { create(:organization) }
+
+    it 'returns organizations linked through organization_projects' do
+      create(:organization_project, organization: organization, project: project)
+
+      expect(project.organizations).to include(organization)
+    end
+  end
+
   describe "#field_guides" do
     let(:field_guide) { build(:field_guide, project: project) }
 
@@ -472,25 +482,6 @@ describe Project, type: :model do
           let(:value) { true }
           it 'should queue the worker' do
             expect(ProjectRequestEmailWorker).to receive(:perform_async).with("beta", project.id)
-          end
-        end
-
-        context "when false" do
-          let(:value) { false }
-
-          it 'should not queue the worker' do
-            expect(ProjectRequestEmailWorker).not_to receive(:perform_async)
-          end
-        end
-      end
-
-      context "when launch_requested changed" do
-        let(:field) { "launch_requested" }
-
-        context "when true" do
-          let(:value) { true }
-          it 'should queue the worker' do
-            expect(ProjectRequestEmailWorker).to receive(:perform_async).with("launch", project.id)
           end
         end
 

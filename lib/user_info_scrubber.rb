@@ -29,6 +29,7 @@ class UserInfoScrubber
     user.valid_email = false
     user.private_profile = true
     user.api_key = nil
+    user.unsubscribe_token = nil
     user.tsv = nil
     user.save!
     user

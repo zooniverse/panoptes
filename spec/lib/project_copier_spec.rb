@@ -16,13 +16,9 @@ describe ProjectCopier do
       expect(copied_project.owner).to eq(copyist)
     end
 
-    it 'renames a project when the owner is copying their own project' do
-      new_copy = described_class.new(project.id, project.owner.id).copy
-      expect(new_copy.display_name).to include('(copy)')
-    end
-
-    it 'has matching attributes' do
-      expect(copied_project.display_name).to eq(project.display_name)
+    it 'appends copy and current timestamp to display_name' do
+      allow(Time).to receive(:now).and_return(Time.utc(2024, 5, 17, 12, 0, 0))
+      expect(copied_project.display_name).to eq("#{project.display_name} (copy: 2024-05-17 12:00:00)")
     end
 
     it 'resets the live attribute' do
@@ -39,6 +35,14 @@ describe ProjectCopier do
 
     it "adds the source project id to the copied project's configuration" do
       expect(copied_project.configuration['source_project_id']).to be(project.id)
+    end
+
+    it 'does not copy over excluded attributes' do
+      project_with_excluded_keys = create(:full_project, classifications_count: 3, classifiers_count: 2, launch_date: Date.yesterday, completeness: 0.5, activity: 1, lock_version: 8)
+      other_copied_project = described_class.new(project_with_excluded_keys.id, copyist.id).copy
+      ProjectCopier::EXCLUDE_ATTRIBUTES.each do |attr|
+        expect(other_copied_project[attr]).not_to eq(project_with_excluded_keys[attr])
+      end
     end
 
     it 'creates Talk roles for the new project and its owner' do

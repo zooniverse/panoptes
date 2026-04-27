@@ -94,9 +94,9 @@ describe Api::V1::SubjectSetsController, type: :controller do
   end
 
   describe '#update' do
-    let(:subjects) { create_list(:subject, 4, project: project) }
+    let!(:subjects) { create_list(:subject, 4, project: project) }
     let(:workflow) { create(:workflow, project: project) }
-    let(:resource) { create(:subject_set, project: project) }
+    let!(:resource) { create(:subject_set, project: project, subjects: subjects) }
     let(:resource_id) { :subject_set_id }
     let(:test_attr) { :display_name }
     let(:test_attr_value) { 'A Better Name' }
@@ -222,9 +222,17 @@ describe Api::V1::SubjectSetsController, type: :controller do
 
       context 'when the subjects already existin in the set' do
         it 'does not raise a duplicate key error' do
-          SetMemberSubject.create!(subject_id: subjects.first.id, subject_set_id: resource.id)
-          run_update_links
+          expect { run_update_links }.not_to change(SetMemberSubject, :count)
           expect(response).to have_http_status(:ok)
+        end
+      end
+
+      context 'when a linking resource has been soft deleted' do
+        it 'returns a 422 with a missing subject' do
+          last_subject = subjects.last
+          last_subject.update(activated_state: 'inactive')
+          run_update_links
+          expect(response).to have_http_status(:unprocessable_entity)
         end
       end
     end
@@ -410,13 +418,13 @@ describe Api::V1::SubjectSetsController, type: :controller do
 
     it 'calls the subject removal worker' do
       subject_set.subjects.each_with_index do |s, index|
-        allow(SubjectRemovalWorker).to receive(:perform_in).with(index.seconds, s.id)
+        allow(SubjectRemovalWorker).to receive(:perform_in).with(index.seconds, s.id, subject_set.id)
       end
       delete_resources
       subject_set.subjects.each_with_index do |s, index|
         expect(SubjectRemovalWorker)
           .to have_received(:perform_in)
-          .with(index.seconds, s.id)
+          .with(index.seconds, s.id, subject_set.id)
       end
     end
   end

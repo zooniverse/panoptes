@@ -105,8 +105,6 @@ describe SessionsController, type: :controller do
     end
 
     describe "#new" do
-      let(:providers) { %w(facebook) }
-
       before(:each) do
         get :new
       end
@@ -116,11 +114,7 @@ describe SessionsController, type: :controller do
       end
 
       it 'should return a json response of login routes' do
-        expect(json_response).to include('login', *providers)
-      end
-
-      it 'should return the url for each omniauth provider' do
-        expect(json_response['facebook']).to eq('/users/auth/facebook')
+        expect(json_response).to include('login')
       end
     end
   end

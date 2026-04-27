@@ -4,7 +4,7 @@ The new Zooniverse API for supporting user-created projects.
 
 ## Documentation
 
-The Panoptes public API is documented [here](http://docs.panoptes.apiary.io), using [apiary.io](http://apiary.io).
+The Panoptes public API is documented [here](https://zooniverse.github.io/panoptes/#introduction).
 
 ## Requirements
 

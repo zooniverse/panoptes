@@ -9,6 +9,7 @@ require "rspec/rails"
 require "sidekiq/testing"
 require 'flipper/adapters/memory'
 require 'webmock/rspec'
+require 'net/smtp'
 
 Dir[Rails.root.join("spec/support/**/*.rb")].each { |f| require f }
 
@@ -25,7 +26,6 @@ RSpec.configure do |config|
   config.include APIResponseHelpers, type: :request
   config.include ValidUserRequestHelper, type: :request
   config.include SubjectSelectionHelpers
-  config.include Flipper
   config.extend RSpec::Helpers::ActiveRecordMocks
 
   config.filter_run focus: true
@@ -35,7 +35,7 @@ RSpec.configure do |config|
 
   config.filter_run_excluding disabled: true
 
-  Devise.mailer = Devise::Mailer
+  Devise.mailer = 'Devise::Mailer'
 
   # disable standby reads to deal with testing transaction isolation
   Standby.disabled = true

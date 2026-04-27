@@ -62,10 +62,6 @@ class WorkflowUpdateSchema < JsonSchema
       type "array"
     end
 
-    property "aggregation" do
-      type "object"
-    end
-
     property "configuration" do
       type "object"
     end

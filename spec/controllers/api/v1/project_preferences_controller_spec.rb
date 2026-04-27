@@ -221,6 +221,16 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
         json_response = JSON.parse(response.body)
         expect(json_response['project_preferences'].count).to eq(2)
       end
+
+      # relevant attributes are id, href and settings from UPP
+      it 'returns the correct serialized attributes' do
+        json_response = JSON.parse(response.body)
+        first_response = json_response['project_preferences'].first
+
+        expect(first_response).to have_key 'settings'
+        expect(first_response).to_not have_key 'activity_count_by_workflow'
+        expect(first_response).to_not have_key 'email_communication'
+      end
     end
 
     describe 'invalid project' do
@@ -238,7 +248,7 @@ RSpec.describe Api::V1::ProjectPreferencesController, type: :controller do
       it 'only fetches settings of owned project' do
         default_request user_id: unauthorised_user.id, scopes: scopes
         get :read_settings, params: { project_id: project.id, user_id: unauthorised_user.id, format: :json }
-        expect(response.status).to eq(404)
+        expect(response.status).to eq(403)
       end
 
       it 'only fetches settings of the specified user' do

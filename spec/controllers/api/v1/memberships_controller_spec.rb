@@ -35,12 +35,29 @@ describe Api::V1::MembershipsController, type: :controller do
     end
 
     it_behaves_like "is updatable"
+
+    context 'when updating roles as group_admin' do
+      let(:other_user) { create(:user) }
+      let(:other_user_group) { create(:user_group, admin: authorized_user, private: true) }
+      let(:other_user_membership) { create(:membership, user: other_user, user_group: other_user_group, roles: ['group_member']) }
+
+      it 'allows update of membership roles' do
+        default_request user_id: authorized_user.id, scopes: scopes
+        params = {
+          memberships: { roles: ['group_admin'] },
+          id: other_user_membership.id
+        }
+
+        put :update, params: params
+        expect(other_user_membership.reload.roles).to eq(['group_admin'])
+      end
+    end
   end
 
   describe "#create" do
     let(:test_attr) { :state }
     let(:test_attr_value) { "active" }
-    let(:user_group) { create :user_group }
+    let(:user_group) { create(:user_group) }
     let(:create_params) do
       {
         memberships: {
@@ -53,7 +70,50 @@ describe Api::V1::MembershipsController, type: :controller do
       }
     end
 
-    it_behaves_like "is creatable"
+    it_behaves_like 'is creatable'
+
+    it 're-activates a membership' do
+      membership = create(:membership, user_id: authorized_user.id, user_group_id: user_group.id, state: :inactive)
+      default_request scopes: scopes, user_id: authorized_user.id
+      post :create, params: create_params
+      expect(response).to have_http_status(:created)
+      expect(membership.reload.state).to eq('active')
+    end
+
+    context 'with an inactive user_group' do
+      let(:inactive_user_group) { create(:user_group, activated_state: :inactive) }
+      let(:params) do
+        {
+          memberships: {
+            join_token: inactive_user_group.join_token,
+            links: {
+              user: authorized_user.id.to_s,
+              user_group: inactive_user_group.id.to_s
+            }
+          }
+        }
+      end
+
+      before do
+        default_request scopes: scopes, user_id: authorized_user.id
+        post :create, params: params
+      end
+
+      it 'disallows membership creation' do
+        expect(response).to have_http_status(:unprocessable_entity)
+      end
+
+      it 'responds with group is inactive error message' do
+        response_body = JSON.parse(response.body)
+        expect(response_body['errors'][0]['message']).to eq('Group is inactive')
+      end
+
+      it 'disallows membership re-activation' do
+        membership = create(:membership, user_id: authorized_user.id, user_group_id: inactive_user_group.id, state: :inactive)
+        expect(response).to have_http_status(:unprocessable_entity)
+        expect(membership.reload.state).to eq('inactive')
+      end
+    end
   end
 
   describe "#destroy" do

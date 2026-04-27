@@ -134,73 +134,6 @@ describe User, type: :model do
     end
   end
 
-  describe '::from_omniauth' do
-    let(:auth_hash) { OmniAuth.config.mock_auth[:facebook] }
-
-    shared_examples 'new user from omniauth' do
-      let(:user_from_auth_hash) do
-        User.from_omniauth(auth_hash)
-      end
-
-      it 'should create a new valid user' do
-        expect(user_from_auth_hash).to be_valid
-      end
-
-      it 'should create a user with the same details' do
-        expect(user_from_auth_hash.email).to eq(auth_hash.info.email)
-      end
-
-      it 'should create a user with a login' do
-        expect(user_from_auth_hash.login).to eq(auth_hash.info.name.gsub(/\s/, '_'))
-      end
-
-      it 'should create a user with a authorization' do
-        expect(user_from_auth_hash.authorizations).to all( be_an(Authorization) )
-      end
-    end
-
-    context 'a new user with email' do
-      it_behaves_like 'new user from omniauth'
-    end
-
-    context 'a user without an email' do
-      let(:auth_hash) { OmniAuth.config.mock_auth[:facebook_no_email] }
-
-      it 'should not have an email' do
-        expect(User.from_omniauth(auth_hash).email).to be_nil
-      end
-
-      it_behaves_like 'new user from omniauth'
-    end
-
-    context 'an existing user' do
-      let!(:omniauth_user) { create(:omniauth_user) }
-
-      it 'should return the existing user' do
-        expect(User.from_omniauth(auth_hash)).to eq(omniauth_user)
-      end
-    end
-
-    context 'a user who already had a normal account' do
-      it 'should raise an exception when email is used' do
-        user = create(:user)
-        auth_hash = OmniAuth.config.mock_auth[:facebook]
-        auth_hash[:info][:email] = user.email
-        expect { User.from_omniauth(auth_hash) }.to raise_error(ActiveRecord::RecordInvalid)
-        expect(Authorization.count).to eq(0)
-      end
-
-      it 'should create multiple users if email is different' do
-        user = create(:user, display_name: 'Same Thing', login: User.sanitize_login('Same Thing'))
-
-        auth_hash = OmniAuth.config.mock_auth[:facebook]
-        auth_hash[:info][:name] = user.display_name
-        auth_hash[:info][:email] = "somethingelse@example.com"
-        expect(User.from_omniauth(auth_hash)).to be_persisted
-      end
-    end
-  end
-
   describe "::user_from_unsubscribe_token" do
 
     it "should find the user from the token" do
@@ -276,6 +209,43 @@ describe User, type: :model do
       it 'returns an unpersisted user' do
         returned_user = User.send_reset_password_instructions(email: 'unknown@example.com')
         expect(returned_user).not_to be_persisted
+      end
+    end
+  end
+
+  describe '#send_devise_notification' do
+    let(:user) { create(:user) }
+    let(:mailer) do
+      instance_double(
+        ActionMailer::MessageDelivery,
+        deliver_later: true,
+        deliver_now: true
+      )
+    end
+    let(:notifications) do
+      %i[reset_password_instructions confirmation_instructions unlock_instructions]
+    end
+
+    it 'sends when valid_email is true' do
+      notifications.each do |notification|
+        allow(Devise::Mailer)
+          .to receive(notification)
+          .with(user, 'token', {})
+          .and_return(mailer)
+
+        user.send(:send_devise_notification, notification, 'token', {})
+        expect(Devise::Mailer).to have_received(notification).with(user, 'token', {})
+      end
+    end
+
+    it 'does not send when valid_email is false' do
+      user.update!(valid_email: false)
+
+      notifications.each do |notification|
+        allow(Devise::Mailer).to receive(notification)
+
+        user.send(:send_devise_notification, notification, 'token', {})
+        expect(Devise::Mailer).not_to have_received(notification)
       end
     end
   end
@@ -755,6 +725,7 @@ describe User, type: :model do
   describe "#increment_subjects_count_cache", :with_cache_store do
     it 'should return nil if no cache entry' do
       uploader = create(:user_with_uploaded_subjects)
+
       expect(uploader.increment_subjects_count_cache).to eq(nil)
     end
 

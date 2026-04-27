@@ -1,31 +1,33 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 describe Api::V1::WorkflowsController, type: :controller do
   let(:user) { create(:user) }
   let(:workflows) { create_list :workflow_with_contents, 2 }
-  let(:workflow){ workflows.first }
-  let(:project){ workflow.project }
-  let(:owner){ project.owner }
-  let(:api_resource_name){ 'workflows' }
+  let(:workflow) { workflows.first }
+  let(:project) { workflow.project }
+  let(:owner) { project.owner }
+  let(:api_resource_name) { 'workflows' }
   let(:resource_class) { Workflow }
   let(:authorized_user) { owner }
   let(:default_params) { { format: :json } }
 
   let(:api_resource_attributes) do
-    %w(id display_name tasks classifications_count subjects_count
-    created_at updated_at first_task primary_language content_language
-    version grouped prioritized pairwise retirement aggregation
-    active mobile_friendly configuration finished_at steps public_gold_standard)
+    %w[id display_name tasks classifications_count subjects_count
+       created_at updated_at first_task primary_language content_language
+       version grouped prioritized pairwise retirement
+       active mobile_friendly configuration finished_at steps public_gold_standard]
   end
   let(:api_resource_links) do
-    %w(workflows.project workflows.subject_sets workflows.tutorial_subject
-    workflows.attached_images)
+    %w[workflows.project workflows.subject_sets workflows.tutorial_subject
+       workflows.attached_images]
   end
-  let(:scopes) { %w(public project) }
+  let(:scopes) { %w[public project] }
 
   describe '#index' do
     let(:filterable_resources) { create_list(:workflow_with_subjects, 2) }
-    let(:expected_filtered_ids) { [ filterable_resources.first.id.to_s ] }
+    let(:expected_filtered_ids) { [filterable_resources.first.id.to_s] }
     let(:private_project) { create(:private_project) }
     let(:private_resource) { create(:workflow, project: private_project) }
     let(:n_visible) { 2 }
@@ -39,7 +41,7 @@ describe Api::V1::WorkflowsController, type: :controller do
     it_behaves_like 'has many filterable', :subject_sets
 
     describe 'filter by' do
-      before(:each) do
+      before do
         filterable_resources
         default_request user_id: user.id, scopes: scopes
         get :index, params: filter_opts
@@ -51,17 +53,17 @@ describe Api::V1::WorkflowsController, type: :controller do
 
         it 'only returns activated workflows', :aggregate_failures do
           expect(json_response[api_resource_name].length).to eq(2)
-          expect(json_response[api_resource_name].map{ |w| w['active'] }).to all( be true )
+          expect(json_response[api_resource_name].map { |w| w['active'] }).to all(be true)
         end
 
         it 'does not include in active workflows' do
-          expect(json_response[api_resource_name].map{ |w| w['id'] }).to_not include(inactive_workflow.id)
+          expect(json_response[api_resource_name].map { |w| w['id'] }).not_to include(inactive_workflow.id)
         end
       end
     end
 
     describe 'limiting fields' do
-      before(:each) do
+      before do
         filterable_resources
         default_request user_id: user.id, scopes: scopes
       end
@@ -98,24 +100,23 @@ describe Api::V1::WorkflowsController, type: :controller do
           display_name: 'A Better Name',
           active: false,
           retirement: { criteria: 'classification_count' },
-          aggregation: {},
           configuration: {},
           public_gold_standard: true,
           tasks: {
             interest: {
-             type: 'draw',
-             question: 'Draw a Circle',
-             next: 'shape',
-             tools: [
-               { value: 'red', label: 'Red', type: 'point', color: 'red' },
-               { value: 'green', label: 'Green', type: 'point', color: 'lime' },
-               { value: 'blue', label: 'Blue', type: 'point', color: 'blue' }
-             ]
-           }
-           },
-           steps: [['S0', { 'taskKeys' => ['T0', 'T1'] }]],
-           display_order_position: 1,
-           links: {
+              type: 'draw',
+              question: 'Draw a Circle',
+              next: 'shape',
+              tools: [
+                { value: 'red', label: 'Red', type: 'point', color: 'red' },
+                { value: 'green', label: 'Green', type: 'point', color: 'lime' },
+                { value: 'blue', label: 'Blue', type: 'point', color: 'blue' }
+              ]
+            }
+          },
+          steps: [['S0', { 'taskKeys' => %w[T0 T1] }]],
+          display_order_position: 1,
+          links: {
             subject_sets: [subject_set.id.to_s],
             tutorials: [tutorial.id.to_s]
           }
@@ -136,8 +137,8 @@ describe Api::V1::WorkflowsController, type: :controller do
       end
     end
 
-    it_behaves_like "is updatable"
-    it_behaves_like "has updatable links"
+    it_behaves_like 'is updatable'
+    it_behaves_like 'has updatable links'
 
     it_behaves_like 'it syncs the resource translation strings' do
       let(:translated_klass_name) { resource.class.name }
@@ -161,6 +162,7 @@ describe Api::V1::WorkflowsController, type: :controller do
 
     context 'when extracting strings from workflow' do
       let(:new_question) { 'Contemplate' }
+
       before do
         default_request scopes: scopes, user_id: authorized_user.id
         update_params[:workflows][:tasks][:interest][:question] = new_question
@@ -233,7 +235,7 @@ describe Api::V1::WorkflowsController, type: :controller do
     end
 
     context 'when a project is live' do
-      before(:each) do
+      before do
         resource.update!(active: true)
         project = resource.project
         project.live = true
@@ -309,7 +311,7 @@ describe Api::V1::WorkflowsController, type: :controller do
         end
 
         it 'updates the content model' do
-          expect{ resource.reload }.to change{ resource.strings }
+          expect{ resource.reload }.to change(resource, :strings)
         end
       end
     end
@@ -523,7 +525,6 @@ describe Api::V1::WorkflowsController, type: :controller do
           first_task: 'interest',
           active: true,
           retirement: { criteria: 'classification_count' },
-          aggregation: { public: true },
           configuration: { autoplay_subjects: true },
           public_gold_standard: true,
           tasks: create_task_params,

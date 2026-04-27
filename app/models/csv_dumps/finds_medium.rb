@@ -1,11 +1,12 @@
 module CsvDumps
   class FindsMedium
-    attr_reader :medium_id, :resource, :dump_target
+    attr_reader :medium_id, :resource, :dump_target, :job_id
 
-    def initialize(id, resource, dump_target)
+    def initialize(id, resource, dump_target, job_id=nil)
       @medium_id = id
       @resource = resource
       @dump_target = dump_target
+      @job_id = job_id
     end
 
     def medium
@@ -18,7 +19,7 @@ module CsvDumps
         type: dump_type,
         path_opts: resource_file_path,
         linked: resource,
-        metadata: { state: 'creating' },
+        metadata: { state: 'creating', job_id: job_id },
         private: true,
         content_disposition: content_disposition
       )
@@ -26,7 +27,7 @@ module CsvDumps
 
     def load_medium
       m = Medium.find(medium_id)
-      metadata = m.metadata.merge("state" => "creating")
+      metadata = m.metadata.merge('state' => 'creating', 'job_id' => job_id)
       m.update!(
         path_opts: resource_file_path,
         private: true,

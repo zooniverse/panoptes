@@ -13,11 +13,9 @@ class User < ApplicationRecord
   attr_accessor :minor_age
 
   devise :database_authenticatable, :registerable,
-    :recoverable, :rememberable, :trackable, :validatable, :confirmable,
-    :omniauthable, omniauth_providers: [:facebook, :google_oauth2]
+    :recoverable, :rememberable, :trackable, :validatable, :confirmable
 
   has_many :classifications, dependent: :restrict_with_exception
-  has_many :authorizations, dependent: :destroy
   has_many :collection_preferences, class_name: "UserCollectionPreference", dependent: :destroy
   has_many :project_preferences, class_name: "UserProjectPreference", dependent: :destroy
   has_many :oauth_applications, class_name: "Doorkeeper::Application", as: :owner, dependent: :destroy
@@ -50,7 +48,7 @@ class User < ApplicationRecord
   validates :login, presence: true, format: { with: USER_LOGIN_REGEX }
   validates_uniqueness_of :login, case_sensitive: false
   validates :display_name, presence: true
-  validates :unsubscribe_token, presence: true, uniqueness: true
+  validates :unsubscribe_token, presence: true, uniqueness: true, on: :create
   validates_inclusion_of :valid_email, in: [true, false], message: "must be true or false"
 
   validates_with IdentityGroupNameValidator
@@ -130,20 +128,6 @@ class User < ApplicationRecord
     end
   end
 
-  def self.from_omniauth(auth_hash)
-    transaction do
-      auth = Authorization.from_omniauth(auth_hash)
-      auth.user ||= create! do |u|
-        u.email = auth_hash.info.email
-        u.display_name = auth_hash.info.name
-        u.login = uniqueify(:login, sanitize_login(u.display_name))
-        u.password = Devise.friendly_token[0,20]
-        u.build_identity_group
-        u.authorizations << auth
-      end
-    end
-  end
-
   def self.reflect_on_association(association_name)
     case association_name.to_sym
     when :projects, :collections
@@ -198,6 +182,12 @@ class User < ApplicationRecord
     recoverable
   end
 
+  def send_devise_notification(notification, *args)
+    return unless valid_email
+
+    super
+  end
+
   def self.find_by_lower_login(login)
     find_by("lower(login) = ?", login.downcase)
   end
@@ -243,7 +233,7 @@ class User < ApplicationRecord
   end
 
   def email_required?
-    authorizations.blank? && !disabled?
+    !disabled?
   end
 
   def receives_email?
@@ -346,7 +336,7 @@ class User < ApplicationRecord
   end
 
   def uploaded_subjects_count
-    count = Rails.cache.fetch(subjects_count_cache_key, expires_in: subject_count_cache_expiry) do
+    count = Rails.cache.fetch(subjects_count_cache_key, expires_in: subject_count_cache_expiry, raw: true) do
       DatabaseReplica.read('read_user_uploaded_subjects_counts_from_replica') do
         Subject.where(upload_user_id: id).count
       end
@@ -355,6 +345,8 @@ class User < ApplicationRecord
   end
 
   def increment_subjects_count_cache
+    return nil unless Rails.cache.exist?(subjects_count_cache_key)
+
     Rails.cache.increment(subjects_count_cache_key)
   end
 
@@ -365,7 +357,7 @@ class User < ApplicationRecord
   private
 
   def subjects_count_cache_key
-    @subjects_count_cache_key ||= "User/#{id}/uploaded_subjects_count"
+    @subjects_count_cache_key ||= "User/#{id}/uploaded_subjects_count:v1"
   end
 
   def subject_count_cache_expiry

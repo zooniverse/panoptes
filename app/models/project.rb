@@ -14,7 +14,8 @@ class Project < ApplicationRecord
 
   has_many :tutorials
   has_many :field_guides, dependent: :destroy
-  belongs_to :organization
+  has_many :organization_projects, dependent: :destroy
+  has_many :organizations, through: :organization_projects
   has_many :user_project_preference, dependent: :destroy
   # uses the activated_state enum on the workflow
   has_many :workflows,
@@ -75,7 +76,9 @@ class Project < ApplicationRecord
         dictionary: "english",
         tsvector_column: "tsv"
       },
-      trigram: {}
+      trigram: {
+        word_similarity: true
+      }
     },
     :ranked_by => ":tsearch + (0.25 * :trigram)"
 
@@ -118,8 +121,6 @@ class Project < ApplicationRecord
     if Panoptes.project_request.recipients
       request_type = if saved_change_to_beta_requested? && beta_requested
                        "beta"
-                     elsif saved_change_to_launch_requested? && launch_requested
-                       "launch"
                      end
       ProjectRequestEmailWorker.perform_async(request_type, id) if request_type
     end

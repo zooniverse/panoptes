@@ -15,7 +15,7 @@ describe Api::V1::SubjectsController, type: :controller do
     [ "id", "metadata", "locations", "zooniverse_id", "created_at", "updated_at" ]
   end
   let(:api_resource_links) do
-    [ "subjects.project","subjects.collections", "subjects.subject_sets" ]
+    ['subjects.project', 'subjects.collections', 'subjects.subject_sets', 'subjects.attached_images']
   end
 
   describe "#index" do
@@ -47,6 +47,10 @@ describe Api::V1::SubjectsController, type: :controller do
       context "without any sort" do
         before(:each) do
           get :index
+        end
+
+        it 'defaults sort parameter to id' do
+          expect(controller.params[:sort]).to eq('id')
         end
 
         it_behaves_like "an api response"
@@ -83,6 +87,10 @@ describe Api::V1::SubjectsController, type: :controller do
           context "when firing the request before the test" do
             before(:each) do
               get :index, params: request_params
+            end
+
+            it 'does not default sort parameter to id' do
+              expect(controller.params[:sort]).not_to eq('id')
             end
 
             it "should return 200" do

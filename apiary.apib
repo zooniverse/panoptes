@@ -889,7 +889,8 @@ Resources related to _Panoptes Projects_.
 ## Project [/projects/{id}{?include,display_name,approved,beta,live}]
 A Project is a collection of subjects and task workflows that a
 volunteer performs on subjects. The project also holds supplementary
-text describing the tasks volunteers perform.
+text describing the tasks volunteers perform. A project can be linked to
+multiple organizations.
 
 It has the following attributes:
 
@@ -946,6 +947,10 @@ It has the following attributes:
                     "projects.owner": {
                         "href": "/{projects.owner.href}",
                         "type": "owners"
+                    },
+                    "projects.organizations": {
+                        "href": "/organizations/{projects.organizations}",
+                        "type": "organizations"
                     }
                 },
                 "projects": [{
@@ -1097,7 +1102,7 @@ this action.
 
 + Response 204
 
-## Project Collection [/projects{?page,page_size,sort,owner,include}]
+## Project Collection [/projects{?page,page_size,sort,owner,organization_id,include}]
 A collection of _Panotpes Project_ resources.
 
 All collections add a *meta* attribute hash containing
@@ -1132,6 +1137,10 @@ Projects are returned as an array under the _projects_ key.
                     "projects.owner": {
                         "href": "/{projects.owner.href}",
                         "type": "owners"
+                    },
+                    "projects.organizations": {
+                        "href": "/organizations/{projects.organizations}",
+                        "type": "organizations"
                     }
                 },
                 "meta": {
@@ -1222,6 +1231,7 @@ Projects are returned as an array under the _projects_ key.
   + page_size (optional, integer) ... number of items to include on a page default is 20
   + sort (optional, string) ... field to sort by
   + owner (optional, string) ... string owner name of either a user or a user group to filter by.
+  + organization_id (optional, integer or comma-separated integers) ... return projects linked to one or more organizations.
   + include (optional, string) ... comma separated list of linked resources to include in the response
 
 + Request
@@ -1276,7 +1286,8 @@ returned.
 Resources related to _Panoptes Organizations_.
 
 ## Organization [/organizations/{id}{?include,display_name}]
-An Organization is a collection of projects that are related by dicipline, research group
+An Organization is a collection of projects that are related by dicipline or
+research group. Projects can be linked to multiple organizations.
 
 It has the following attributes:
 
@@ -1452,7 +1463,9 @@ A user may destroy a Organization they own or have destroy permissions for.
 ## Organization Create Links [/Organization/{id}/links/{link_type}]
 
 ### Add a Link [POST]
-The body key must match the link_type parameter. Po
+The body key must match the link_type parameter. Use this endpoint to link one
+or more projects to an organization. A project may be linked to multiple
+organizations.
 
 + Parameters
   + id (required, integer) - the id of the project to add

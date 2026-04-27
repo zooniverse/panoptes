@@ -8,4 +8,12 @@ namespace :user_groups do
       UserGroup.where(id: user_group_ids_to_update).update_all(stats_visibility: 0)
     end
   end
+
+  desc 'Touch user_group updated_at'
+  task touch_user_group_updated_at: :environment do
+    UserGroup.select(:id).find_in_batches do |user_groups|
+      user_group_ids_to_update = user_groups.map(&:id)
+      UserGroup.where(id: user_group_ids_to_update).update_all(updated_at: Time.current.to_s(:db))
+    end
+  end
 end
