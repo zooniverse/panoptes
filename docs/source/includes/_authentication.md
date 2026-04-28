@@ -1,7 +1,8 @@
 # Authentication
 
-Panoptes API provides an OAuth 2.0 authentication mechanism. (TODO: Describe
-Authentication Workflow).
+The Zooniverse API, Panoptes, provides an OAuth 2.0 authentication mechanism. It uses [Devise](https://github.com/heartcombo/devise) and [Doorkeeper](https://github.com/doorkeeper-gem/doorkeeper) for authentication and authorization.
+
+This is a introductory guide to authenticating with Panoptes and performing a few typical requests.
 
 ## How do I authenticate with the Zooniverse API?
 
@@ -69,11 +70,10 @@ Tick all the resource scopes you'll be needing access to (start with all). Once 
 
 There are other OAuth flows that can be used to get bearer tokens, please [email contact@zooniverse.org](mailto:contact@zooniverse.org) to find out more.
 
-### Setup postman to use the client credentials to get API bearer tokens
+### Setup Postman to use the client credentials to get API bearer tokens
+This short guide will explain how to use Postman to interact with the Panoptes API.
 
-I won’t go into details on how to setup postman, there are lots of [docs that help with this](https://www.getpostman.com/docs/v6/).
-
-You will need to setup a request to `https://signin.zooniverse.org/api/me` and under the authorization tab, select OAuth 2.0, and click the ‘Get New Access Token’ button. Complete the forms like the images below:
+First, set up a request to `https://signin.zooniverse.org/api/me` and under the authorization tab, select OAuth 2.0, and click the ‘Get New Access Token’ button. Complete the forms like the images below:
 
 ![initial postman req](/images/authentication/initial_postman_req.png)
 

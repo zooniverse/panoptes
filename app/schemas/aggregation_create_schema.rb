@@ -1,26 +1,35 @@
 class AggregationCreateSchema < JsonSchema
   schema do
-    type "object"
-    description "An Aggregation for a subject"
-    required "links"
+    type 'object'
+    description 'An Aggregation for a workflow'
+    required 'links'
     additional_properties false
 
-    property "aggregation" do
-      type "object"
+    property 'uuid' do
+      type 'string'
     end
 
-    property "links" do
-      type "object"
+    property 'task_id' do
+      type 'string'
+    end
+
+    property 'status' do
+      type 'string'
+    end
+
+    property 'links' do
+      type 'object'
+      required 'workflow'
       additional_properties false
 
-      required "subject", "workflow"
-
-      property "subject" do
-        type "integer", "string"
+      property 'workflow' do
+        type 'integer', 'string'
+        pattern '^[0-9]*$'
       end
 
-      property "workflow" do
-        type "integer", "string"
+      property 'user' do
+        type 'integer', 'string'
+        pattern '^[0-9]*$'
       end
     end
   end

@@ -49,7 +49,26 @@ describe Api::V1::OrganizationsController, type: :controller do
         organization.save
         get :index
         expect(response.status).to eq(200)
-        expect(json_response["organizations"].map { |o| o['id'] }).to include(organization.id.to_s)
+        expect(json_response['organizations'].map { |o| o['id'] }).to include(organization.id.to_s)
+      end
+
+      describe 'search' do
+        let!(:exact_match) { create(:organization, display_name: 'Alpha Beta Society', owner: authorized_user) }
+        let(:resource) { exact_match }
+
+        it_behaves_like 'filter by display_name'
+
+        it 'supports word similarity matches against longer display names' do
+          get :index, params: { search: 'Societ' }
+
+          expect(json_response['organizations'].map { |o| o['id'] }).to include(exact_match.id.to_s)
+        end
+
+        it 'does not perform fuzzy matching for short non-exact queries' do
+          get :index, params: { search: 'Al' }
+
+          expect(json_response['organizations']).to be_empty
+        end
       end
 
       describe "with unlisted organizations" do
@@ -63,13 +82,27 @@ describe Api::V1::OrganizationsController, type: :controller do
         it "returns unlisted organizations that I own" do
           default_request scopes: scopes, user_id: authorized_user.id
           get :index
-          expect(json_response["organizations"].map { |o| o['id'] }).to include(owned_unlisted_organization.id.to_s)
+          expect(json_response['organizations'].map { |o| o['id'] }).to include(owned_unlisted_organization.id.to_s)
         end
 
         it "doesn't return unlisted organizations for unauthorized users" do
           default_request scopes: scopes, user_id: unauthorized_user.id
           get :index
-          expect(json_response["organizations"]).to be_empty
+          expect(json_response['organizations']).to be_empty
+        end
+
+        it 'returns unlisted organizations that I own when searching' do
+          default_request scopes: scopes, user_id: authorized_user.id
+          get :index, params: { search: owned_unlisted_organization.display_name }
+
+          expect(json_response['organizations'].map { |o| o['id'] }).to include(owned_unlisted_organization.id.to_s)
+        end
+
+        it "doesn't return unlisted organizations for unauthorized users when searching" do
+          default_request scopes: scopes, user_id: unauthorized_user.id
+          get :index, params: { search: owned_unlisted_organization.display_name }
+
+          expect(json_response['organizations']).to be_empty
         end
       end
 
@@ -296,9 +329,14 @@ describe Api::V1::OrganizationsController, type: :controller do
       let(:test_relation_ids) { [ linked_resource.id.to_s ] }
 
       describe "linking a project" do
-        let!(:linked_resource) { create(:project) }
+        let(:existing_linked_resource) { create(:project) }
+        let(:linked_resource) { create(:project) }
         let(:test_relation) { :projects }
         let(:expected_copies_count) { 1 }
+
+        before do
+          resource.projects << existing_linked_resource
+        end
 
         it_behaves_like "supports update_links"
       end

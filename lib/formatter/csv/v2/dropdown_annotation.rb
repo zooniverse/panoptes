@@ -58,7 +58,8 @@ module Formatter
           return annotation unless selected_option
 
           annotation.merge(
-            'option' => true, # this means volunteer selected a provided worfklow option select
+            'option' => true, # this means volunteer selected a provided workflow option select
+            'option_index' => selected_option['option_index'],
             'value' => selected_option['value'],
             'label' => workflow_information.string(selected_option['label'])
           )
@@ -73,9 +74,8 @@ module Formatter
           found_option = flattened_dropdown_option_values[answer_index]
           return unless found_option
 
-          # override the value in the workflow's task option representation
-          # to preserve the supplied answer index for downstream consumers
-          found_option.merge('value' => answer_index)
+          # 24 March 2026: add index as additional output, not in place of value
+          found_option.merge('option_index' => answer_index)
         end
 
         # raise if annotation format is not @current['taskType'] == "dropdown-simple"

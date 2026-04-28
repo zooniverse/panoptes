@@ -33,9 +33,9 @@ RSpec.describe Subjects::Remover do
 
       before do
         allow(panoptes_client)
-        .to receive(:discussions)
-        .with(focus_id: subject.id, focus_type: "Subject")
-        .and_return(discussions)
+          .to receive(:discussions)
+          .with({ focus_id: subject.id, focus_type: "Subject" })
+          .and_return(discussions)
       end
 
       context "without a real subject" do
@@ -103,6 +103,33 @@ RSpec.describe Subjects::Remover do
         sms_ids = subject.set_member_subjects.map(&:id)
         remover.cleanup
         expect { SetMemberSubject.find(sms_ids) }.to raise_error(ActiveRecord::RecordNotFound)
+      end
+
+      context 'when subject_set_id is param in init' do
+        let(:remover_with_subject_set) {
+          described_class.new(subject.id, panoptes_client, subject_set.id)
+        }
+
+        it 'removes a subject that has not been used' do
+          remover_with_subject_set.cleanup
+          expect { Subject.find(subject.id) }.to raise_error(ActiveRecord::RecordNotFound)
+        end
+
+        it 'does not remove a subject that has been classified' do
+          create(:classification, subjects: [subject])
+          expect(remover_with_subject_set.cleanup).to be_falsey
+        end
+
+        context 'with multiple subject sets' do
+          let(:alternate_subject_set) { create(:subject_set) }
+          let(:remover) { described_class.new(subject.id, panoptes_client, alternate_subject_set.id) }
+          let(:new_sms) { create(:set_member_subject, subject: subject, subject_set: alternate_subject_set) }
+
+          it 'does not remove subjects associated with multiple set_member_subjects' do
+            remover.cleanup
+            expect(Subject.where(id: subject.id)).to exist
+          end
+        end
       end
 
       it "should remove the associated media resources" do

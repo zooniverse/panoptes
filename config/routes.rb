@@ -3,6 +3,7 @@ ActionDispatch::Routing::Mapper.send :include, Routes::JsonApiRoutes
 # require 'sidekiq/web' via
 require 'sidekiq_unique_jobs/web'
 require 'sidekiq/cron/web'
+require 'sidekiq/grouping/web'
 
 Rails.application.routes.draw do
 
@@ -21,7 +22,7 @@ Rails.application.routes.draw do
   end
 
   devise_for :users,
-    controllers: { confirmations: 'confirmations', omniauth_callbacks: 'omniauth_callbacks', passwords: 'passwords' },
+    controllers: { confirmations: 'confirmations', passwords: 'passwords' },
     skip: [ :sessions, :registrations ]
 
   as :user do
@@ -75,6 +76,7 @@ Rails.application.routes.draw do
           get :grouped # SubjectGroup selection end point
           get :selection # Subject selection by subject ids end point
         end
+        media_resources :attached_images
       end
 
       json_api_resources :users, except: [:new, :edit, :create], links: [:user_groups] do
@@ -148,8 +150,6 @@ Rails.application.routes.draw do
         constraints: Routes::Constraints::TranslationsConstraint.new,
         except: %i(new edit destroy)
       })
-
-      json_api_resources :subject_groups, only: %w[index show]
     end
   end
 

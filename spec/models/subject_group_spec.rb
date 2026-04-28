@@ -3,51 +3,28 @@
 require 'spec_helper'
 
 describe SubjectGroup, type: :model do
-  let(:subject_group) { build(:subject_group) }
+  let!(:s1) { create(:subject, :with_mediums, num_media: 1) }
+  let!(:s2) { create(:subject, :with_mediums, num_media: 2) }
 
-  it 'has a valid factory' do
-    expect(subject_group).to be_valid
-  end
-
-  it 'is invalid without a project_id' do
-    subject_group.project = nil
-    expect(subject_group).to be_invalid
-  end
-
-  it 'is invalid without any subject_group_members' do
-    subject_group.subject_group_members = []
-    expect(subject_group).to be_invalid
-  end
-
-  it 'is invalid without a key' do
-    subject_group.key = nil
-    expect(subject_group).to be_invalid
-  end
-
-  it 'is invalid without a group_subject_id' do
-    subject_group.group_subject = nil
-    expect(subject_group).to be_invalid
-  end
-
-  describe '#subjects' do
-    it 'has many subjects' do
-      expect(subject_group.subjects).to all(be_a(Subject))
-    end
-  end
-
-  describe '#destroy' do
-    let(:subject_group) { create(:subject_group) }
-
-    it 'cleans up the group member records' do
-      members = subject_group.subject_group_members
-      subject_group.destroy
-      expect(members.map(&:destroyed?)).to all(be true)
+  describe 'from_member_subjects' do
+    it 'builds a virtual subject with negative id when not provided' do
+      virtual_subject_group = described_class.from_member_subjects([s1, s2])
+      expect(virtual_subject_group.id).to be < 0
     end
 
-    it 'is leaves the subjects intact' do
-      test_subjects = subject_group.subjects
-      subject_group.destroy
-      expect(test_subjects.map(&:destroyed?)).to all(be false)
+    it 'uses the supplied virtual_id when provided' do
+      virtual_subject_group = described_class.from_member_subjects([s1, s2], virtual_id: -1)
+      expect(virtual_subject_group.id).to eq(-1)
+    end
+
+    it 'sets metadata with #group_subject_ids key' do
+      virtual_subject_group = described_class.from_member_subjects([s1, s2], virtual_id: -1)
+      expect(virtual_subject_group.metadata['#group_subject_ids']).to eq("#{s1.id}-#{s2.id}")
+    end
+
+    it 'flattens member media into ordered_locations' do
+      virtual_subject_group = described_class.from_member_subjects([s1, s2], virtual_id: -1)
+      expect(virtual_subject_group.ordered_locations.length).to eq(s1.ordered_locations.length + s2.ordered_locations.length)
     end
   end
 end

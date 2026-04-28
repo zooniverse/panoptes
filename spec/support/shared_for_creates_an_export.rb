@@ -47,4 +47,43 @@ shared_examples_for "creates an export" do
     export.reload
     expect(export.metadata).to include("state" => "creating")
   end
+
+  context 'with duplicate exports' do
+    it 'reuses the most recently updated export and removes the rest' do
+      params = create_params
+      params[:media].delete(:metadata)
+
+      old_export = create(
+        :medium,
+        linked: resource,
+        type: medium_type,
+        content_type: content_type,
+        metadata: { recipients: [user.id], state: 'ready' },
+        updated_at: 3.days.ago,
+        created_at: 3.days.ago,
+        content_disposition: 'attachment; filename="old-export.csv"'
+      )
+
+      recent_export = create(
+        :medium,
+        linked: resource,
+        type: medium_type,
+        content_type: content_type,
+        metadata: { recipients: [user.id], state: 'ready' },
+        updated_at: 1.day.ago,
+        created_at: 1.day.ago,
+        content_disposition: 'attachment; filename="recent-export.csv"'
+      )
+
+      result = nil
+
+      expect do
+        result = operation.with(object: resource).run!(create_params)
+      end.to change { Medium.where(linked: resource, type: medium_type).count }.from(2).to(1)
+
+      expect(result.id).to eq(recent_export.id)
+      expect(Medium.exists?(old_export.id)).to be(false)
+      expect(result.metadata).to include('state' => 'creating', 'recipients' => [user.id])
+    end
+  end
 end

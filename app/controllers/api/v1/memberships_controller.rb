@@ -6,7 +6,7 @@ class Api::V1::MembershipsController < Api::ApiController
   resource_actions :index, :show, :create, :update, :deactivate
   schema_type :strong_params
 
-  allowed_params :update, :state
+  allowed_params :update, :state, roles: []
 
   def create
     resources = resource_class.transaction(requires_new: true) do

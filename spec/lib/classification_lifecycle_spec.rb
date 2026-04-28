@@ -304,29 +304,34 @@ describe ClassificationLifecycle do
     let(:classification) { create(:classification) }
 
     context "with a user" do
-      it 'should call the worker to add the subject_id to the seen subjects' do
-        expect(UserSeenSubjectsWorker)
-          .to receive(:perform_async)
-          .with(
-            classification.user_id,
-            classification.workflow_id,
-            classification.subject_ids
-          )
+      it 'calls the worker to add the subject_id to the seen subjects' do
+        allow(UserSeenSubjectsGroupWorker).to receive(:perform_async).with({
+          user_id: classification.user_id,
+          workflow_id: classification.workflow_id,
+          subject_ids_arr: classification.subject_ids
+        }.stringify_keys)
         subject.update_seen_subjects
+        expect(UserSeenSubjectsGroupWorker)
+          .to have_received(:perform_async)
+          .with({
+            user_id: classification.user_id,
+            workflow_id: classification.workflow_id,
+            subject_ids_arr: classification.subject_ids
+          }.stringify_keys)
       end
     end
 
     context "without a user" do
       let(:classification) { build(:classification, user: nil) }
       it 'should not call the worker' do
-        expect(UserSeenSubjectsWorker).to_not receive(:perform_async)
+        expect(UserSeenSubjectsGroupWorker).not_to receive(:perform_async)
         subject.update_seen_subjects
       end
     end
 
     it 'should not call the worker when subjects have been seen' do
       allow(subject).to receive(:subjects_are_unseen_by_user?).and_return(false)
-      expect(UserSeenSubjectsWorker).to_not receive(:perform_async)
+      expect(UserSeenSubjectsGroupWorker).not_to receive(:perform_async)
       subject.update_seen_subjects
     end
   end

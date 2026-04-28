@@ -22,8 +22,8 @@ describe Inaturalist::Observation do
   }
   let(:obs_locations) {
     [
-      { 'image/jpeg' => 'https://static.inaturalist.org/photos/12345/original.JPG' },
-      { 'image/jpeg' => 'https://static.inaturalist.org/photos/45678/original.JPG' }
+      { 'image/jpeg' => 'https://static.inaturalist.org/photos/12345/large.JPG' },
+      { 'image/jpeg' => 'https://static.inaturalist.org/photos/45678/large.JPG' }
     ]
   }
 

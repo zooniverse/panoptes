@@ -153,4 +153,37 @@ describe UserProjectPreferenceSerializer do
       end
     end
   end
+
+  describe 'filtering by non-zero activity count' do
+    let!(:upp_with_activity_count) { create(:user_project_preference) }
+    let!(:legacy_count_upp) { create(:legacy_user_project_preference) }
+    let(:project) { create(:project_with_workflow) }
+    let(:upp_with_count_from_uss) { create(:user_project_preference, project: project, activity_count: nil) }
+    let(:user) { upp_with_count_from_uss.user }
+    let(:workflow) { project.workflows.first }
+    let!(:user_seens) do
+      create(:user_seen_subject, user: user, workflow: workflow).tap do |uss|
+        create(:classification, user: user, workflow: workflow, subject_ids: uss.subject_ids)
+      end
+    end
+    let(:project2) { create :project }
+    let(:upp_with_no_activity) { create(:user_project_preference, project: project2, user: user, activity_count: nil) }
+    let(:params) { { non_null_activity_count: 'true' } }
+    let(:serialized_page) do
+      described_class.page(
+        params,
+        UserProjectPreference.all,
+        {}
+      )
+    end
+    let(:result_ids) do
+      serialized_page['project_preferences'].map { |r| r[:id].to_i }
+    end
+
+    it 'filters out non-zero activity counts' do
+      expect(result_ids.length).to eq(3)
+      expect(result_ids).to contain_exactly(upp_with_count_from_uss.id, upp_with_activity_count.id, legacy_count_upp.id)
+      expect(result_ids).not_to include(upp_with_no_activity.id)
+    end
+  end
 end

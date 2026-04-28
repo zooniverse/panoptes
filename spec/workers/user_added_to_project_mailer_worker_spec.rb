@@ -8,27 +8,27 @@ RSpec.describe UserAddedToProjectMailerWorker do
   let(:roles) { ['collaborator'] }
 
   it 'delivers the mail' do
-    expect { subject.perform(user.id, project.id, roles) }.to change { ActionMailer::Base.deliveries.count }.by(1)
+    expect { subject.perform(user.id, project.id, roles) }.to change { 'ActionMailer::Base'.constantize.deliveries.count }.by(1)
   end
 
   context 'missing attributes' do
     it "is missing a user and doesn't send" do
-      expect { subject.perform(nil, project.id, roles) }.not_to change { ActionMailer::Base.deliveries.count }
+      expect { subject.perform(nil, project.id, roles) }.not_to change { 'ActionMailer::Base'.constantize.deliveries.count }
     end
 
     it "is missing a project and doesn't send" do
-      expect { subject.perform(user.id, nil, roles) }.not_to change { ActionMailer::Base.deliveries.count }
+      expect { subject.perform(user.id, nil, roles) }.not_to change { 'ActionMailer::Base'.constantize.deliveries.count }
     end
 
     it "is missing roles and doesn't send" do
-      expect { subject.perform(user.id, project.id, nil) }.not_to change { ActionMailer::Base.deliveries.count }
+      expect { subject.perform(user.id, project.id, nil) }.not_to change { 'ActionMailer::Base'.constantize.deliveries.count }
     end
   end
 
   context 'when an the user has been scrubbed of email address' do
     it 'does not deliver the mail' do
       UserInfoScrubber.scrub_personal_info!(user)
-      expect { subject.perform(user.id, project.id, roles) }.not_to change { ActionMailer::Base.deliveries.count }
+      expect { subject.perform(user.id, project.id, roles) }.not_to change { 'ActionMailer::Base'.constantize.deliveries.count }
     end
   end
 

@@ -1,7 +1,5 @@
 module Subjects
   class PostgresqlRandomSelection
-    using Refinements::RangeClamping
-
     attr_reader :available, :limit
 
     def initialize(available, limit)

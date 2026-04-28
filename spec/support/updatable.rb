@@ -101,7 +101,7 @@ RSpec.shared_examples "supports update_links" do
 
   it 'retains pre-existing links' do
     post :update_links, params: params
-    expect(linked_resources.map(&:id)).to include(*old_ids)
+    expect(linked_resources.map(&:id) & old_ids).to match_array(old_ids)
   end
 
   it 'updates the cache key on the resource' do

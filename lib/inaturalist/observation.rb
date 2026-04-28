@@ -39,7 +39,7 @@ module Inaturalist
     def extract_locations(obs)
       locations = []
       obs['photos'].each do |p|
-        url = p['url'].sub('square', 'original')
+        url = p['url'].sub('square', 'large')
         mimetype = mime_type_from_file_extension(url)
         locations << { mimetype => url }
       end

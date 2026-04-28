@@ -1,10 +1,11 @@
 module Subjects
   class Remover
-    attr_reader :subject_id, :panoptes_client
+    attr_reader :subject_id, :panoptes_client, :subject_set_id
 
-    def initialize(subject_id, client=nil)
+    def initialize(subject_id, client=nil, subject_set_id=nil)
       @subject_id = subject_id
       @panoptes_client = client || Panoptes::Client.new(env: Rails.env)
+      @subject_set_id = subject_set_id
     end
 
     def cleanup
@@ -31,6 +32,8 @@ module Subjects
     def can_be_removed?
       return false if has_been_collected_or_classified?
 
+      return false if belongs_to_other_subject_set?
+
       return false if has_been_talked_about?
 
       return false if has_been_counted_or_retired?
@@ -54,6 +57,12 @@ module Subjects
 
     def has_been_collected_or_classified?
       !orphan_subject
+    end
+
+    def belongs_to_other_subject_set?
+      return false if subject_set_id.nil?
+
+      orphan_subject.set_member_subjects.where.not(subject_set_id: subject_set_id).count.positive?
     end
 
     def has_been_talked_about?

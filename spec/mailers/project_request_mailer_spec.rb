@@ -1,12 +1,23 @@
 require "spec_helper"
 
 RSpec.describe ProjectRequestMailer, type: :mailer do
+  let(:configured_bcc) { "project-bcc@example.org" }
   let(:project) { create(:project) }
   let(:mail) do
     described_class.project_request("beta", project.id)
   end
   let(:emails) do
     [project.owner.email].concat(Panoptes.project_request.recipients)
+  end
+
+  before do
+    allow(ENV).to receive(:fetch).and_call_original
+    allow(ENV).to receive(:fetch).with('PROJECT_REQUEST_BCC', '').and_return(configured_bcc)
+    Panoptes.instance_variable_set(:@project_request, nil)
+  end
+
+  after do
+    Panoptes.instance_variable_set(:@project_request, nil)
   end
 
   it 'should send emails to the project owner and the designated recipients' do

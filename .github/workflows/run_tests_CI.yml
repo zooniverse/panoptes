@@ -25,9 +25,9 @@ jobs:
       matrix:
         gemfile:
           - Gemfile
-         # - Gemfile.next
+          - Gemfile.next
         ruby:
-          - 2.7
+          - '3.2'
         spec-commands:
           - 'spec/controllers/api/v1/[a-m]*.rb spec/counters spec/operations spec/serializers spec/workers'
           - 'spec/controllers/api/v1/[n-s]*.rb'

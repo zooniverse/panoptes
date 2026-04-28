@@ -1,4 +1,6 @@
-module ACLSerializer
+# frozen_string_literal: true
+
+module AclSerializer
   extend ActiveSupport::Concern
 
   include Serialization::PanoptesRestpack

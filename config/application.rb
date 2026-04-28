@@ -1,5 +1,6 @@
 require File.expand_path('../boot', __FILE__)
 
+require 'logger'
 require "active_model/railtie"
 require "active_record/railtie"
 require "action_controller/railtie"
@@ -15,14 +16,27 @@ Bundler.require(*Rails.groups)
 
 module Panoptes
   class Application < Rails::Application
-    config.eager_load_paths += Dir[Rails.root.join('app', 'models', '*/')]
-    config.eager_load_paths += Dir[Rails.root.join('app', 'workers', '*/')]
-    config.eager_load_paths += Dir[Rails.root.join('app', 'operations', '*/')]
-    config.eager_load_paths += Dir[Rails.root.join('app', 'serializers', '*/')]
-    config.eager_load_paths += Dir[Rails.root.join('app', 'formatters', '*/')]
-    config.eager_load_paths += Dir[Rails.root.join('app', 'policies', '*/')]
+    config.autoload_paths += Dir[Rails.root.join('lib')]
+    config.autoload_paths += [
+      'app/models',
+      'app/workers',
+      'app/operations',
+      'app/serializers',
+      'app/policies',
+      'app/services'
+    ].collect { |path| Rails.root.join path }
 
-    config.eager_load_paths += Dir[Rails.root.join('lib', '**/')]
+    config.eager_load_paths += [
+      'lib',
+      'app/models/concerns',
+      'app/models',
+      'app/workers',
+      'app/operations',
+      'app/serializers/concerns',
+      'app/serializers',
+      'app/policies',
+      'app/services'
+    ].collect { |path| Rails.root.join path }
 
     config.action_dispatch.perform_deep_munge = false
     config.middleware.insert_before ActionDispatch::Cookies, RejectPatchRequests

@@ -22,12 +22,9 @@ module SubjectGroups
         num_columns
       )
 
-      subject_groups = find_or_create_subject_groups(
-        subject_selector.get_subject_ids,
-        subject_selector.workflow.project_id.to_s
-      )
+      subject_id_groups = build_subject_id_groups(subject_selector.get_subject_ids)
 
-      OpenStruct.new(subject_selector: subject_selector, subject_groups: subject_groups)
+      OpenStruct.new(subject_selector: subject_selector, subject_id_groups: subject_id_groups)
     end
 
     private
@@ -53,27 +50,8 @@ module SubjectGroups
       raise Error, 'Supplied num_rows and num_colums mismatches the workflow configuration'
     end
 
-    def find_or_create_subject_groups(selected_subject_ids, project_id)
-      [].tap do |subject_groups|
-        SubjectGroup.transaction do
-          # split the subject ids into equal groups of `grid_size`
-          selected_subject_ids.each_slice(grid_size) do |per_grid_subject_ids|
-            subject_group_key = per_grid_subject_ids.join('-')
-
-            # re-use any existing SubjectGroup based on key lookup
-            subject_group = SubjectGroup.find_by(key: subject_group_key)
-
-            # if we didn't find it, create a new subject group from the selected ids
-            subject_group ||= SubjectGroups::Create.run!(
-              subject_ids: per_grid_subject_ids,
-              uploader_id: uploader_id,
-              project_id: project_id,
-              group_size: grid_size
-            )
-            subject_groups << subject_group
-          end
-        end
-      end
+    def build_subject_id_groups(selected_subject_ids)
+      selected_subject_ids.each_slice(grid_size).to_a
     end
   end
 end

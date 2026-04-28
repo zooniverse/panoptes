@@ -1,5 +1,7 @@
 # frozen_string_literal: true
 
+require 'media_storage'
+
 module Panoptes
   module StorageAdapter
     def self.configuration

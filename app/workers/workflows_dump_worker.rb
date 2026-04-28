@@ -12,7 +12,7 @@ class WorkflowsDumpWorker
     raise ApiErrors::FeatureDisabled unless Flipper.enabled?(:dump_worker_exports)
 
     if @resource = CsvDumps::FindsDumpResource.find(resource_type, resource_id)
-      @medium = CsvDumps::FindsMedium.new(medium_id, @resource, dump_target).medium
+      @medium = CsvDumps::FindsMedium.new(medium_id, @resource, dump_target, jid).medium
       scope = get_scope(resource)
       @processor = CsvDumps::DumpProcessor.new(formatter, scope, medium)
       @processor.execute

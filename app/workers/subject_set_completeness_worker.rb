@@ -2,7 +2,6 @@
 
 class SubjectSetCompletenessWorker
   include Sidekiq::Worker
-  using Refinements::RangeClamping
 
   class EmptySubjectSet < StandardError; end
 
@@ -60,7 +59,7 @@ class SubjectSetCompletenessWorker
     raise EmptySubjectSet, "No subjets in subject set: #{subject_set.id}" if total_subjects_count.zero?
 
     # calculate and clamp the completeness value between 0.0 and 1.0, i.e. 0 to 100%
-    (0.0..1.0).clamp(retired_subjects_count / total_subjects_count)
+    (retired_subjects_count / total_subjects_count).clamp(0.0, 1.0)
   end
 
   def subject_set_completeness_has_changed?(subject_set_completeness)

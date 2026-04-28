@@ -94,10 +94,13 @@ ALTER SEQUENCE public.access_control_lists_id_seq OWNED BY public.access_control
 CREATE TABLE public.aggregations (
     id integer NOT NULL,
     workflow_id integer,
-    subject_id integer,
-    aggregation jsonb DEFAULT '{}'::jsonb NOT NULL,
     created_at timestamp without time zone,
-    updated_at timestamp without time zone
+    updated_at timestamp without time zone,
+    project_id integer,
+    user_id integer,
+    uuid character varying,
+    task_id character varying,
+    status integer DEFAULT 0
 );
 
 
@@ -130,41 +133,6 @@ CREATE TABLE public.ar_internal_metadata (
     created_at timestamp without time zone NOT NULL,
     updated_at timestamp without time zone NOT NULL
 );
-
-
---
--- Name: authorizations; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.authorizations (
-    id integer NOT NULL,
-    user_id integer,
-    provider character varying,
-    uid character varying,
-    token character varying,
-    expires_at timestamp without time zone,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
-);
-
-
---
--- Name: authorizations_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.authorizations_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: authorizations_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.authorizations_id_seq OWNED BY public.authorizations.id;
 
 
 --
@@ -585,7 +553,8 @@ CREATE TABLE public.oauth_access_grants (
     redirect_uri text NOT NULL,
     created_at timestamp without time zone NOT NULL,
     revoked_at timestamp without time zone,
-    scopes character varying
+    scopes character varying DEFAULT ''::character varying,
+    CONSTRAINT check_oauth_access_grants_scopes_not_null CHECK ((scopes IS NOT NULL))
 );
 
 
@@ -792,6 +761,38 @@ ALTER SEQUENCE public.organization_pages_id_seq OWNED BY public.organization_pag
 
 
 --
+-- Name: organization_projects; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.organization_projects (
+    id bigint NOT NULL,
+    organization_id bigint NOT NULL,
+    project_id bigint NOT NULL,
+    created_at timestamp(6) without time zone NOT NULL,
+    updated_at timestamp(6) without time zone NOT NULL
+);
+
+
+--
+-- Name: organization_projects_id_seq; Type: SEQUENCE; Schema: public; Owner: -
+--
+
+CREATE SEQUENCE public.organization_projects_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+--
+-- Name: organization_projects_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
+--
+
+ALTER SEQUENCE public.organization_projects_id_seq OWNED BY public.organization_projects.id;
+
+
+--
 -- Name: organization_versions; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -847,7 +848,8 @@ CREATE TABLE public.organizations (
     description character varying,
     introduction text,
     url_labels jsonb,
-    announcement character varying
+    announcement character varying,
+    tsv tsvector
 );
 
 
@@ -1166,73 +1168,6 @@ CREATE SEQUENCE public.set_member_subjects_id_seq
 --
 
 ALTER SEQUENCE public.set_member_subjects_id_seq OWNED BY public.set_member_subjects.id;
-
-
---
--- Name: subject_group_members; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.subject_group_members (
-    id integer NOT NULL,
-    subject_group_id integer,
-    subject_id integer,
-    display_order integer NOT NULL,
-    created_at timestamp without time zone,
-    updated_at timestamp without time zone
-);
-
-
---
--- Name: subject_group_members_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.subject_group_members_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: subject_group_members_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.subject_group_members_id_seq OWNED BY public.subject_group_members.id;
-
-
---
--- Name: subject_groups; Type: TABLE; Schema: public; Owner: -
---
-
-CREATE TABLE public.subject_groups (
-    id integer NOT NULL,
-    context jsonb DEFAULT '{}'::jsonb NOT NULL,
-    key character varying NOT NULL,
-    project_id integer NOT NULL,
-    group_subject_id integer NOT NULL,
-    created_at timestamp without time zone NOT NULL,
-    updated_at timestamp without time zone NOT NULL
-);
-
-
---
--- Name: subject_groups_id_seq; Type: SEQUENCE; Schema: public; Owner: -
---
-
-CREATE SEQUENCE public.subject_groups_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
---
--- Name: subject_groups_id_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: -
---
-
-ALTER SEQUENCE public.subject_groups_id_seq OWNED BY public.subject_groups.id;
 
 
 --
@@ -1663,7 +1598,8 @@ CREATE TABLE public.user_groups (
     private boolean DEFAULT true NOT NULL,
     lock_version integer DEFAULT 0,
     join_token character varying,
-    stats_visibility integer DEFAULT 0
+    stats_visibility integer DEFAULT 0,
+    tsv tsvector
 );
 
 
@@ -1951,7 +1887,6 @@ CREATE TABLE public.workflows (
     retired_set_member_subjects_count integer DEFAULT 0,
     retirement jsonb DEFAULT '{}'::jsonb,
     active boolean DEFAULT true,
-    aggregation jsonb DEFAULT '{}'::jsonb NOT NULL,
     display_order integer,
     configuration jsonb DEFAULT '{}'::jsonb NOT NULL,
     public_gold_standard boolean DEFAULT false,
@@ -2003,13 +1938,6 @@ ALTER TABLE ONLY public.access_control_lists ALTER COLUMN id SET DEFAULT nextval
 --
 
 ALTER TABLE ONLY public.aggregations ALTER COLUMN id SET DEFAULT nextval('public.aggregations_id_seq'::regclass);
-
-
---
--- Name: authorizations id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.authorizations ALTER COLUMN id SET DEFAULT nextval('public.authorizations_id_seq'::regclass);
 
 
 --
@@ -2132,6 +2060,13 @@ ALTER TABLE ONLY public.organization_pages ALTER COLUMN id SET DEFAULT nextval('
 
 
 --
+-- Name: organization_projects id; Type: DEFAULT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_projects ALTER COLUMN id SET DEFAULT nextval('public.organization_projects_id_seq'::regclass);
+
+
+--
 -- Name: organization_versions id; Type: DEFAULT; Schema: public; Owner: -
 --
 
@@ -2192,20 +2127,6 @@ ALTER TABLE ONLY public.recents ALTER COLUMN id SET DEFAULT nextval('public.rece
 --
 
 ALTER TABLE ONLY public.set_member_subjects ALTER COLUMN id SET DEFAULT nextval('public.set_member_subjects_id_seq'::regclass);
-
-
---
--- Name: subject_group_members id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.subject_group_members ALTER COLUMN id SET DEFAULT nextval('public.subject_group_members_id_seq'::regclass);
-
-
---
--- Name: subject_groups id; Type: DEFAULT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.subject_groups ALTER COLUMN id SET DEFAULT nextval('public.subject_groups_id_seq'::regclass);
 
 
 --
@@ -2373,14 +2294,6 @@ ALTER TABLE ONLY public.ar_internal_metadata
 
 
 --
--- Name: authorizations authorizations_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.authorizations
-    ADD CONSTRAINT authorizations_pkey PRIMARY KEY (id);
-
-
---
 -- Name: classifications classifications_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2517,6 +2430,14 @@ ALTER TABLE ONLY public.organization_pages
 
 
 --
+-- Name: organization_projects organization_projects_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_projects
+    ADD CONSTRAINT organization_projects_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: organization_versions organization_versions_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -2586,22 +2507,6 @@ ALTER TABLE ONLY public.recents
 
 ALTER TABLE ONLY public.set_member_subjects
     ADD CONSTRAINT set_member_subjects_pkey PRIMARY KEY (id);
-
-
---
--- Name: subject_group_members subject_group_members_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.subject_group_members
-    ADD CONSTRAINT subject_group_members_pkey PRIMARY KEY (id);
-
-
---
--- Name: subject_groups subject_groups_pkey; Type: CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.subject_groups
-    ADD CONSTRAINT subject_groups_pkey PRIMARY KEY (id);
 
 
 --
@@ -2779,6 +2684,13 @@ CREATE UNIQUE INDEX idx_lower_email ON public.users USING btree (lower((email)::
 
 
 --
+-- Name: idx_subjects_project_id_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX idx_subjects_project_id_id ON public.subjects USING btree (project_id, id);
+
+
+--
 -- Name: idx_translations_on_translated_type+id_and_language; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -2800,24 +2712,10 @@ CREATE INDEX index_access_control_lists_on_user_group_id ON public.access_contro
 
 
 --
--- Name: index_aggregations_on_subject_id_and_workflow_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_aggregations_on_subject_id_and_workflow_id ON public.aggregations USING btree (subject_id, workflow_id);
-
-
---
 -- Name: index_aggregations_on_workflow_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_aggregations_on_workflow_id ON public.aggregations USING btree (workflow_id);
-
-
---
--- Name: index_authorizations_on_user_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_authorizations_on_user_id ON public.authorizations USING btree (user_id);
 
 
 --
@@ -3087,10 +2985,38 @@ CREATE INDEX index_organization_pages_on_organization_id ON public.organization_
 
 
 --
+-- Name: index_organization_projects_on_organization_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_projects_on_organization_id ON public.organization_projects USING btree (organization_id);
+
+
+--
+-- Name: index_organization_projects_on_organization_id_and_project_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE UNIQUE INDEX index_organization_projects_on_organization_id_and_project_id ON public.organization_projects USING btree (organization_id, project_id);
+
+
+--
+-- Name: index_organization_projects_on_project_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organization_projects_on_project_id ON public.organization_projects USING btree (project_id);
+
+
+--
 -- Name: index_organization_versions_on_organization_id; Type: INDEX; Schema: public; Owner: -
 --
 
 CREATE INDEX index_organization_versions_on_organization_id ON public.organization_versions USING btree (organization_id);
+
+
+--
+-- Name: index_organizations_display_name_trgrm; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organizations_display_name_trgrm ON public.organizations USING gin (COALESCE((display_name)::text, ''::text) public.gin_trgm_ops);
 
 
 --
@@ -3126,6 +3052,13 @@ CREATE INDEX index_organizations_on_listed_at ON public.organizations USING btre
 --
 
 CREATE UNIQUE INDEX index_organizations_on_slug ON public.organizations USING btree (slug);
+
+
+--
+-- Name: index_organizations_on_tsv; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_organizations_on_tsv ON public.organizations USING gin (tsv);
 
 
 --
@@ -3203,6 +3136,13 @@ CREATE INDEX index_projects_on_beta_requested ON public.projects USING btree (be
 --
 
 CREATE INDEX index_projects_on_beta_row_order ON public.projects USING btree (beta_row_order);
+
+
+--
+-- Name: index_projects_on_configuration; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_projects_on_configuration ON public.projects USING gin (configuration);
 
 
 --
@@ -3343,27 +3283,6 @@ CREATE UNIQUE INDEX index_set_member_subjects_on_subject_id_and_subject_set_id O
 --
 
 CREATE INDEX index_set_member_subjects_on_subject_set_id ON public.set_member_subjects USING btree (subject_set_id);
-
-
---
--- Name: index_subject_group_members_on_subject_group_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_subject_group_members_on_subject_group_id ON public.subject_group_members USING btree (subject_group_id);
-
-
---
--- Name: index_subject_group_members_on_subject_id; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_subject_group_members_on_subject_id ON public.subject_group_members USING btree (subject_id);
-
-
---
--- Name: index_subject_groups_on_key; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE UNIQUE INDEX index_subject_groups_on_key ON public.subject_groups USING btree (key);
 
 
 --
@@ -3542,6 +3461,13 @@ CREATE INDEX index_user_groups_on_private ON public.user_groups USING btree (pri
 
 
 --
+-- Name: index_user_groups_on_tsv; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_user_groups_on_tsv ON public.user_groups USING gin (tsv);
+
+
+--
 -- Name: index_user_project_preferences_on_project_id_and_user_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3703,13 +3629,6 @@ CREATE INDEX index_workflows_on_activated_state ON public.workflows USING btree 
 
 
 --
--- Name: index_workflows_on_aggregation; Type: INDEX; Schema: public; Owner: -
---
-
-CREATE INDEX index_workflows_on_aggregation ON public.workflows USING btree (((aggregation ->> 'public'::text)));
-
-
---
 -- Name: index_workflows_on_display_order; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3759,10 +3678,24 @@ CREATE INDEX users_idx_trgm_login ON public.users USING gin (COALESCE((login)::t
 
 
 --
+-- Name: organizations tsvectorupdate; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE ON public.organizations FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('tsv', 'pg_catalog.english', 'display_name');
+
+
+--
 -- Name: projects tsvectorupdate; Type: TRIGGER; Schema: public; Owner: -
 --
 
 CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE ON public.projects FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('tsv', 'pg_catalog.english', 'display_name');
+
+
+--
+-- Name: user_groups tsvectorupdate; Type: TRIGGER; Schema: public; Owner: -
+--
+
+CREATE TRIGGER tsvectorupdate BEFORE INSERT OR UPDATE ON public.user_groups FOR EACH ROW EXECUTE PROCEDURE tsvector_update_trigger('tsv', 'pg_catalog.english', 'display_name');
 
 
 --
@@ -3893,22 +3826,6 @@ ALTER TABLE ONLY public.aggregations
 
 
 --
--- Name: subject_groups fk_rails_283ede5252; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.subject_groups
-    ADD CONSTRAINT fk_rails_283ede5252 FOREIGN KEY (project_id) REFERENCES public.projects(id);
-
-
---
--- Name: aggregations fk_rails_28a7ada458; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.aggregations
-    ADD CONSTRAINT fk_rails_28a7ada458 FOREIGN KEY (subject_id) REFERENCES public.subjects(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
 -- Name: project_contents fk_rails_305e6d8bf1; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3965,14 +3882,6 @@ ALTER TABLE ONLY public.user_project_preferences
 
 
 --
--- Name: authorizations fk_rails_4ecef5b8c5; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.authorizations
-    ADD CONSTRAINT fk_rails_4ecef5b8c5 FOREIGN KEY (user_id) REFERENCES public.users(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
 -- Name: recents fk_rails_5244e2cc55; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3986,14 +3895,6 @@ ALTER TABLE ONLY public.recents
 
 ALTER TABLE ONLY public.organization_page_versions
     ADD CONSTRAINT fk_rails_53b1c6ff8a FOREIGN KEY (organization_page_id) REFERENCES public.organization_pages(id);
-
-
---
--- Name: subject_groups fk_rails_59adcbe133; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.subject_groups
-    ADD CONSTRAINT fk_rails_59adcbe133 FOREIGN KEY (group_subject_id) REFERENCES public.subjects(id);
 
 
 --
@@ -4058,6 +3959,14 @@ ALTER TABLE ONLY public.subject_set_imports
 
 ALTER TABLE ONLY public.collections_projects
     ADD CONSTRAINT fk_rails_895b025564 FOREIGN KEY (project_id) REFERENCES public.projects(id);
+
+
+--
+-- Name: aggregations fk_rails_8eb620b6f6; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.aggregations
+    ADD CONSTRAINT fk_rails_8eb620b6f6 FOREIGN KEY (user_id) REFERENCES public.users(id) NOT VALID;
 
 
 --
@@ -4133,14 +4042,6 @@ ALTER TABLE ONLY public.field_guides
 
 
 --
--- Name: subject_group_members fk_rails_a5b8c1ffff; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.subject_group_members
-    ADD CONSTRAINT fk_rails_a5b8c1ffff FOREIGN KEY (subject_id) REFERENCES public.subjects(id);
-
-
---
 -- Name: translation_versions fk_rails_ad41ce8e02; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4213,6 +4114,14 @@ ALTER TABLE ONLY public.organization_versions
 
 
 --
+-- Name: aggregations fk_rails_c7d229ada4; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.aggregations
+    ADD CONSTRAINT fk_rails_c7d229ada4 FOREIGN KEY (project_id) REFERENCES public.projects(id) NOT VALID;
+
+
+--
 -- Name: subject_set_imports fk_rails_d596712569; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4245,6 +4154,14 @@ ALTER TABLE ONLY public.collections_subjects
 
 
 --
+-- Name: organization_projects fk_rails_e612101b95; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_projects
+    ADD CONSTRAINT fk_rails_e612101b95 FOREIGN KEY (project_id) REFERENCES public.projects(id);
+
+
+--
 -- Name: user_seen_subjects fk_rails_e881fca299; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4258,6 +4175,14 @@ ALTER TABLE ONLY public.user_seen_subjects
 
 ALTER TABLE ONLY public.collections_subjects
     ADD CONSTRAINT fk_rails_e9323f2e30 FOREIGN KEY (subject_id) REFERENCES public.subjects(id) ON UPDATE CASCADE ON DELETE RESTRICT;
+
+
+--
+-- Name: organization_projects fk_rails_ece07c98f6; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.organization_projects
+    ADD CONSTRAINT fk_rails_ece07c98f6 FOREIGN KEY (organization_id) REFERENCES public.organizations(id);
 
 
 --
@@ -4293,14 +4218,6 @@ ALTER TABLE ONLY public.subjects
 
 
 --
--- Name: subject_group_members fk_rails_f611f500c0; Type: FK CONSTRAINT; Schema: public; Owner: -
---
-
-ALTER TABLE ONLY public.subject_group_members
-    ADD CONSTRAINT fk_rails_f611f500c0 FOREIGN KEY (subject_group_id) REFERENCES public.subject_groups(id);
-
-
---
 -- Name: classification_subjects fk_rails_fc0cd14ebe; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -4323,268 +4240,281 @@ ALTER TABLE ONLY public.users
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
-('20150210025312'),
-('20150216192914'),
-('20150216192936'),
-('20150220000430'),
-('20150223194424'),
-('20150223200017'),
-('20150224161921'),
-('20150224211450'),
-('20150224223657'),
-('20150225181828'),
-('20150227223423'),
-('20150309171224'),
-('20150317180911'),
-('20150318132024'),
-('20150318174012'),
-('20150318221605'),
-('20150327184058'),
-('20150406095027'),
-('20150409130306'),
-('20150421161901'),
-('20150421191603'),
-('20150427171257'),
-('20150427181152'),
-('20150427204917'),
-('20150429163442'),
-('20150430084746'),
-('20150430132128'),
-('20150501162020'),
-('20150504171133'),
-('20150504185433'),
-('20150504193426'),
-('20150505181642'),
-('20150506195759'),
-('20150506195817'),
-('20150507120651'),
-('20150507212315'),
-('20150511151058'),
-('20150512012101'),
-('20150512123559'),
-('20150512223346'),
-('20150517015229'),
-('20150521160726'),
-('20150522155815'),
-('20150523190207'),
-('20150526180444'),
-('20150527200052'),
-('20150527223732'),
-('20150602140836'),
-('20150602160633'),
-('20150604214129'),
-('20150605103339'),
-('20150610200133'),
-('20150615153138'),
-('20150616113453'),
-('20150616113526'),
-('20150616113559'),
-('20150616155130'),
-('20150622085848'),
-('20150624131746'),
-('20150624135643'),
-('20150624155122'),
-('20150625043821'),
-('20150625045214'),
-('20150625160224'),
-('20150629192248'),
-('20150630144332'),
-('20150706100343'),
-('20150706133624'),
-('20150706185722'),
-('20150709191011'),
-('20150710184447'),
-('20150715134211'),
-('20150716161318'),
-('20150717123631'),
-('20150721221349'),
-('20150722180408'),
-('20150727212724'),
-('20150729165415'),
-('20150730160541'),
-('20150811202500'),
-('20150817145756'),
-('20150827124834'),
-('20150901222924'),
-('20150902000226'),
-('20150908162042'),
-('20150908193654'),
-('20150916161203'),
-('20150916162320'),
-('20150921130111'),
-('20151005093746'),
-('20151007161139'),
-('20151007193849'),
-('20151009145251'),
-('20151012162248'),
-('20151013181750'),
-('20151023103228'),
-('20151024080849'),
-('20151026142554'),
-('20151027134345'),
-('20151106172531'),
-('20151110101156'),
-('20151110135415'),
-('20151111154310'),
-('20151116143407'),
-('20151117154126'),
-('20151120104454'),
-('20151120161458'),
-('20151125153712'),
-('20151127150019'),
-('20151201102135'),
-('20151207111508'),
-('20151207145728'),
-('20151210134819'),
-('20151231123306'),
-('20160103142817'),
-('20160104131622'),
-('20160106120927'),
-('20160107143209'),
-('20160111112417'),
-('20160113120732'),
-('20160113132540'),
-('20160113133848'),
-('20160113143609'),
-('20160114135531'),
-('20160114141909'),
-('20160202155708'),
-('20160303163658'),
-('20160323101942'),
-('20160329144922'),
-('20160330142609'),
-('20160406151657'),
-('20160408104326'),
-('20160412125332'),
-('20160414151041'),
-('20160425190129'),
-('20160427150421'),
-('20160506182308'),
-('20160512181921'),
-('20160525103520'),
-('20160527140046'),
-('20160527162831'),
-('20160601162035'),
-('20160613074506'),
-('20160613074514'),
-('20160613074521'),
-('20160613074534'),
-('20160613074550'),
-('20160613074559'),
-('20160613074613'),
-('20160613074625'),
-('20160613074633'),
-('20160613074640'),
-('20160613074658'),
-('20160613074711'),
-('20160613074718'),
-('20160613074730'),
-('20160613074745'),
-('20160613074746'),
-('20160613074754'),
-('20160613074924'),
-('20160613074934'),
-('20160613075003'),
-('20160628165038'),
-('20160630150419'),
-('20160630170502'),
-('20160810140805'),
-('20160810195152'),
-('20160819134413'),
-('20160824101413'),
-('20160901100944'),
-('20160901141903'),
-('20161017135917'),
-('20161017141439'),
-('20161125123824'),
-('20161128193435'),
-('20161205203956'),
-('20161207111319'),
-('20161212205412'),
-('20161221203241'),
-('20170112163747'),
-('20170113113532'),
-('20170116134142'),
-('20170118141452'),
-('20170202200131'),
-('20170202202724'),
-('20170206161946'),
-('20170210163241'),
-('20170215105309'),
-('20170215151802'),
-('20170310131642'),
-('20170316170501'),
-('20170320203350'),
-('20170325135953'),
-('20170403194826'),
-('20170420095703'),
-('20170425110939'),
-('20170426162708'),
-('20170519181110'),
-('20170523135118'),
-('20170524205300'),
-('20170524210302'),
-('20170525151142'),
-('20170727142122'),
-('20170808130619'),
-('20170824165411'),
-('20171019115705'),
-('20171120222438'),
-('20171121120455'),
-('20171208141841'),
-('20171208142645'),
-('20171213144807'),
-('20171214121332'),
-('20180110133833'),
-('20180115214144'),
-('20180119110708'),
-('20180122134607'),
-('20180207120238'),
-('20180403150901'),
-('20180404144354'),
-('20180404144531'),
-('20180510100328'),
-('20180510121206'),
-('20180614131933'),
-('20180710151618'),
-('20180724112620'),
-('20180726133210'),
-('20180730133806'),
-('20180730150333'),
-('20180808140938'),
-('20180821125430'),
-('20180821151555'),
-('20181001154345'),
-('20181002145749'),
-('20181015112421'),
-('20181022172507'),
-('20181023130028'),
-('20181203164038'),
-('20190220114950'),
-('20190220155414'),
-('20190220161628'),
-('20190222121420'),
-('20190307114830'),
-('20190307121801'),
-('20190307141138'),
-('20190411125709'),
-('20190507103007'),
-('20190524111214'),
-('20190624094308'),
-('20200513124310'),
-('20200714191914'),
-('20200716170833'),
-('20200717155424'),
-('20200720125246'),
-('20201113151433'),
-('20210226173243'),
-('20210602210437'),
-('20210729152047'),
-('20211007125705'),
-('20211124175756'),
-('20211201164326'),
-('20221018032140'),
+('20260323120200'),
+('20260323120100'),
+('20260323120000'),
+('20260209120000'),
+('20260122212801'),
+('20251113172303'),
+('20251027120000'),
+('20250530191528'),
+('20250326191749'),
+('20240531184258'),
+('20240304201959'),
+('20240216171937'),
+('20240216171653'),
+('20240216142515'),
+('20231025200957'),
 ('20230613165746'),
-('20231025200957');
-
+('20221018032140'),
+('20211201164326'),
+('20211124175756'),
+('20211007125705'),
+('20210729152047'),
+('20210602210437'),
+('20210226173243'),
+('20201113151433'),
+('20200720125246'),
+('20200717155424'),
+('20200716170833'),
+('20200714191914'),
+('20200513124310'),
+('20190624094308'),
+('20190524111214'),
+('20190507103007'),
+('20190411125709'),
+('20190307141138'),
+('20190307121801'),
+('20190307114830'),
+('20190222121420'),
+('20190220161628'),
+('20190220155414'),
+('20190220114950'),
+('20181203164038'),
+('20181023130028'),
+('20181022172507'),
+('20181015112421'),
+('20181002145749'),
+('20181001154345'),
+('20180821151555'),
+('20180821125430'),
+('20180808140938'),
+('20180730150333'),
+('20180730133806'),
+('20180726133210'),
+('20180724112620'),
+('20180710151618'),
+('20180614131933'),
+('20180510121206'),
+('20180510100328'),
+('20180404144531'),
+('20180404144354'),
+('20180403150901'),
+('20180207120238'),
+('20180122134607'),
+('20180119110708'),
+('20180115214144'),
+('20180110133833'),
+('20171214121332'),
+('20171213144807'),
+('20171208142645'),
+('20171208141841'),
+('20171121120455'),
+('20171120222438'),
+('20171019115705'),
+('20170824165411'),
+('20170808130619'),
+('20170727142122'),
+('20170525151142'),
+('20170524210302'),
+('20170524205300'),
+('20170523135118'),
+('20170519181110'),
+('20170426162708'),
+('20170425110939'),
+('20170420095703'),
+('20170403194826'),
+('20170325135953'),
+('20170320203350'),
+('20170316170501'),
+('20170310131642'),
+('20170215151802'),
+('20170215105309'),
+('20170210163241'),
+('20170206161946'),
+('20170202202724'),
+('20170202200131'),
+('20170118141452'),
+('20170116134142'),
+('20170113113532'),
+('20170112163747'),
+('20161221203241'),
+('20161212205412'),
+('20161207111319'),
+('20161205203956'),
+('20161128193435'),
+('20161125123824'),
+('20161017141439'),
+('20161017135917'),
+('20160901141903'),
+('20160901100944'),
+('20160824101413'),
+('20160819134413'),
+('20160810195152'),
+('20160810140805'),
+('20160630170502'),
+('20160630150419'),
+('20160628165038'),
+('20160613075003'),
+('20160613074934'),
+('20160613074924'),
+('20160613074754'),
+('20160613074746'),
+('20160613074745'),
+('20160613074730'),
+('20160613074718'),
+('20160613074711'),
+('20160613074658'),
+('20160613074640'),
+('20160613074633'),
+('20160613074625'),
+('20160613074613'),
+('20160613074559'),
+('20160613074550'),
+('20160613074534'),
+('20160613074521'),
+('20160613074514'),
+('20160613074506'),
+('20160601162035'),
+('20160527162831'),
+('20160527140046'),
+('20160525103520'),
+('20160512181921'),
+('20160506182308'),
+('20160427150421'),
+('20160425190129'),
+('20160414151041'),
+('20160412125332'),
+('20160408104326'),
+('20160406151657'),
+('20160330142609'),
+('20160329144922'),
+('20160323101942'),
+('20160303163658'),
+('20160202155708'),
+('20160114141909'),
+('20160114135531'),
+('20160113143609'),
+('20160113133848'),
+('20160113132540'),
+('20160113120732'),
+('20160111112417'),
+('20160107143209'),
+('20160106120927'),
+('20160104131622'),
+('20160103142817'),
+('20151231123306'),
+('20151210134819'),
+('20151207145728'),
+('20151207111508'),
+('20151201102135'),
+('20151127150019'),
+('20151125153712'),
+('20151120161458'),
+('20151120104454'),
+('20151117154126'),
+('20151116143407'),
+('20151111154310'),
+('20151110135415'),
+('20151110101156'),
+('20151106172531'),
+('20151027134345'),
+('20151026142554'),
+('20151024080849'),
+('20151023103228'),
+('20151013181750'),
+('20151012162248'),
+('20151009145251'),
+('20151007193849'),
+('20151007161139'),
+('20151005093746'),
+('20150921130111'),
+('20150916162320'),
+('20150916161203'),
+('20150908193654'),
+('20150908162042'),
+('20150902000226'),
+('20150901222924'),
+('20150827124834'),
+('20150817145756'),
+('20150811202500'),
+('20150730160541'),
+('20150729165415'),
+('20150727212724'),
+('20150722180408'),
+('20150721221349'),
+('20150717123631'),
+('20150716161318'),
+('20150715134211'),
+('20150710184447'),
+('20150709191011'),
+('20150706185722'),
+('20150706133624'),
+('20150706100343'),
+('20150630144332'),
+('20150629192248'),
+('20150625160224'),
+('20150625045214'),
+('20150625043821'),
+('20150624155122'),
+('20150624135643'),
+('20150624131746'),
+('20150622085848'),
+('20150616155130'),
+('20150616113559'),
+('20150616113526'),
+('20150616113453'),
+('20150615153138'),
+('20150610200133'),
+('20150605103339'),
+('20150604214129'),
+('20150602160633'),
+('20150602140836'),
+('20150527223732'),
+('20150527200052'),
+('20150526180444'),
+('20150523190207'),
+('20150522155815'),
+('20150521160726'),
+('20150517015229'),
+('20150512223346'),
+('20150512123559'),
+('20150512012101'),
+('20150511151058'),
+('20150507212315'),
+('20150507120651'),
+('20150506195817'),
+('20150506195759'),
+('20150505181642'),
+('20150504193426'),
+('20150504185433'),
+('20150504171133'),
+('20150501162020'),
+('20150430132128'),
+('20150430084746'),
+('20150429163442'),
+('20150427204917'),
+('20150427181152'),
+('20150427171257'),
+('20150421191603'),
+('20150421161901'),
+('20150409130306'),
+('20150406095027'),
+('20150327184058'),
+('20150318221605'),
+('20150318174012'),
+('20150318132024'),
+('20150317180911'),
+('20150309171224'),
+('20150227223423'),
+('20150225181828'),
+('20150224223657'),
+('20150224211450'),
+('20150224161921'),
+('20150223200017'),
+('20150223194424'),
+('20150220000430'),
+('20150216192936'),
+('20150216192914'),
+('20150210025312');
 

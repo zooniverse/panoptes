@@ -76,7 +76,7 @@ class ClassificationLifecycle
 
   def update_seen_subjects
     if should_update_seen? && subjects_are_unseen_by_user?
-      UserSeenSubjectsWorker.perform_async(user.id, workflow.id, subject_ids)
+      UserSeenSubjectsGroupWorker.perform_async({ user_id: user.id, workflow_id: workflow.id, subject_ids_arr: subject_ids }.stringify_keys)
     end
   end
 

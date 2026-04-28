@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-module JSONApiResponses
+module JsonApiResponses
   extend ActiveSupport::Concern
 
   def created_resource_response(resources)

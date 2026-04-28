@@ -1,3 +1,3 @@
 class AccessControlListSerializer
-  include ACLSerializer
+  include AclSerializer
 end
