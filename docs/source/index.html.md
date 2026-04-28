@@ -13,6 +13,7 @@ toc_footers:
 
 includes:
   - authentication
+  - authentication_routes
   - json_api
   - headers
   - aggregations
@@ -20,6 +21,7 @@ includes:
   - collection_preferences
   - collection_roles
   - collections
+  - field_guides
   - memberships
   - organizations
   - project_preferences
@@ -30,9 +32,13 @@ includes:
   - subject_sets
   - subject_workflow_statuses
   - subjects
+  - translations
+  - tutorials
   - user_groups
   - users
   - workflows
+  - media_resources
+  - inaturalist
 
 search: true
 ---

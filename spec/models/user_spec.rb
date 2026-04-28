@@ -213,6 +213,43 @@ describe User, type: :model do
     end
   end
 
+  describe '#send_devise_notification' do
+    let(:user) { create(:user) }
+    let(:mailer) do
+      instance_double(
+        ActionMailer::MessageDelivery,
+        deliver_later: true,
+        deliver_now: true
+      )
+    end
+    let(:notifications) do
+      %i[reset_password_instructions confirmation_instructions unlock_instructions]
+    end
+
+    it 'sends when valid_email is true' do
+      notifications.each do |notification|
+        allow(Devise::Mailer)
+          .to receive(notification)
+          .with(user, 'token', {})
+          .and_return(mailer)
+
+        user.send(:send_devise_notification, notification, 'token', {})
+        expect(Devise::Mailer).to have_received(notification).with(user, 'token', {})
+      end
+    end
+
+    it 'does not send when valid_email is false' do
+      user.update!(valid_email: false)
+
+      notifications.each do |notification|
+        allow(Devise::Mailer).to receive(notification)
+
+        user.send(:send_devise_notification, notification, 'token', {})
+        expect(Devise::Mailer).not_to have_received(notification)
+      end
+    end
+  end
+
   describe "::find_by_lower_login" do
 
     it "should find the user by the login" do
@@ -688,6 +725,7 @@ describe User, type: :model do
   describe "#increment_subjects_count_cache", :with_cache_store do
     it 'should return nil if no cache entry' do
       uploader = create(:user_with_uploaded_subjects)
+
       expect(uploader.increment_subjects_count_cache).to eq(nil)
     end
 

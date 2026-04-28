@@ -2,7 +2,6 @@
 
 class CalculateProjectCompletenessWorker
   include Sidekiq::Worker
-  using Refinements::RangeClamping
   attr_reader :project
 
   COMPLETENESS_ROUNDING_PRECISION = ENV.fetch('COMPLETENESS_ROUNDING_PRECISION', 4).to_i
@@ -22,13 +21,16 @@ class CalculateProjectCompletenessWorker
   def perform(project_id)
     @project = Project.find(project_id)
     Project.transaction do
+      # Order by id to have a consistent lock order
       project_workflows = project.workflows.select(
         :id,
         :real_set_member_subjects_count,
         :retired_set_member_subjects_count
-      )
+      ).order(:id).load
+
       project_workflows.each do |workflow|
-        workflow.update_columns completeness: workflow_completeness(workflow)
+        # We use .where instead of .find since it does not instatiate AR model objects (and therefore not loading up a full AR object)
+        Workflow.where(id: workflow.id).update_all(completeness: workflow_completeness(workflow))
       end
 
       project.update_columns(project_columns_to_update)
@@ -68,7 +70,7 @@ class CalculateProjectCompletenessWorker
 
     retired_subjects = workflow.retired_subjects_count
     total_subjects = workflow_subjects_count
-    (0.0..1.0).clamp(retired_subjects / total_subjects.to_d)
+    (retired_subjects / total_subjects.to_d).clamp(0.0, 1.0)
   end
 
   def project_columns_to_update

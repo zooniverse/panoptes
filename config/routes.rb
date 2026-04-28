@@ -76,6 +76,7 @@ Rails.application.routes.draw do
           get :grouped # SubjectGroup selection end point
           get :selection # Subject selection by subject ids end point
         end
+        media_resources :attached_images
       end
 
       json_api_resources :users, except: [:new, :edit, :create], links: [:user_groups] do
@@ -149,8 +150,6 @@ Rails.application.routes.draw do
         constraints: Routes::Constraints::TranslationsConstraint.new,
         except: %i(new edit destroy)
       })
-
-      json_api_resources :subject_groups, only: %w[index show]
     end
   end
 

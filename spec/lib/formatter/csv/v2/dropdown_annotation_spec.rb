@@ -12,7 +12,7 @@ RSpec.describe Formatter::Csv::V2::DropdownAnnotation do
   let(:annotation) do
     {
       'task' => 'T1',
-      # Note: the selected value is not index based (similar to single / simple tasks)
+      # Note: the selected value is index based (similar to single / simple tasks)
       # and not the old PFE value key. See details at
       # https://github.com/zooniverse/front-end-monorepo/discussions/2131
       'value' => { 'selection' => 2, 'option' => true },
@@ -26,7 +26,10 @@ RSpec.describe Formatter::Csv::V2::DropdownAnnotation do
       'value' => {
         'select_label' => 'Country',
         'option' => true,
-        'value' => 2,
+        # Note: the selected value is exported as option_index, and the value
+        # of the selected option is assigned as the exported annotation value.
+        'option_index' => 2,
+        'value' => '3844fc24a3df7',
         'label' => 'US'
       }
     }

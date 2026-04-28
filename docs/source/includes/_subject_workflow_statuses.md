@@ -71,6 +71,17 @@ updated_at | datetime | read-only
 SubjectWorkflowStatuses are
 only visible to users with rights on the workflow's associated project.
 
+## Retirement Reason Types
+The types of retirement reasons are:
+
++ classification_count
++ flagged
++ nothing_here
++ consensus
++ other
++ human
+
+
 ## List all SubjectWorkflowStatuses
 ```http
 GET /api/subject_workflow_statuses HTTP/1.1

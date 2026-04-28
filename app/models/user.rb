@@ -182,6 +182,12 @@ class User < ApplicationRecord
     recoverable
   end
 
+  def send_devise_notification(notification, *args)
+    return unless valid_email
+
+    super
+  end
+
   def self.find_by_lower_login(login)
     find_by("lower(login) = ?", login.downcase)
   end
@@ -330,7 +336,7 @@ class User < ApplicationRecord
   end
 
   def uploaded_subjects_count
-    count = Rails.cache.fetch(subjects_count_cache_key, expires_in: subject_count_cache_expiry) do
+    count = Rails.cache.fetch(subjects_count_cache_key, expires_in: subject_count_cache_expiry, raw: true) do
       DatabaseReplica.read('read_user_uploaded_subjects_counts_from_replica') do
         Subject.where(upload_user_id: id).count
       end
@@ -339,6 +345,8 @@ class User < ApplicationRecord
   end
 
   def increment_subjects_count_cache
+    return nil unless Rails.cache.exist?(subjects_count_cache_key)
+
     Rails.cache.increment(subjects_count_cache_key)
   end
 
@@ -349,7 +357,7 @@ class User < ApplicationRecord
   private
 
   def subjects_count_cache_key
-    @subjects_count_cache_key ||= "User/#{id}/uploaded_subjects_count"
+    @subjects_count_cache_key ||= "User/#{id}/uploaded_subjects_count:v1"
   end
 
   def subject_count_cache_expiry

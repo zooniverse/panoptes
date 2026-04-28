@@ -15,10 +15,10 @@ gem 'azure-storage-blob'
 gem 'dalli'
 gem 'deep_cloneable', '~> 3.2.0'
 gem 'devise', '~> 4.9'
-gem 'doorkeeper', '~> 4.4'
+gem 'doorkeeper', '~> 5.8'
 gem 'doorkeeper-jwt', '~> 0.2.1'
 gem 'faraday', '~> 1.10'
-gem 'faraday-http-cache', '~> 2.4'
+gem 'faraday-http-cache', '~> 2.5'
 gem 'faraday_middleware', '~> 1.2'
 gem 'flipper'
 gem 'flipper-active_record'
@@ -38,20 +38,18 @@ gem 'pg', '~> 1.4'
 gem 'pg_search'
 gem 'puma', '~> 6.4.3'
 gem 'pundit', '~> 2.4.0'
+gem 'rack-attack'
 gem 'rack-cors', '~> 1.0', require: 'rack/cors'
-if next?
-  gem 'rails', '~> 6.1'
-else
-  gem 'rails', '~> 6.1'
-end
+gem 'rails', '7.2.3'
+gem 'restpack_serializer', git: 'https://github.com/zooniverse/restpack_serializer.git', branch: 'panoptes-api-version', ref: 'a99b03c'
 gem 'ranked-model', '~> 0.4.8'
-gem 'restpack_serializer', git: 'https://github.com/zooniverse/restpack_serializer.git', branch: 'panoptes-api-version', ref: '5f1ef6c2b2'
 gem 'scientist', '~> 1.6.4'
 gem 'sidekiq', '< 7'
 gem 'sidekiq-congestion', '~> 0.1.0'
 gem 'sidekiq-cron'
 gem 'sidekiq-grouping'
 gem 'sidekiq-unique-jobs'
+gem 'sprockets-rails', '~> 3.5'
 gem 'standby'
 gem 'stringex', '~> 2.8'
 gem 'strong_migrations'
@@ -64,19 +62,19 @@ end
 
 group :development, :test do
   gem 'factory_bot_rails'
-  gem 'mini_racer'
+  gem "mini_racer", "~> 0.6.3"
   gem 'pry'
   gem 'rubocop', '~> 0.91.0'
   gem 'rubocop-performance'
   gem 'rubocop-rails'
   gem 'rubocop-rspec'
-  gem 'spring', '~>2.1.1' # remove constraint once on or past rails 5.2
+  gem 'spring', '~>4.2.1'
   gem 'sprockets', '~>3.7'
   gem 'ten_years_rails'
 end
 
 group :test do
-  gem 'database_cleaner', '~> 1.99.0'
+  gem 'database_cleaner', '~> 2.1'
   gem 'guard-rspec', require: false
   gem 'listen', '~> 3.8'
   gem 'mock_redis'
@@ -86,4 +84,3 @@ group :test do
   gem 'spring-commands-rspec'
   gem 'webmock'
 end
-
