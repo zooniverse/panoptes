@@ -69,7 +69,7 @@ group :development, :test do
   gem 'rubocop-rails'
   gem 'rubocop-rspec'
   gem 'spring', '~>4.2.1'
-  gem 'sprockets', '~>3.7'
+  gem 'sprockets', '~>4.2'
   gem 'ten_years_rails'
 end
 
