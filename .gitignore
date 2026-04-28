@@ -35,3 +35,6 @@ spec/examples.txt
 public/commit_id.txt
 vendor/cache/
 vendor/bundle/
+
+# Local docker-compose overrides (port mappings, volume mounts)
+docker-compose.override.yml
