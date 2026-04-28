@@ -14,7 +14,7 @@ class Api::V1::AggregationsController < Api::ApiController
     response = AggregationClient.new.send_aggregation_request(
       project_id,
       workflow.id,
-      create_params['links']['user']
+      bearer_token
     )
     super do |agg|
       agg.update({ task_id: response['task_id'], status: 'pending' })
@@ -26,5 +26,11 @@ class Api::V1::AggregationsController < Api::ApiController
   def update
     super
     AggregationCompletedMailerWorker.perform_async(params['id']) if update_params[:status]
+  end
+
+  private
+
+  def bearer_token
+    request.headers['Authorization']
   end
 end

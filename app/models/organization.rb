@@ -3,11 +3,13 @@
 class Organization < ApplicationRecord
   include RoleControl::Owned
   include Activatable
+  include PgSearch::Model
   include SluggedName
   include Translatable
   include Versioning
 
-  has_many :projects
+  has_many :organization_projects, dependent: :destroy
+  has_many :projects, through: :organization_projects
   has_many :acls, class_name: "AccessControlList", as: :resource, dependent: :destroy
   has_one :avatar, -> { where(type: "organization_avatar") }, class_name: "Medium", as: :linked
   has_one :background, -> { where(type: "organization_background") }, class_name: "Medium", as: :linked
@@ -24,6 +26,19 @@ class Organization < ApplicationRecord
   validates :primary_language, format: {with: LanguageValidation.lang_regex}
 
   alias_attribute :title, :display_name
+
+  pg_search_scope :search_display_name,
+                  against: :display_name,
+                  using: {
+                    tsearch: {
+                      dictionary: 'english',
+                      tsvector_column: 'tsv'
+                    },
+                    trigram: {
+                      word_similarity: true
+                    }
+                  },
+                  ranked_by: ':tsearch + (0.25 * :trigram)'
 
   def self.translatable_attributes
     %i(display_name title description introduction announcement url_labels)

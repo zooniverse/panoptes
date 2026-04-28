@@ -1,3 +1,4 @@
+require 'media_storage/abstract_adapter'
 require 'media_storage/test_adapter'
 require 'media_storage/aws_adapter'
 require 'media_storage/azure_adapter'

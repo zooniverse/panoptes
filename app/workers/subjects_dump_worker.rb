@@ -21,14 +21,18 @@ class SubjectsDumpWorker
   end
 
   def formatter
-    @formatter ||= Formatter::Csv::Subject.new(resource)
+    @formatter ||= Formatter::Csv::Subject.new(resource, cache)
   end
 
   def get_scope(resource)
-    CsvDumps::SubjectScope.new(resource)
+    CsvDumps::SubjectScope.new(resource, cache)
   end
 
   def dump_target
     "subjects"
+  end
+
+  def cache
+    @cache ||= SubjectDumpCache.new
   end
 end

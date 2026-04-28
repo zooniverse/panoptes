@@ -6,6 +6,6 @@ RSpec.describe ProjectRequestEmailWorker do
   it 'should send mail' do
     expect do
       subject.perform("beta", project.id)
-    end.to change{ ActionMailer::Base.deliveries.count }.by(1)
+    end.to change{ 'ActionMailer::Base'.constantize.deliveries.count }.by(1)
   end
 end

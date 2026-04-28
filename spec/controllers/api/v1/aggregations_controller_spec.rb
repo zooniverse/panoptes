@@ -54,14 +54,24 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
 
     it_behaves_like 'is creatable'
 
-    it 'saves the project id' do
+    it 'associates the project' do
       post :create, params: create_params
-      expect(Aggregation.first.project_id).to eq(workflow.project.id)
+      aggregation = Aggregation.first
+      expect(aggregation.project_id).to eq(workflow.project.id)
     end
 
-    it 'makes a request to the aggregation service' do
+    it 'associates the user' do
+      post :create, params: create_params
+      aggregation = Aggregation.first
+      expect(aggregation.user_id).to eq(authorized_user.id)
+    end
+
+    it 'makes a request to the aggregation service with the bearer token' do
+      bearer_token = 'Bearer test-token'
+      request.headers['Authorization'] = bearer_token
       post :create, params: create_params
       expect(mock_agg).to have_received(:send_aggregation_request)
+        .with(workflow.project.id, workflow.id, bearer_token)
     end
 
     it 'stores the task_id from the client response' do
@@ -98,7 +108,8 @@ RSpec.describe Api::V1::AggregationsController, type: :controller do
     let(:test_attr_value) { '557ebcfa3c29496787336bfbd7c4d856' }
 
     let(:update_params) do
-      { aggregations:
+      {
+        aggregations:
           {
             uuid: '557ebcfa3c29496787336bfbd7c4d856',
             status: 'completed'
