@@ -8,8 +8,15 @@ RSpec.describe AggregationClient do
       allow(described_class).to receive(:host).and_return('http://test.example.com')
     end
 
-    let(:headers) { { 'Content-Type': 'application/json', 'Accept': 'application/json' } }
-    let(:params) { { project_id: 1, workflow_id: 10, user_id: 100 } }
+    let!(:bearer_token) { 'Bearer token123' }
+    let(:headers) {
+      {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': bearer_token
+      }
+    }
+    let(:params) { { project_id: 1, workflow_id: 10 } }
     let(:body) { { task_id: '1234-asdf-1234' } }
     let(:path) { '/run_aggregation' }
 
@@ -20,7 +27,7 @@ RSpec.describe AggregationClient do
         end
       end
 
-      response = described_class.new([:test, stubs]).send_aggregation_request(1, 10, 100)
+      response = described_class.new([:test, stubs]).send_aggregation_request(1, 10, bearer_token)
       expect(response).to eq(body.with_indifferent_access)
     end
 
@@ -34,7 +41,7 @@ RSpec.describe AggregationClient do
           end
 
           expect do
-            described_class.new([:test, stubs]).send_aggregation_request(1, 10, 100)
+            described_class.new([:test, stubs]).send_aggregation_request(1, 10, bearer_token)
           end.to raise_error(AggregationClient::ConnectionError)
         end
 
@@ -50,7 +57,7 @@ RSpec.describe AggregationClient do
           end
 
           expect do
-            described_class.new([:test, stubs]).send_aggregation_request(1, 10, 100)
+            described_class.new([:test, stubs]).send_aggregation_request(1, 10, bearer_token)
           end.to raise_error(AggregationClient::ServerError)
         end
 
@@ -62,7 +69,7 @@ RSpec.describe AggregationClient do
           end
 
           expect do
-            described_class.new([:test, stubs]).send_aggregation_request(1, 10, 100)
+            described_class.new([:test, stubs]).send_aggregation_request(1, 10, bearer_token)
           end.to raise_error(AggregationClient::ConnectionError)
         end
 
@@ -78,8 +85,24 @@ RSpec.describe AggregationClient do
           end
 
           expect do
-            described_class.new([:test, stubs]).send_aggregation_request(1, 10, 100)
+            described_class.new([:test, stubs]).send_aggregation_request(1, 10, bearer_token)
           end.to raise_error(AggregationClient::ResourceNotFound)
+        end
+
+        it 'raises if the bearer token is nil' do
+          stubs = Faraday::Adapter::Test::Stubs.new do |stub|
+            stub.post(path, params.to_json, headers.except(:Authorization)) do
+              [
+                401,
+                { 'Content-Type' => 'application/json' },
+                { 'errors' => 'Authorization token required' }.to_json
+              ]
+            end
+          end
+
+          expect do
+            described_class.new([:test, stubs]).send_aggregation_request(1, 10, nil)
+          end.to raise_error(AggregationClient::NotAuthorized)
         end
       end
     end

@@ -33,6 +33,8 @@ class Api::V1::ProjectsController < Api::ApiController
     :create_subjects_export, :create_workflows_export, :create_workflow_contents_export]
 
   def index
+    filter_by_organization_ids
+    filter_by_languages
     unless params.has_key?(:sort)
       @controlled_resources = case
                               when params.has_key?(:launch_approved)
@@ -197,5 +199,21 @@ class Api::V1::ProjectsController < Api::ApiController
 
   def cards_exclude_keys
     ProjectSerializer.serializable_attributes.except(*CARD_FIELDS).keys
+  end
+
+  def filter_by_languages
+    languages = params.delete(:languages)&.split(',')&.map(&:downcase)
+
+    @controlled_resources = controlled_resources.where("configuration->'languages' @> ?", languages.to_json) if languages.present?
+  end
+
+  def filter_by_organization_ids
+    organization_ids = params.delete(:organization_id)&.split(',')
+    return if organization_ids.blank?
+
+    project_ids = OrganizationProject.where(organization_id: organization_ids)
+                                     .select(:project_id)
+
+    @controlled_resources = controlled_resources.where(id: project_ids)
   end
 end

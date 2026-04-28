@@ -7,26 +7,26 @@ RSpec.describe UserInfoChangedMailerWorker do
 
   context 'when delivering an email' do
     it 'delivers the mail' do
-      expect { subject.perform(user.id, 'password') }.to change { ActionMailer::Base.deliveries.count }.by(1)
+      expect { subject.perform(user.id, 'password') }.to change { 'ActionMailer::Base'.constantize.deliveries.count }.by(1)
     end
 
     it 'delivers to the right recipients' do
       subject.perform(user.id, 'email', prev_email)
-      mail = ActionMailer::Base.deliveries.last
+      mail = 'ActionMailer::Base'.constantize.deliveries.last
       expect(mail.to).to eq([user.email, prev_email])
     end
   end
 
   context "without a user" do
     it 'should not deliver the mail' do
-      expect{ subject.perform(nil, "password") }.to_not change{ ActionMailer::Base.deliveries.count }
+      expect{ subject.perform(nil, "password") }.to_not change{ 'ActionMailer::Base'.constantize.deliveries.count }
     end
   end
 
   context "when an the user has been scrubbed of email address" do
     it 'should not deliver the mail' do
       UserInfoScrubber.scrub_personal_info!(user)
-      expect{ subject.perform(user.id, "password") }.to_not change{ ActionMailer::Base.deliveries.count }
+      expect{ subject.perform(user.id, "password") }.to_not change{ 'ActionMailer::Base'.constantize.deliveries.count }
     end
   end
 

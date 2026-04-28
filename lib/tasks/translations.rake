@@ -59,15 +59,14 @@ namespace :translations do
         puts create_missing_translation_strings(page, primary_language)
       end
 
-      organization = project.organization
-      next unless organization
+      project.organizations.each do |organization|
+        puts 'Syncing project organization strings to translations'
+        puts create_missing_translation_strings(organization, primary_language)
 
-      puts 'Syncing project organization strings to translations'
-      puts create_missing_translation_strings(organization, primary_language)
-
-      puts 'Syncing project organization page strings to translations'
-      organization.pages.each do |page|
-        puts create_missing_translation_strings(page, primary_language)
+        puts 'Syncing project organization page strings to translations'
+        organization.pages.each do |page|
+          puts create_missing_translation_strings(page, primary_language)
+        end
       end
     end
   end

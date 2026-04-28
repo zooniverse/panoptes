@@ -1,6 +1,6 @@
 # -*- mode: ruby -*-
 # vi: set ft=ruby :
-require_relative '../export/export_json_project'
+require_relative '../export/json/project'
 
 namespace :project do
 

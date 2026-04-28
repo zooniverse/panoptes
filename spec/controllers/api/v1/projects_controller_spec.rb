@@ -67,6 +67,9 @@ describe Api::V1::ProjectsController, type: :controller do
         let(:new_project) do
           create(:full_project, display_name: 'Non-test project', owner: owner)
         end
+        let(:longer_substring_project) do
+          create(:full_project, display_name: 'Longer Display Name', owner: owner)
+        end
         let(:resource) { new_project }
         let(:ids) { json_response['projects'].map { |p| p['id'] } }
         let(:index_request) do
@@ -80,12 +83,23 @@ describe Api::V1::ProjectsController, type: :controller do
         describe 'search' do
           it_behaves_like 'filter by display_name'
 
-          describe 'filter by display_name substring' do
+          describe 'filter by display_name tsv substring' do
             let(:index_options) { { search: resource.display_name[0..2] } }
 
             it 'responds with the most relevant item first' do
               index_request
               expect(json_response[api_resource_name].length).to eq(1)
+              expect(ids[0].to_i).to eq(resource.id)
+            end
+          end
+
+          describe 'filter by display_name substring' do
+            let(:index_options) { { search: longer_substring_project.display_name[0..2] } }
+
+            it 'responds with the most relevant item first' do
+              index_request
+              expect(json_response[api_resource_name].length).to eq(1)
+              expect(ids[0].to_i).to eq(longer_substring_project.id)
             end
           end
         end
@@ -238,6 +252,64 @@ describe Api::V1::ProjectsController, type: :controller do
               it 'responds with the correct item' do
                 project_state = json_response[api_resource_name][0]['state']
                 expect(project_state).to eq(filtered_project.state)
+              end
+            end
+          end
+
+          describe 'filter by language' do
+            let!(:translated_project) { create(:full_project, configuration: { languages: ['fr'] }) }
+            let!(:multi_translated_project) {
+              create(:full_project, configuration: { languages: %w[fr ja] })
+            }
+
+            it 'filters projects by one language' do
+              get :index, params: { languages: 'ja' }
+              expect(json_response[api_resource_name].length).to eq(1)
+              expect(json_response['projects'][0]['id'].to_i).to eq(multi_translated_project.id)
+            end
+
+            it 'filters projects by multiple languages' do
+              get :index, params: { languages: 'fr,ja' }
+              expect(json_response[api_resource_name].length).to eq(1)
+              expect(json_response['projects'][0]['id'].to_i).to eq(multi_translated_project.id)
+            end
+
+            it 'returns multiple projects filtered by one language' do
+              get :index, params: { languages: 'fr' }
+              expect(json_response[api_resource_name].length).to eq(2)
+              project_ids = json_response['projects'].map { |p| p['id']&.to_i }
+              expect(project_ids).to contain_exactly(multi_translated_project.id, translated_project.id)
+            end
+          end
+
+          describe 'filter by organization_id' do
+            let(:organization) { create(:organization, owner: owner) }
+            let(:other_organization) { create(:organization, owner: owner) }
+            let!(:project_for_organization) { create(:project, owner: owner) }
+            let!(:project_for_other_organization) { create(:project, owner: owner) }
+            let(:index_options) { { organization_id: organization.id.to_s } }
+
+            before do
+              create(:organization_project, organization: organization, project: project_for_organization)
+              create(:organization_project, organization: other_organization, project: project_for_other_organization)
+            end
+
+            it 'returns projects linked to the requested organization' do
+              index_request
+              expect(ids).to include(project_for_organization.id.to_s)
+            end
+
+            it 'does not return projects linked to other organizations' do
+              index_request
+              expect(ids).not_to include(project_for_other_organization.id.to_s)
+            end
+
+            context 'with sorting' do
+              let(:index_options) { { organization_id: organization.id.to_s, sort: 'display_name' } }
+
+              it 'returns projects linked to the requested organization' do
+                index_request
+                expect(ids).to include(project_for_organization.id.to_s)
               end
             end
           end
@@ -769,7 +841,7 @@ describe Api::V1::ProjectsController, type: :controller do
     end
 
     describe 'linking a subject_set' do
-      let(:linked_resource) { create(:subject_set_with_subjects, project: resource) }
+      let!(:linked_resource) { create(:subject_set_with_subjects, project: resource) }
       let(:test_relation) { :subject_sets }
       let(:expected_copies_count) { linked_resource.subjects.count }
 

@@ -33,9 +33,9 @@ RSpec.describe Subjects::Remover do
 
       before do
         allow(panoptes_client)
-        .to receive(:discussions)
-        .with(focus_id: subject.id, focus_type: "Subject")
-        .and_return(discussions)
+          .to receive(:discussions)
+          .with({ focus_id: subject.id, focus_type: "Subject" })
+          .and_return(discussions)
       end
 
       context "without a real subject" do

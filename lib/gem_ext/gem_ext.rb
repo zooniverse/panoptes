@@ -1,3 +1,6 @@
 require_dependency 'gem_ext/doorkeeper/application'
 require 'gem_ext/doorkeeper/server'
 require 'gem_ext/doorkeeper/client_credentials_creator'
+require 'gem_ext/doorkeeper/access_cleanup'
+require 'gem_ext/doorkeeper/client_credentials_request'
+require 'gem_ext/doorkeeper/error_response'

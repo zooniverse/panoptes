@@ -1,4 +1,4 @@
-module JSONApiRender
+module JsonApiRender
   extend ActiveSupport::Concern
 
   included do

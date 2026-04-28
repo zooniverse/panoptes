@@ -305,7 +305,7 @@ describe Api::V1::ClassificationsController, type: :controller do
           req_params = { project_id: project.id,
                          workflow_id: "MOCK_WORKFLOW_FOR_CLASSIFIER",
                          subject_id: "MOCK_SUBJECT_FOR_CLASSIFIER" }
-          setup_create_request(req_params)
+          setup_create_request(**req_params)
           error = json_response["errors"].first["message"]
           expected_error = { "links/workflow"   => "value \"MOCK_WORKFLOW_FOR_CLASSIFIER\" did not match the regex '^[0-9]*$'",
                              "links/subjects/0" => "value \"MOCK_SUBJECT_FOR_CLASSIFIER\" did not match the regex '^[0-9]*$'"}.to_s
