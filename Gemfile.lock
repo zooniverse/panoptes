@@ -565,7 +565,7 @@ GEM
       base64
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
-    yard (0.9.41)
+    yard (0.9.42)
     zeitwerk (2.7.5)
     zoo_stream (1.0.1)
       aws-sdk
