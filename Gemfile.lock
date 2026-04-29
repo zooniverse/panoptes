@@ -166,7 +166,7 @@ GEM
     doorkeeper-jwt (0.2.1)
       jwt (~> 1.5.2, >= 1.5.2)
     drb (2.2.3)
-    erb (6.0.2)
+    erb (6.0.4)
     erubi (1.13.1)
     et-orbi (1.2.7)
       tzinfo
