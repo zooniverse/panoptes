@@ -43,6 +43,8 @@ data:
         # avoid attacker setting the host value for links in rails_app
         # https://github.com/rails/rails/issues/29893
         proxy_set_header X-Forwarded-Host $server_name;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
         proxy_pass http://docker-panoptes;
       }
 kind: ConfigMap
@@ -55,6 +57,8 @@ data:
     upstream docker-panoptes {
       server 127.0.0.1:81;
     }
+
+    set_real_ip_from 172.16.0.0/12;
 
     server {
       server_name panoptes-staging.zooniverse.org;
@@ -243,7 +247,7 @@ spec:
           secret:
             secretName: panoptes-doorkeeper-jwt-staging
 ---
-apiVersion: autoscaling/v1
+apiVersion: autoscaling/v2
 kind: HorizontalPodAutoscaler
 metadata:
   name: panoptes-staging-app
@@ -254,7 +258,19 @@ spec:
     name: panoptes-staging-app
   minReplicas: 1
   maxReplicas: 2
-  targetCPUUtilizationPercentage: 95
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 90
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: Utilization
+        averageUtilization: 70
 ---
 apiVersion: v1
 kind: Service
@@ -531,32 +547,21 @@ spec:
       targetPort: 11211
   type: NodePort
 ---
-apiVersion: networking.k8s.io/v1
-kind: Ingress
+apiVersion: traefik.io/v1alpha1
+kind: IngressRoute
 metadata:
   name: panoptes-staging-ingress
-  annotations:
-    kubernetes.io/ingress.class: nginx
-    cert-manager.io/cluster-issuer: letsencrypt-prod
-    nginx.ingress.kubernetes.io/proxy-buffer-size: "128k"
-    nginx.ingress.kubernetes.io/proxy-body-size: 20m
-    nginx.ingress.kubernetes.io/set-real-ip-from: "10.0.0.0/8"
 spec:
+  entryPoints:
+    - websecure
   tls:
-  - hosts:
-    - panoptes-staging.zooniverse.org
     secretName: panoptes-staging-tls-secret
-  rules:
-  - host: panoptes-staging.zooniverse.org
-    http:
-      paths:
-      - pathType: Prefix
-        path: /
-        backend:
-          service:
-            name: panoptes-staging-app
-            port:
-              number: 80
+  routes:
+    - match: Host(`panoptes-staging.zooniverse.org`)
+      kind: Rule
+      services:
+        - name: panoptes-staging-app
+          port: 80
 ---
 apiVersion: cert-manager.io/v1
 kind: Certificate
