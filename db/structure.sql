@@ -554,6 +554,8 @@ CREATE TABLE public.oauth_access_grants (
     created_at timestamp without time zone NOT NULL,
     revoked_at timestamp without time zone,
     scopes character varying DEFAULT ''::character varying,
+    code_challenge character varying,
+    code_challenge_method character varying,
     CONSTRAINT check_oauth_access_grants_scopes_not_null CHECK ((scopes IS NOT NULL))
 );
 
@@ -4240,6 +4242,7 @@ ALTER TABLE ONLY public.users
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260407184533'),
 ('20260323120200'),
 ('20260323120100'),
 ('20260323120000'),
