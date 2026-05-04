@@ -141,7 +141,8 @@ GEM
     crack (0.4.5)
       rexml
     crass (1.0.6)
-    dalli (3.2.3)
+    dalli (5.0.2)
+      logger
     database_cleaner (2.1.0)
       database_cleaner-active_record (>= 2, < 3)
     database_cleaner-active_record (2.2.2)
