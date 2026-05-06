@@ -1127,6 +1127,24 @@ ALTER SEQUENCE public.recents_id_seq OWNED BY public.recents.id;
 
 
 --
+-- Name: recents_old; Type: TABLE; Schema: public; Owner: -
+--
+
+CREATE TABLE public.recents_old (
+    id integer DEFAULT nextval('public.recents_id_seq'::regclass) NOT NULL,
+    classification_id integer,
+    subject_id integer,
+    created_at timestamp without time zone NOT NULL,
+    updated_at timestamp without time zone NOT NULL,
+    project_id integer,
+    workflow_id integer,
+    user_id integer,
+    user_group_id integer,
+    mark_remove boolean DEFAULT false
+);
+
+
+--
 -- Name: schema_migrations; Type: TABLE; Schema: public; Owner: -
 --
 
@@ -2494,6 +2512,14 @@ ALTER TABLE ONLY public.projects
 
 
 --
+-- Name: recents_old recents_old_pkey; Type: CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.recents_old
+    ADD CONSTRAINT recents_old_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: recents recents_pkey; Type: CONSTRAINT; Schema: public; Owner: -
 --
 
@@ -3230,6 +3256,41 @@ CREATE INDEX index_projects_on_tsv ON public.projects USING gin (tsv);
 
 
 --
+-- Name: index_recents_old_on_created_at; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_recents_old_on_created_at ON public.recents_old USING btree (created_at);
+
+
+--
+-- Name: index_recents_old_on_project_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_recents_old_on_project_id ON public.recents_old USING btree (project_id);
+
+
+--
+-- Name: index_recents_old_on_subject_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_recents_old_on_subject_id ON public.recents_old USING btree (subject_id);
+
+
+--
+-- Name: index_recents_old_on_user_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_recents_old_on_user_id ON public.recents_old USING btree (user_id);
+
+
+--
+-- Name: index_recents_old_on_workflow_id; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_recents_old_on_workflow_id ON public.recents_old USING btree (workflow_id);
+
+
+--
 -- Name: index_recents_on_created_at; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -3248,6 +3309,13 @@ CREATE INDEX index_recents_on_project_id ON public.recents USING btree (project_
 --
 
 CREATE INDEX index_recents_on_subject_id ON public.recents USING btree (subject_id);
+
+
+--
+-- Name: index_recents_on_user_and_created; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_recents_on_user_and_created ON public.recents USING btree (user_id, created_at DESC);
 
 
 --
@@ -3802,10 +3870,10 @@ ALTER TABLE ONLY public.gold_standard_annotations
 
 
 --
--- Name: recents fk_rails_1e54468460; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: recents_old fk_rails_1e54468460; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.recents
+ALTER TABLE ONLY public.recents_old
     ADD CONSTRAINT fk_rails_1e54468460 FOREIGN KEY (classification_id) REFERENCES public.classifications(id);
 
 
@@ -3882,10 +3950,10 @@ ALTER TABLE ONLY public.user_project_preferences
 
 
 --
--- Name: recents fk_rails_5244e2cc55; Type: FK CONSTRAINT; Schema: public; Owner: -
+-- Name: recents_old fk_rails_5244e2cc55; Type: FK CONSTRAINT; Schema: public; Owner: -
 --
 
-ALTER TABLE ONLY public.recents
+ALTER TABLE ONLY public.recents_old
     ADD CONSTRAINT fk_rails_5244e2cc55 FOREIGN KEY (subject_id) REFERENCES public.subjects(id);
 
 
@@ -4234,12 +4302,29 @@ ALTER TABLE ONLY public.users
 
 
 --
+-- Name: recents fk_recents_classifications; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.recents
+    ADD CONSTRAINT fk_recents_classifications FOREIGN KEY (classification_id) REFERENCES public.classifications(id);
+
+
+--
+-- Name: recents fk_recents_subjects; Type: FK CONSTRAINT; Schema: public; Owner: -
+--
+
+ALTER TABLE ONLY public.recents
+    ADD CONSTRAINT fk_recents_subjects FOREIGN KEY (subject_id) REFERENCES public.subjects(id);
+
+
+--
 -- PostgreSQL database dump complete
 --
 
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260428222525'),
 ('20260323120200'),
 ('20260323120100'),
 ('20260323120000'),
