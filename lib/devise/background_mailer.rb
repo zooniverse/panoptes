@@ -20,9 +20,23 @@ module Devise
     end
 
     def deliver
-      Devise::Mailer.send(@method, @record, @token, @opts).deliver_later
+      deliver_later
+    end
+
+    def deliver_now
+      deliver_later
+    end
+
+    def deliver_later
+      mailer.deliver_later
     rescue Redis::CannotConnectError, Redis::TimeoutError, Timeout::Error
-      Devise::Mailer.send(@method, @record, @token, @opts).deliver
+      mailer.deliver_now
+    end
+
+    private
+
+    def mailer
+      Devise::Mailer.send(@method, @record, @token, @opts)
     end
   end
 end

@@ -137,7 +137,7 @@ GEM
     congestion (0.1.0)
       connection_pool (>= 2.0)
       redis (>= 3.1)
-    connection_pool (2.5.5)
+    connection_pool (3.0.2)
     crack (0.4.5)
       rexml
     crass (1.0.6)
@@ -152,10 +152,10 @@ GEM
     deep_cloneable (3.2.1)
       activerecord (>= 3.1.0, < 9)
     deprecate (0.0.0)
-    devise (4.9.4)
+    devise (5.0.3)
       bcrypt (~> 3.0)
       orm_adapter (~> 0.1)
-      railties (>= 4.1.0)
+      railties (>= 7.0)
       responders
       warden (~> 1.2.3)
     diff-lcs (1.5.0)
@@ -320,8 +320,8 @@ GEM
     multi_xml (0.6.0)
     multipart-post (2.2.3)
     nenv (0.3.0)
-    net-http-persistent (4.0.1)
-      connection_pool (~> 2.2)
+    net-http-persistent (4.0.8)
+      connection_pool (>= 2.2.4, < 4)
     net-imap (0.6.3)
       date
       net-protocol
@@ -583,7 +583,7 @@ DEPENDENCIES
   dalli
   database_cleaner (~> 2.1)
   deep_cloneable (~> 3.2.0)
-  devise (~> 4.9)
+  devise (~> 5.0)
   doorkeeper (~> 5.8)
   doorkeeper-jwt (~> 0.2.1)
   factory_bot_rails
