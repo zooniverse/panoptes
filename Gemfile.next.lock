@@ -581,6 +581,7 @@ DEPENDENCIES
   activerecord-import (~> 1.4)
   aws-sdk (~> 2.10)
   azure-storage-blob
+  connection_pool (< 3)
   dalli
   database_cleaner (~> 2.1)
   deep_cloneable (~> 3.2.0)
