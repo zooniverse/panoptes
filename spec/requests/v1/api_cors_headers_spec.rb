@@ -1,28 +1,26 @@
 require 'spec_helper'
 
 shared_examples 'cors headers' do
-  let(:hashed_response_headers) { response.headers.to_h }
+  let(:hashed_response_headers) { response.headers.to_h.transform_keys(&:downcase) }
 
   it 'has the Access-Control-Allow-Origin header' do
-    expect(hashed_response_headers).to include('Access-Control-Allow-Origin' => '*')
+    expect(hashed_response_headers).to include('access-control-allow-origin' => '*')
   end
 
   it 'has the Access-Control-Expose-Headers header' do
-    expect(hashed_response_headers).to include('Access-Control-Expose-Headers')
+    expect(hashed_response_headers).to include('access-control-expose-headers')
   end
 
   it 'exposes the correct headers' do
-    expect(
-      response.headers['Access-Control-Expose-Headers']
-    ).to eq('ETag, X-CSRF-Param, X-CSRF-Token')
+    expect(hashed_response_headers['access-control-expose-headers']).to eq('ETag, X-CSRF-Param, X-CSRF-Token')
   end
 
   it 'has the Access-Control-Allow-Methods header' do
-    expect(hashed_response_headers).to include('Access-Control-Allow-Methods' => 'DELETE, GET, POST, OPTIONS, PUT, HEAD')
+    expect(hashed_response_headers).to include('access-control-allow-methods' => 'DELETE, GET, POST, OPTIONS, PUT, HEAD')
   end
 
   it 'has the correct Access-Control-Max-Age header' do
-    expect(hashed_response_headers).to include('Access-Control-Max-Age' => '300')
+    expect(hashed_response_headers).to include('access-control-max-age' => '300')
   end
 end
 
@@ -44,7 +42,7 @@ RSpec.describe "api should return CORS headers on all requests", type: :request 
           'HTTP_ACCEPT' => 'application/json',
           'HTTP_ORIGIN' => 'http://localhost:3000'
         }
-        expect(response.headers.to_h).to include('Access-Control-Expose-Headers')
+        expect(response.headers.to_h.transform_keys(&:downcase)).to include('access-control-expose-headers')
       end
     end
 
@@ -54,7 +52,7 @@ RSpec.describe "api should return CORS headers on all requests", type: :request 
           'HTTP_ACCEPT' => 'application/json',
           'HTTP_ORIGIN' => 'http://example.com'
         }
-        expect(response.headers.to_h).not_to include('Access-Control-Expose-Headers')
+        expect(response.headers.to_h.transform_keys(&:downcase)).not_to include('access-control-expose-headers')
       end
     end
 
@@ -85,7 +83,7 @@ RSpec.describe "api should return CORS headers on all requests", type: :request 
           'HTTP_ACCEPT' => 'application/json',
           'HTTP_ORIGIN' => 'https://panoptessdfdsfd-uploads.zooniverse.org'
         }
-        expect(response.headers.to_h).not_to include('Access-Control-Expose-Headers')
+        expect(response.headers.to_h.transform_keys(&:downcase)).not_to include('access-control-expose-headers')
       end
     end
   end
