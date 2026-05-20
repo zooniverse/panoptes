@@ -1,5 +1,5 @@
 namespace :collections do
-  desc "Backfill subjects_count on collections"
+  desc 'Backfill subjects_count on collections'
   task backfill_subjects_count: :environment do
     Collection.in_batches(of: 1_000) do |batch|
       collection_ids = batch.pluck(:id)
