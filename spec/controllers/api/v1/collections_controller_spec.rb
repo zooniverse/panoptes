@@ -79,6 +79,26 @@ describe Api::V1::CollectionsController, type: :controller do
           expect(json_response[api_resource_name].map { |r| r['id'] }).to match_array([favorite_col.id.to_s])
         end
       end
+
+      describe 'by min_subjects' do
+        before do
+          collections.first.update_column(:subjects_count, 1)
+          collections.second.update_column(:subjects_count, 3)
+          private_resource.update_column(:subjects_count, 4)
+        end
+
+        it 'only returns visible collections with at least the requested subject count' do
+          get :index, params: { min_subjects: 3 }
+
+          expect(json_response[api_resource_name].map { |r| r['id'] }).to match_array([collections.second.id.to_s])
+        end
+
+        it 'does not filter collections when min_subjects is blank' do
+          get :index, params: { min_subjects: '' }
+
+          expect(json_response[api_resource_name].map { |r| r['id'] }).to match_array(collections.map { |col| col.id.to_s })
+        end
+      end
     end
   end
 
@@ -272,6 +292,9 @@ describe Api::V1::CollectionsController, type: :controller do
   end
 
   describe '#destroy_links' do
+    it 'decrements the subjects_count' do
+    end
+    
     context 'removing the default subject from the collection' do
       let(:default_subject) { collection.subjects.first }
 
