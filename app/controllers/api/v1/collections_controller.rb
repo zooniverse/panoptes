@@ -5,6 +5,7 @@ class Api::V1::CollectionsController < Api::ApiController
   include IndexSearch
 
   before_action :filter_by_project_ids, only: :index
+  before_action :filter_by_subjects_count, only: :index
   before_action :pluralize_project_links, only: :create
 
   require_authentication :create, :update, :destroy, scopes: [:collection]
@@ -42,6 +43,13 @@ class Api::V1::CollectionsController < Api::ApiController
       project_ids = ids_string.split(",")
       @controlled_resources = controlled_resources.joins(:projects).where(projects: {id: project_ids})
     end
+  end
+
+  def filter_by_subjects_count
+    min_subjects_count = params.delete(:min_subjects).presence&.to_i
+    return unless min_subjects_count
+
+    @controlled_resources = @controlled_resources.where('subjects_count >= ?', min_subjects_count)
   end
 
   def pluralize_project_links
