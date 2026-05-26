@@ -1,10 +1,12 @@
+# frozen_string_literal: true
+
 require 'spec_helper'
 
 RSpec.describe RecentsCleanupWorker, type: :worker do
   describe '#perform' do
     let(:worker) { described_class.new }
 
-    context 'Temporal Sweep' do
+    context 'when running a temporal sweep' do
       let(:user) { create(:user)}
 
       it 'deletes recents older than 14 days' do
@@ -14,10 +16,9 @@ RSpec.describe RecentsCleanupWorker, type: :worker do
         # Make sure the recent's created_at isn't overridden by the factory
         old_recent.update_column(:created_at, old_cls.created_at)
 
-        new_cls = create(:classification, user: user, created_at: 1.days.ago)
+        new_cls = create(:classification, user: user, created_at: 1.day.ago)
         new_recent = create(:recent, classification: new_cls)
         new_recent.update_column(:created_at, new_cls.created_at)
-
 
         expect {
           worker.perform
@@ -27,8 +28,8 @@ RSpec.describe RecentsCleanupWorker, type: :worker do
       end
     end
 
-    context 'Volume sweep' do
-      let(:user) { create(:user)}
+    context 'when running a volume sweep' do
+      let(:user) { create(:user) }
 
       it 'keeps the 20 newest recents and deletes the rest for a recently active user' do
         old_recents = []
@@ -50,7 +51,7 @@ RSpec.describe RecentsCleanupWorker, type: :worker do
         expect(Recent.where(user_id: user.id).count).to eq(25)
         expect {
           worker.perform
-        }.to change { Recent.count }.by(-5)
+        }.to change(Recent, :count).by(-5)
 
         # Confirm it was the 5 older ones that were deleted
         old_records = Recent.where('created_at < ?', 10.days.ago)
@@ -66,7 +67,7 @@ RSpec.describe RecentsCleanupWorker, type: :worker do
 
         expect {
           worker.perform
-        }.not_to change { Recent.count }
+        }.not_to change(Recent, :count)
       end
 
       it 'ignores users who have not been active in the last hour' do
@@ -81,7 +82,7 @@ RSpec.describe RecentsCleanupWorker, type: :worker do
 
         expect {
           worker.perform
-        }.not_to change { Recent.count }
+        }.not_to change(Recent, :count)
       end
     end
   end

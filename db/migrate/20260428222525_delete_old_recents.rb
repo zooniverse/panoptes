@@ -8,7 +8,7 @@ class DeleteOldRecents < ActiveRecord::Migration[7.2]
       cutoff_date = 14.days.ago.to_fs(:db)
       current_time = Time.current.to_fs(:db)
 
-      say "Step 1: Creating new table from existing and loading recent recents..."
+      say 'Step 1: Creating new table from existing and loading recent recents...'
 
       execute <<-SQL
         CREATE TABLE recents_new (LIKE recents INCLUDING DEFAULTS INCLUDING CONSTRAINTS);
@@ -19,18 +19,18 @@ class DeleteOldRecents < ActiveRecord::Migration[7.2]
           AND created_at < '#{current_time}';
       SQL
 
-      say "Step 2: Building indexes and FKs on new table with temporary names..."
+      say 'Step 2: Building indexes and FKs on new table with temporary names...'
 
-      execute "ALTER TABLE recents_new ADD PRIMARY KEY (id);"
+      execute 'ALTER TABLE recents_new ADD PRIMARY KEY (id);'
 
-      execute "CREATE INDEX index_recents_new_on_workflow_id ON recents_new (workflow_id);"
-      execute "CREATE INDEX index_recents_new_on_project_id ON recents_new (project_id);"
-      execute "CREATE INDEX index_recents_new_on_user_id ON recents_new (user_id);"
-      execute "CREATE INDEX index_recents_new_on_subject_id ON recents_new (subject_id);"
-      execute "CREATE INDEX index_recents_new_on_created_at ON recents_new (created_at);"
+      execute 'CREATE INDEX index_recents_new_on_workflow_id ON recents_new (workflow_id);'
+      execute 'CREATE INDEX index_recents_new_on_project_id ON recents_new (project_id);'
+      execute 'CREATE INDEX index_recents_new_on_user_id ON recents_new (user_id);'
+      execute 'CREATE INDEX index_recents_new_on_subject_id ON recents_new (subject_id);'
+      execute 'CREATE INDEX index_recents_new_on_created_at ON recents_new (created_at);'
 
       # New compound index for user/created_at lookups
-      execute "CREATE INDEX index_recents_on_user_and_created ON recents_new (user_id, created_at DESC);"
+      execute 'CREATE INDEX index_recents_on_user_and_created ON recents_new (user_id, created_at DESC);'
 
       execute <<-SQL
         ALTER TABLE recents_new
@@ -42,7 +42,7 @@ class DeleteOldRecents < ActiveRecord::Migration[7.2]
         FOREIGN KEY (subject_id) REFERENCES subjects(id);
       SQL
 
-      say "Step 3: Executing the table swap..."
+      say 'Step 3: Executing the table swap...'
 
       execute <<-SQL
         BEGIN;
@@ -84,10 +84,10 @@ class DeleteOldRecents < ActiveRecord::Migration[7.2]
         COMMIT;
       SQL
 
-      say "Step 4: Updating database statistics for the new table..."
-      execute "ANALYZE recents;"
+      say 'Step 4: Updating database statistics for the new table...'
+      execute 'ANALYZE recents;'
 
-      say "Recents swap complete."
+      say 'Recents swap complete.'
     end
   end
 
@@ -126,7 +126,7 @@ class DeleteOldRecents < ActiveRecord::Migration[7.2]
         COMMIT;
       SQL
 
-      execute "DROP TABLE recents_new;"
+      execute 'DROP TABLE recents_new;'
     end
   end
 end
