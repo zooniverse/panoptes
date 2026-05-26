@@ -29,8 +29,8 @@ class DeleteOldRecents < ActiveRecord::Migration[7.2]
       execute 'CREATE INDEX index_recents_new_on_subject_id ON recents_new (subject_id);'
       execute 'CREATE INDEX index_recents_new_on_created_at ON recents_new (created_at);'
 
-      # New compound index for user/created_at lookups
-      execute 'CREATE INDEX index_recents_on_user_and_created ON recents_new (user_id, created_at DESC);'
+      # New compound index for user/project/created_at lookups
+      execute 'CREATE INDEX index_recents_on_user_project_and_created ON recents_new (user_id, project_id, created_at DESC);'
 
       execute <<-SQL
         ALTER TABLE recents_new

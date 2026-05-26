@@ -12,26 +12,26 @@ class RecentsCleanupWorker
                   }
 
   def perform
-    # Delete all older than 14 days
-    Recent.where('created_at < ?', 14.days.ago).in_batches(of: 5000).delete_all
+    # Delete all older than 90 days
+    Recent.where('created_at < ?', 90.days.ago).in_batches(of: 5000).delete_all
 
     # Identify users active in the past 2 hours
-    recently_active_user_ids = Recent.where('created_at > ?', 2.hours.ago)
-                                     .distinct
-                                     .pluck(:user_id)
+    recently_active_pairs = Recent.where('created_at > ?', 2.hours.ago)
+                                  .distinct
+                                  .pluck(:user_id, :project_id)
 
-    # Delete all but the 20 newest recents for each recently active user
-    recently_active_user_ids.each do |user_id|
-      next unless Recent.where(user_id: user_id).count > 20
 
-      ids_to_keep = Recent.where(user_id: user_id)
-                          .order(created_at: :desc)
-                          .limit(20)
-                          .pluck(:id)
+    # Clean up any recents over 20 per user/project for recently active users
+    recently_active_pairs.each do |user_id, project_id|
+      scope = Recent.where(user_id: user_id, project_id: project_id)
 
-      Recent.where(user_id: user_id)
-            .where.not(id: ids_to_keep)
-            .delete_all
+      next unless scope.count > 20
+
+      ids_to_keep = scope.order(created_at: :desc)
+                         .limit(20)
+                         .pluck(:id)
+
+      scope.where.not(id: ids_to_keep).delete_all
     end
   end
 end
