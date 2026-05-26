@@ -7,7 +7,7 @@ RSpec.describe RecentsCleanupWorker, type: :worker do
     let(:worker) { described_class.new }
 
     context 'when running a temporal sweep' do
-      let(:user) { create(:user)}
+      let(:user) { create(:user) }
 
       it 'deletes recents older than 14 days' do
         old_cls = create(:classification, user: user, created_at: 15.days.ago)
