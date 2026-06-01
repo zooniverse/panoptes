@@ -49,7 +49,7 @@ class Api::V1::CollectionsController < Api::ApiController
     min_subjects_count = params.delete(:min_subjects).presence&.to_i
     return unless min_subjects_count
 
-    @controlled_resources = @controlled_resources.where('subjects_count >= ?', min_subjects_count)
+    @controlled_resources = controlled_resources.where('subjects_count >= ?', min_subjects_count)
   end
 
   def pluralize_project_links
