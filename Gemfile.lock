@@ -224,9 +224,8 @@ GEM
       raabro (~> 1.4)
     globalid (1.3.0)
       activesupport (>= 6.1)
-    graphiql-rails (1.8.0)
+    graphiql-rails (1.10.5)
       railties
-      sprockets-rails
     graphql (2.0.15)
     guard (2.18.0)
       formatador (>= 0.2.4)
@@ -566,7 +565,7 @@ GEM
       websocket-extensions (>= 0.1.0)
     websocket-extensions (0.1.5)
     yard (0.9.42)
-    zeitwerk (2.7.5)
+    zeitwerk (2.8.2)
     zoo_stream (1.0.1)
       aws-sdk
 
