@@ -539,8 +539,8 @@ GEM
       activerecord (>= 3.0.0, < 8.0)
     stringex (2.8.5)
     stringio (3.2.0)
-    strong_migrations (1.4.3)
-      activerecord (>= 5.2)
+    strong_migrations (2.8.0)
+      activerecord (>= 7.2)
     ten_years_rails (0.2.0)
       actionview
       activesupport
