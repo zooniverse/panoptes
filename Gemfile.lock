@@ -150,7 +150,7 @@ GEM
       database_cleaner-core (~> 2.0)
     database_cleaner-core (2.0.1)
     date (3.5.1)
-    deep_cloneable (3.2.1)
+    deep_cloneable (3.2.2)
       activerecord (>= 3.1.0, < 9)
     deprecate (0.0.0)
     devise (5.0.4)
@@ -589,7 +589,7 @@ DEPENDENCIES
   connection_pool (< 3)
   dalli
   database_cleaner (~> 2.1)
-  deep_cloneable (~> 3.2.0)
+  deep_cloneable (~> 3.2.2)
   devise (~> 5.0)
   doorkeeper (~> 5.8)
   doorkeeper-jwt (~> 0.2.1)
