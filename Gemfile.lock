@@ -162,7 +162,7 @@ GEM
     diff-lcs (1.5.0)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
-    doorkeeper (5.8.2)
+    doorkeeper (5.9.1)
       railties (>= 5)
     doorkeeper-jwt (0.2.1)
       jwt (~> 1.5.2, >= 1.5.2)
@@ -368,7 +368,7 @@ GEM
     pry (0.14.1)
       coderay (~> 1.1)
       method_source (~> 1.0)
-    psych (5.3.1)
+    psych (5.4.0)
       date
       stringio
     public_suffix (7.0.5)
@@ -591,7 +591,7 @@ DEPENDENCIES
   database_cleaner (~> 2.1)
   deep_cloneable (~> 3.2.0)
   devise (~> 5.0)
-  doorkeeper (~> 5.8)
+  doorkeeper (~> 5.9)
   doorkeeper-jwt (~> 0.2.1)
   factory_bot_rails
   faraday (~> 1.10)
