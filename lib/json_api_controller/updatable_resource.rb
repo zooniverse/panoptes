@@ -16,6 +16,12 @@ module JsonApiController
 
           yield resource if block_given?
 
+          if resource.changed?
+            pending_changes = resource.changes.transform_values(&:last)
+            resource.reload
+            resource.assign_attributes(pending_changes)
+          end
+
           resource.save!
           resource
         end
@@ -31,7 +37,6 @@ module JsonApiController
         add_relation(resource, relation, params[relation])
         # as this resource may not have changed but the linked resources may have
         # ensure we modify the upated_at timestamp to cache bust this resource
-        resource.reload
         resource.updated_at = Time.zone.now
         resource.save!
       end

@@ -17,6 +17,7 @@ module JsonApiController
       case value
       when Array
         resource.send(relation).concat(new_items(resource, relation, value))
+        resource.reload
       else
         resource.send("#{relation}=", update_relation(resource, relation, value))
       end

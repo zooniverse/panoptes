@@ -39,7 +39,7 @@ describe JsonApiController::UpdatableResource, type: :controller do
   end
 
   let(:user) { create(:user) }
-  let(:resource) { create(:collection, owner: user) }
+  let!(:resource) { create(:collection, owner: user) }
   let(:subjects) { create_list(:subject, 4) }
 
   describe "#update_links" do
