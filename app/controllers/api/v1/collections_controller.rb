@@ -5,6 +5,7 @@ class Api::V1::CollectionsController < Api::ApiController
   include IndexSearch
 
   before_action :filter_by_project_ids, only: :index
+  before_action :filter_by_min_subjects, only: :index
   before_action :pluralize_project_links, only: :create
 
   require_authentication :create, :update, :destroy, scopes: [:collection]
@@ -51,6 +52,12 @@ class Api::V1::CollectionsController < Api::ApiController
         raise BadLinkParams.new("Error: project_ids and project link keys must not be set together")
       end
       collection_params[:links].merge!(projects: [project_id])
+    end
+  end
+
+  def filter_by_min_subjects
+    if min_subjects = params.delete(:min_subjects)
+      @controlled_resources = controlled_resources.joins(:collections_subjects).group(:id).having("COUNT(collections_subjects.id) >= ?", min_subjects.to_i)
     end
   end
 end
