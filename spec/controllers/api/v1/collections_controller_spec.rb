@@ -292,7 +292,20 @@ describe Api::V1::CollectionsController, type: :controller do
   end
 
   describe '#destroy_links' do
-    it 'decrements the subjects_count' do
+    context 'subjects_count' do
+      before do
+        default_request scopes: scopes, user_id: authorized_user.id
+      end
+
+      it 'decrements the subjects_count' do
+        delete :destroy_links,
+                 params: {
+                   collection_id: collection.id,
+                   link_relation: :subjects,
+                   link_ids: collection.subjects.first.id.to_s
+                 }
+        expect(collection.reload.subjects_count).to eq(1)
+      end
     end
     
     context 'removing the default subject from the collection' do

@@ -24,7 +24,6 @@ class Api::V1::CollectionsController < Api::ApiController
   def update
     super do |collection|
       if collection.changed?
-        puts 'MDY114 SHOULD BE IN BLOCK GIVEN OF UPDATE LINKS'
         pending_changes = collection.changes.transform_values(&:last)
         collection.reload
         collection.assign_attributes(pending_changes)
@@ -32,10 +31,16 @@ class Api::V1::CollectionsController < Api::ApiController
     end
   end
 
+  def destroy_relation(resource, relation, value)
+    return super unless relation == :subjects
+
+    ids = value.split(',').map(&:to_i)
+    resource.send(relation).destroy(*ids) 
+    resource.reload
+  end
+
   def destroy_links
-    super do |collection| 
-      check_default_subject(collection) 
-    end
+    super { |collection| check_default_subject(collection) }
   end
 
   protected
