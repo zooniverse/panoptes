@@ -16,12 +16,6 @@ module JsonApiController
 
           yield resource if block_given?
 
-          if resource.changed?
-            pending_changes = resource.changes.transform_values(&:last)
-            resource.reload
-            resource.assign_attributes(pending_changes)
-          end
-
           resource.save!
           resource
         end
