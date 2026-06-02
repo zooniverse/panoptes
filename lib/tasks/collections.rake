@@ -5,9 +5,9 @@ namespace :collections do
       collection_ids = batch.pluck(:id)
 
       counts = CollectionSubject
-              .where(collection_id: collection_ids)
-              .group(:collection_id)
-              .count
+               .where(collection_id: collection_ids)
+               .group(:collection_id)
+               .count
 
       collections_to_update = collection_ids.map do |id|
         [id, counts[id] || 0]
