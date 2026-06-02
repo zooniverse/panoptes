@@ -76,7 +76,7 @@ RSpec.describe RecentsCleanupWorker, type: :worker do
         expect(Recent.where(user_id: user.id).count).to eq(40)
         expect {
           worker.perform
-        }.to change { Recent.count }.by(-5)
+        }.to change(Recent, :count).by(-5)
 
         expect(Recent.where(user_id: user.id, project_id: project_a.id).count).to eq(20)
         expect(Recent.where(user_id: user.id, project_id: project_b.id).count).to eq(15)

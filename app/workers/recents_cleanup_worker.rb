@@ -20,7 +20,6 @@ class RecentsCleanupWorker
                                   .distinct
                                   .pluck(:user_id, :project_id)
 
-
     # Clean up any recents over 20 per user/project for recently active users
     recently_active_pairs.each do |user_id, project_id|
       scope = Recent.where(user_id: user_id, project_id: project_id)
