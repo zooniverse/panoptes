@@ -14,14 +14,31 @@ class ProjectSerializer
     :run_subject_set_completion_events
 
   optional :avatar_src
-  can_include :workflows, :active_workflows, :subject_sets, :owners,
-    :project_roles, :pages, :organization
+  can_include(
+    :workflows,
+    :active_workflows,
+    :subject_sets,
+    :owners,
+    :project_roles,
+    :pages,
+    :organizations
+  )
   media_include :avatar, :background, :attached_images,
     classifications_export: { include: false},
     subjects_export: { include: false }
-  can_filter_by :display_name, :slug, :beta_requested, :beta_approved,
-    :launch_requested, :launch_approved, :private, :state, :live,
-    :mobile_friendly, :organization_id, :featured
+  can_filter_by(
+    :display_name,
+    :slug,
+    :beta_requested,
+    :beta_approved,
+    :launch_requested,
+    :launch_approved,
+    :private,
+    :state,
+    :live,
+    :mobile_friendly,
+    :featured
+  )
   can_sort_by :launch_date, :activity, :completeness, :classifiers_count,
     :updated_at, :display_name
 
@@ -34,6 +51,7 @@ class ProjectSerializer
           :attached_images,
           :avatar,
           :background,
+          :organizations,
           :tags,
           :classifications_export,
           :subjects_export

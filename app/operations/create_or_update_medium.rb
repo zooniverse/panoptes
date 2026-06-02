@@ -2,9 +2,9 @@ class CreateOrUpdateMedium < Operation
   object :object
   symbol :type
 
-  hash :media do
+  hash :media, default: -> { {} } do
     string :content_type, default: 'text/csv'
-    hash :metadata, default: {} do
+    hash :metadata, default: -> { {} } do
       array :recipients, default: -> { [api_user.id] } do
         integer
       end

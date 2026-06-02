@@ -9,7 +9,7 @@ module Panoptes
     end
 
     def self.options
-      { expires_in: expires_in, compress: compress, pool_size: pool_size }
+      { expires_in: expires_in, compress: compress, pool: { size: pool_size } }
     end
 
     def self.expires_in

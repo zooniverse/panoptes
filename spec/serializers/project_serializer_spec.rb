@@ -49,11 +49,23 @@ describe ProjectSerializer do
 
   it_should_behave_like "a panoptes restpack serializer", "test_owner_include", "test_blank_links" do
     let(:resource) { project }
-    let(:includes) { %i(workflows active_workflows subject_sets project_roles pages organization) }
+    let(:includes) { %i[workflows active_workflows subject_sets project_roles pages organizations] }
     let(:preloads) { ProjectSerializer.preloads }
     let(:expected_links) do
       non_owners_includes = described_class.can_includes - [:owners]
       non_owners_includes | [:owner] | described_class.media_links
+    end
+  end
+
+  describe 'organizations include' do
+    let(:organization) { create(:organization) }
+
+    it 'includes linked organizations' do
+      create(:organization_project, organization: organization, project: project)
+      result = described_class.page({ include: 'organizations' }, Project.where(id: project.id), {})
+      linked_organization_ids = result.dig(:linked, :organizations).map { |org| org[:id] }
+
+      expect(linked_organization_ids).to include(organization.id.to_s)
     end
   end
 

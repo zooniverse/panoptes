@@ -17,6 +17,21 @@ class Api::V1::OrganizationsController < Api::ApiController
 
   schema_type :json_schema
 
+  @search_handlers[:default] = []
+
+  search_by do |name, query|
+    search_names = name.join(' ').downcase
+    display_name_search = query.where('lower(display_name) = ?', search_names)
+
+    if display_name_search.exists?
+      display_name_search
+    elsif search_names.present? && search_names.length >= 3
+      query.search_display_name(search_names)
+    else
+      query.none
+    end
+  end
+
   def create
     @created_resources = Organization.transaction(requires_new: true) do
       Array.wrap(create_params.to_h).map do |organization_params|

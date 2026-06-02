@@ -26,7 +26,6 @@ RSpec.configure do |config|
   config.include APIResponseHelpers, type: :request
   config.include ValidUserRequestHelper, type: :request
   config.include SubjectSelectionHelpers
-  config.include Flipper
   config.extend RSpec::Helpers::ActiveRecordMocks
 
   config.filter_run focus: true
