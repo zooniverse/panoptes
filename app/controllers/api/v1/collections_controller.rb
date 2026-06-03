@@ -1,82 +1,103 @@
-class Api::V1::CollectionsController < Api::ApiController
-  include JsonApiController::PunditPolicy
-  include FilterByOwner
-  include FilterByCurrentUserRoles
-  include IndexSearch
+# frozen_string_literal: true
 
-  before_action :filter_by_project_ids, only: :index
-  before_action :filter_by_subjects_count, only: :index
-  before_action :pluralize_project_links, only: :create
+module Api
+  module V1
+    class CollectionsController < Api::ApiController
+      include JsonApiController::PunditPolicy
+      include FilterByOwner
+      include FilterByCurrentUserRoles
+      include IndexSearch
 
-  require_authentication :create, :update, :destroy, scopes: [:collection]
-  resource_actions :default
-  schema_type :strong_params
+      before_action :filter_by_project_ids, only: :index
+      before_action :filter_by_subjects_count, only: :index
+      before_action :pluralize_project_links, only: :create
 
-  allowed_params :create, :name, :display_name, :private, :favorite, :description,
-    links: [ :default_subject, :project, projects: [], subjects: [], owner: polymorphic ]
+      require_authentication :create, :update, :destroy, scopes: [:collection]
+      resource_actions :default
+      schema_type :strong_params
 
-  allowed_params :update, :name, :display_name, :private, :description, links: [ :default_subject, subjects: [] ]
+      allowed_params :create, :name, :display_name, :private, :favorite, :description,
+                     links: [:default_subject, :project, { projects: [], subjects: [], owner: polymorphic }]
 
-  search_by do |name, query|
-    query.search_display_name(name.join(" "))
-  end
+      allowed_params :update, :name, :display_name, :private, :description, links: [:default_subject, { subjects: [] }]
 
-  def update
-    super do |collection|
-      if collection.changed?
-        pending_changes = collection.changes.transform_values(&:last)
-        collection.reload
-        collection.assign_attributes(pending_changes)
+      search_by do |name, query|
+        query.search_display_name(name.join(' '))
       end
-    end
-  end
 
-  def destroy_relation(resource, relation, value)
-    return super unless relation == :subjects
+      def update
+        @updated_resources = Collection.transaction do
+          controlled_resources.zip(Array.wrap(update_params.to_h)).map do |collection, update_hash|
+            links = update_hash[:links] || {}
 
-    ids = value.split(',').map(&:to_i)
-    resource.send(relation).destroy(*ids) 
-    resource.reload
-  end
+            collection.assign_attributes(build_update_hash(update_hash.except(:links), collection))
+            collection.save!
 
-  def destroy_links
-    super { |collection| check_default_subject(collection) }
-  end
+            if links.key?(:subjects)
+              subject_ids = Array(links[:subjects]).compact_blank
+              collection.subject_ids = subject_ids
+              Collection.reset_counters(collection.id, :subjects_count)
+            end
 
-  protected
+            if links.key?(:default_subject)
+              default_subject_id = links[:default_subject]
+              collection.default_subject_id = links[:default_subject]
+            end
 
-  def build_resource_for_create(create_params)
-    add_user_as_linked_owner(create_params)
-    super(create_params)
-  end
+            collection.reload
+          end
+        end
 
-  private
-
-  def check_default_subject(collection)
-    collection.update({ default_subject: nil }) if params["link_ids"].split(",").include? collection.default_subject&.id.to_s
-  end
-
-  def filter_by_project_ids
-    if ids_string = (params.delete(:project_ids) || params.delete(:project_id)).try(:split, ',')
-      project_ids = ids_string.split(",")
-      @controlled_resources = controlled_resources.joins(:projects).where(projects: {id: project_ids})
-    end
-  end
-
-  def filter_by_subjects_count
-    min_subjects_count = params.delete(:min_subjects).presence&.to_i
-    return unless min_subjects_count
-
-    @controlled_resources = controlled_resources.where('subjects_count >= ?', min_subjects_count)
-  end
-
-  def pluralize_project_links
-    collection_params = params[:collections]
-    if project_id = collection_params[:links].try(:delete, :project)
-      if collection_params[:links][:projects]
-        raise BadLinkParams.new("Error: project_ids and project link keys must not be set together")
+        updated_resource_response
       end
-      collection_params[:links].merge!(projects: [project_id])
+
+      def destroy_relation(resource, relation, value)
+        return super unless relation == :subjects
+
+        ids = value.split(',').map(&:to_i)
+        resource.send(relation).destroy(*ids)
+        resource.reload
+      end
+
+      def destroy_links
+        super { |collection| check_default_subject(collection) }
+      end
+
+      protected
+
+      def build_resource_for_create(create_params)
+        add_user_as_linked_owner(create_params)
+        super(create_params)
+      end
+
+      private
+
+      def check_default_subject(collection)
+        collection.update({ default_subject: nil }) if params['link_ids'].split(',').include? collection.default_subject&.id.to_s
+      end
+
+      def filter_by_project_ids
+        if ids_string = (params.delete(:project_ids) || params.delete(:project_id)).try(:split, ',')
+          project_ids = ids_string.split(',')
+          @controlled_resources = controlled_resources.joins(:projects).where(projects: { id: project_ids })
+        end
+      end
+
+      def filter_by_subjects_count
+        min_subjects_count = params.delete(:min_subjects).presence&.to_i
+        return unless min_subjects_count
+
+        @controlled_resources = controlled_resources.where('subjects_count >= ?', min_subjects_count)
+      end
+
+      def pluralize_project_links
+        collection_params = params[:collections]
+        if project_id = collection_params[:links].try(:delete, :project)
+          raise BadLinkParams, 'Error: project_ids and project link keys must not be set together' if collection_params[:links][:projects]
+
+          collection_params[:links].merge!(projects: [project_id])
+        end
+      end
     end
   end
 end
