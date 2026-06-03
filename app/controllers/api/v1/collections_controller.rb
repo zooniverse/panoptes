@@ -22,13 +22,28 @@ class Api::V1::CollectionsController < Api::ApiController
   end
 
   def update
-    super do |collection|
-      if collection.changed?
-        pending_changes = collection.changes.transform_values(&:last)
+    @updated_resources = Collection.transaction do
+      controlled_resources.zip(Array.wrap(update_params.to_h)).map do |collection, update_hash|
+        links = update_hash[:links] || {}
+
+        collection.assign_attributes(build_update_hash(update_hash.except(:links), collection))
+        collection.save!
+
+        if links.key?(:subjects)
+          subject_ids = Array(links[:subjects]).compact_blank
+          collection.subject_ids = subject_ids
+          Collection.reset_counters(collection.id, :subjects)
+        end
+
+        if links.key?(:default_subject)
+          collection.default_subject_id = links[:default_subject]
+        end
+
         collection.reload
-        collection.assign_attributes(pending_changes)
       end
     end
+
+    updated_resource_response
   end
 
   def destroy_relation(resource, relation, value)
