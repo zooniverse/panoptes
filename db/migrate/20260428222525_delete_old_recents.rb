@@ -5,7 +5,7 @@ class DeleteOldRecents < ActiveRecord::Migration[7.2]
 
   def up
     safety_assured do
-      cutoff_date = 14.days.ago.to_fs(:db)
+      cutoff_date = 90.days.ago.to_fs(:db)
       current_time = Time.current.to_fs(:db)
 
       say 'Step 1: Creating new table from existing and loading recent recents...'
