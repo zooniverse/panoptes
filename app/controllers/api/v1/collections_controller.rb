@@ -35,9 +35,7 @@ class Api::V1::CollectionsController < Api::ApiController
           Collection.reset_counters(collection.id, :subjects)
         end
 
-        if links.key?(:default_subject)
-          collection.default_subject_id = links[:default_subject]
-        end
+        collection.default_subject_id = links[:default_subject] if links.key?(:default_subject)
 
         collection.reload
       end
@@ -50,7 +48,7 @@ class Api::V1::CollectionsController < Api::ApiController
     return super unless relation == :subjects
 
     ids = value.split(',').map(&:to_i)
-    resource.send(relation).destroy(*ids) 
+    resource.send(relation).destroy(*ids)
     resource.reload
   end
 
