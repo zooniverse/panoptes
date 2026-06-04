@@ -26,6 +26,10 @@
       <%= hidden_field_tag :state, @pre_auth.state %>
       <%= hidden_field_tag :response_type, @pre_auth.response_type %>
       <%= hidden_field_tag :scope, @pre_auth.scope %>
+      <% if @pre_auth.code_challenge %>
+        <%= hidden_field_tag :code_challenge, @pre_auth.code_challenge %>
+        <%= hidden_field_tag :code_challenge_method, @pre_auth.code_challenge_method %>
+      <% end %>
       <%= submit_tag "Authorize", class: "btn btn-success btn-lg btn-block" %>
     <% end %>
     <%= form_tag oauth_authorization_path, method: :delete do %>
@@ -34,6 +38,10 @@
       <%= hidden_field_tag :state, @pre_auth.state %>
       <%= hidden_field_tag :response_type, @pre_auth.response_type %>
       <%= hidden_field_tag :scope, @pre_auth.scope %>
+      <% if @pre_auth.code_challenge %>
+        <%= hidden_field_tag :code_challenge, @pre_auth.code_challenge %>
+        <%= hidden_field_tag :code_challenge_method, @pre_auth.code_challenge_method %>
+      <% end %>
       <%= submit_tag "Deny", class: "btn btn-danger btn-lg btn-block" %>
     <% end %>
   </div>
