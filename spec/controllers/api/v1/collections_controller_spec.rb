@@ -79,6 +79,15 @@ describe Api::V1::CollectionsController, type: :controller do
           expect(json_response[api_resource_name].map { |r| r['id'] }).to match_array([favorite_col.id.to_s])
         end
       end
+
+      describe 'by min_subjects' do
+        let!(:collection_with_no_subject) { create(:collection) }
+
+        it 'only returns visible collections with at least the requested subject count' do
+          get :index, params: { min_subjects: 1 }
+          expect(json_response[api_resource_name].map { |r| r['id'] }).to match_array(collections.map { |c| c.id.to_s })
+        end
+      end
     end
   end
 
