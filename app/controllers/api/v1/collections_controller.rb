@@ -27,22 +27,29 @@ class Api::V1::CollectionsController < Api::ApiController
         links = update_hash[:links] || {}
 
         collection.assign_attributes(build_update_hash(update_hash.except(:links), collection))
+        collection.default_subject_id = links[:default_subject] if links.key?(:default_subject)
         collection.save!
 
         if links.key?(:subjects)
-          subject_ids = Array(links[:subjects]).compact_blank
-          collection.subject_ids = subject_ids
-          Collection.reset_counters(collection.id, :subjects)
+          old_subject_ids = collection.subjects.map(&:id)
+          new_subject_ids = Array(links[:subjects]).compact_blank.map(&:to_i)
+          subject_ids_to_remove = old_subject_ids - new_subject_ids
+          subject_ids_to_add = new_subject_ids - old_subject_ids
+          # trigger AR callbacks for the removed and added subjects to update the collection's subjects_count
+          collection.collections_subjects.where(subject_id: subject_ids_to_remove).destroy_all
+          collection.collections_subjects.create!(subject_ids_to_add.map { |id| { subject_id: id } })
         end
-
-        collection.default_subject_id = links[:default_subject] if links.key?(:default_subject)
-
-        collection.reload
       end
     end
 
     updated_resource_response
   end
+
+  def destroy_links
+    super { |collection| check_default_subject(collection) }
+  end
+
+  protected
 
   def destroy_relation(resource, relation, value)
     return super unless relation == :subjects
@@ -51,12 +58,6 @@ class Api::V1::CollectionsController < Api::ApiController
     resource.send(relation).destroy(*ids)
     resource.reload
   end
-
-  def destroy_links
-    super { |collection| check_default_subject(collection) }
-  end
-
-  protected
 
   def build_resource_for_create(create_params)
     add_user_as_linked_owner(create_params)

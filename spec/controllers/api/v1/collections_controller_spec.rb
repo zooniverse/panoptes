@@ -133,6 +133,38 @@ describe Api::V1::CollectionsController, type: :controller do
     it_behaves_like 'has updatable links'
     it_behaves_like 'supports update_links'
 
+    context 'when update_params contains links' do
+      before do
+        default_request scopes: scopes, user_id: authorized_user.id
+      end
+
+      it 'updates the subjects_count' do
+        put :update, params: update_params.merge(id: resource.id)
+        expect(collection.reload.subjects_count).to eq(subjects.size)
+      end
+
+      it 'updates the default_subject_id' do
+        links = update_params[:collections][:links]
+        links[:default_subject] = subjects.first.id.to_s
+        update_params[:collections][:links] = links
+        put :update, params: update_params.merge(id: resource.id)
+        expect(collection.reload.default_subject_id).to eq(subjects.first.id)
+      end
+    end
+
+    it 'updates subjects_count on update_links' do
+      new_subject = create(:subject)
+      default_request scopes: scopes, user_id: authorized_user.id
+      params = {
+        link_relation: 'subjects',
+        collection_id: resource.id,
+        subjects: [new_subject.id]
+      }
+      previous_subjects_count = resource.subjects_count
+      post :update_links, params: params
+      expect(resource.reload.subjects_count).to eq(previous_subjects_count + params[:subjects].size)
+    end
+
     context 'when the subject is already in a collection' do
       let!(:test_relation_ids) { Array.wrap(collection.subjects.first.id) }
       let(:params) do
@@ -299,15 +331,15 @@ describe Api::V1::CollectionsController, type: :controller do
 
       it 'decrements the subjects_count' do
         delete :destroy_links,
-                 params: {
-                   collection_id: collection.id,
-                   link_relation: :subjects,
-                   link_ids: collection.subjects.first.id.to_s
-                 }
+               params: {
+                 collection_id: collection.id,
+                 link_relation: :subjects,
+                 link_ids: collection.subjects.first.id.to_s
+               }
         expect(collection.reload.subjects_count).to eq(1)
       end
     end
-    
+
     context 'removing the default subject from the collection' do
       let(:default_subject) { collection.subjects.first }
 
