@@ -10,7 +10,7 @@ gem 'active_interaction'
 gem 'active_model_serializers' # Event stream
 gem 'active_record_extended'
 gem 'activerecord-import', '~> 1.4'
-gem 'aws-sdk', '~> 2.10'
+gem 'aws-sdk', '~> 3.3'
 gem 'azure-storage-blob'
 gem 'connection_pool', '< 3'
 gem 'dalli'
