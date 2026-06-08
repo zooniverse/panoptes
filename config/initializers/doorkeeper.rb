@@ -30,6 +30,8 @@ Doorkeeper.configure do
 
   grant_flows ["authorization_code", "client_credentials", "implicit", "password"]
 
+  pkce_code_challenge_methods %w[S256]
+
   access_token_generator "Doorkeeper::JWT"
 
   # Remove the scheme check
