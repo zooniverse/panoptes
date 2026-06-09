@@ -10,14 +10,14 @@ RSpec.describe CollectionsSubject do
   describe 'subjects_count' do
     let(:collection) { create(:collection) }
 
-    it 'increments the collection subjects_count when a subject is added' do
+    it 'increments subjects_count when a collections_subject is created' do
       expect(collection.subjects_count).to eq(0)
       create(:collections_subject, collection: collection)
       collection.reload
       expect(collection.subjects_count).to eq(1)
     end
 
-    it 'decrements the collection subjects_count when a subject is removed' do
+    it 'decrements the subjects_count when a collections_subject is destroyed' do
       cs = create(:collections_subject, collection: collection)
       expect(collection.subjects_count).to eq(1)
       cs.destroy

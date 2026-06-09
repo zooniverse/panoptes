@@ -98,6 +98,12 @@ describe Api::V1::CollectionsController, type: :controller do
 
           expect(json_response[api_resource_name].map { |r| r['id'] }).to match_array(collections.map { |col| col.id.to_s })
         end
+
+        it 'does not filter collections when min_subjects is not provided' do
+          get :index
+
+          expect(json_response[api_resource_name].map { |r| r['id'] }).to match_array(collections.map { |col| col.id.to_s })
+        end
       end
     end
   end
@@ -138,12 +144,12 @@ describe Api::V1::CollectionsController, type: :controller do
         default_request scopes: scopes, user_id: authorized_user.id
       end
 
-      it 'updates the subjects_count' do
+      it 'updates the subjects_count when links contain subjects' do
         put :update, params: update_params.merge(id: resource.id)
         expect(collection.reload.subjects_count).to eq(subjects.size)
       end
 
-      it 'updates the default_subject_id' do
+      it 'updates the default_subject_id when links contain default_subject' do
         links = update_params[:collections][:links]
         links[:default_subject] = subjects.first.id.to_s
         update_params[:collections][:links] = links
@@ -160,9 +166,7 @@ describe Api::V1::CollectionsController, type: :controller do
         collection_id: resource.id,
         subjects: [new_subject.id]
       }
-      previous_subjects_count = resource.subjects_count
-      post :update_links, params: params
-      expect(resource.reload.subjects_count).to eq(previous_subjects_count + params[:subjects].size)
+      expect { post :update_links, params: params }.to change { resource.reload.subjects_count }.by(params[:subjects].size)
     end
 
     context 'when the subject is already in a collection' do
@@ -330,13 +334,10 @@ describe Api::V1::CollectionsController, type: :controller do
       end
 
       it 'decrements the subjects_count' do
-        delete :destroy_links,
-               params: {
-                 collection_id: collection.id,
-                 link_relation: :subjects,
-                 link_ids: collection.subjects.first.id.to_s
-               }
-        expect(collection.reload.subjects_count).to eq(1)
+        params = { collection_id: collection.id,
+                   link_relation: :subjects,
+                   link_ids: collection.subjects.first.id.to_s }
+        expect { delete :destroy_links, params: params }.to change { collection.reload.subjects_count }.by(-1)
       end
     end
 
