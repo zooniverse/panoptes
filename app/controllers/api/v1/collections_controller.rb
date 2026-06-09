@@ -51,6 +51,11 @@ class Api::V1::CollectionsController < Api::ApiController
 
   protected
 
+  def add_relation(resource, relation, value)
+    super
+    resource.reload if relation == :subjects && value.is_a?(Array)
+  end
+
   def destroy_relation(resource, relation, value)
     return super unless relation == :subjects
 
