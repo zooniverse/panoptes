@@ -34,3 +34,8 @@ requeue_export_job_worker:
   class: "RequeueExportJobWorker"
   queue: "data_medium"
   description: "Checks, updates and requeues export jobs"
+recents_cleanup_worker:
+  cron: "0 */3 * * *"
+  class: "RecentsCleanupWorker"
+  queue: "data_medium"
+  description: "Cleans up recents, removes entries older than 90 days and more than 20 per user/project. Runs every 3 hours."
