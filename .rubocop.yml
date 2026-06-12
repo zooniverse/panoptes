@@ -44,7 +44,9 @@ RSpec/MultipleMemoizedHelpers:
 RSpec/NestedGroups:
   Max: 7
 RSpec/ExampleLength:
-  Max: 15
+  Max: 20
+RSpec/MultipleExpectations:
+  Max: 5
 
 Style/NumericLiterals:
   Enabled: false
@@ -78,4 +80,4 @@ Style/HashTransformValues:
 
 AllCops:
   NewCops: enable
-  TargetRailsVersion: 4.2
+  TargetRailsVersion: 7.2
