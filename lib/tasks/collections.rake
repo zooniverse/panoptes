@@ -4,7 +4,7 @@ namespace :collections do
     Collection.in_batches(of: 1_000) do |batch|
       collection_ids = batch.pluck(:id)
 
-      counts = CollectionSubject
+      counts = CollectionsSubject
                .where(collection_id: collection_ids)
                .group(:collection_id)
                .count
