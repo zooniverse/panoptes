@@ -45,10 +45,17 @@ describe JsonApiController::UpdatableResource, type: :controller do
   describe "#update_links" do
     context "many-to-many" do
       it 'should add the new relations to the resource' do
-        post :update_links, params: { id: resource.id,
-                             link_relation: :subjects,
-                             subjects: subjects.map(&:id).map(&:to_s) }
-        expect(resource.subjects).to include(*subjects)
+        subject_set = create(:subject_set)
+        allow(controller).to receive(:resource_class).and_return(SubjectSet)
+        allow(controller).to receive(:serializer).and_return(SubjectSetSerializer)
+        allow(controller).to receive(:controlled_resources).and_return(SubjectSet.where(id: subject_set.id))
+
+        post :update_links, params: {
+          id: subject_set.id,
+          link_relation: :subjects,
+          subjects: subjects.map(&:id).map(&:to_s)
+        }
+        expect(subject_set.subjects).to include(*subjects)
       end
 
       it 'should error when the relation does not match the link' do

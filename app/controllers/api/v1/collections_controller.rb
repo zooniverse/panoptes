@@ -5,6 +5,7 @@ class Api::V1::CollectionsController < Api::ApiController
   include IndexSearch
 
   before_action :filter_by_project_ids, only: :index
+  before_action :filter_by_subjects_count, only: :index
   before_action :pluralize_project_links, only: :create
 
   require_authentication :create, :update, :destroy, scopes: [:collection]
@@ -20,11 +21,48 @@ class Api::V1::CollectionsController < Api::ApiController
     query.search_display_name(name.join(" "))
   end
 
+  def update
+    @updated_resources = Collection.transaction do
+      controlled_resources.zip(Array.wrap(update_params.to_h)).map do |collection, update_hash|
+        links = update_hash[:links] || {}
+
+        collection.assign_attributes(build_update_hash(update_hash.except(:links), collection))
+        collection.default_subject_id = links[:default_subject] if links.key?(:default_subject)
+        collection.save!
+
+        if links.key?(:subjects)
+          old_subject_ids = collection.subjects.map(&:id)
+          new_subject_ids = Array(links[:subjects]).compact_blank.map(&:to_i)
+          subject_ids_to_remove = old_subject_ids - new_subject_ids
+          subject_ids_to_add = new_subject_ids - old_subject_ids
+          # trigger AR callbacks for the removed and added subjects to update the collection's subjects_count
+          collection.collections_subjects.where(subject_id: subject_ids_to_remove).destroy_all
+          collection.collections_subjects.create!(subject_ids_to_add.map { |id| { subject_id: id } })
+        end
+      end
+    end
+
+    updated_resource_response
+  end
+
   def destroy_links
     super { |collection| check_default_subject(collection) }
   end
 
   protected
+
+  def add_relation(resource, relation, value)
+    super
+    resource.reload if relation == :subjects && value.is_a?(Array)
+  end
+
+  def destroy_relation(resource, relation, value)
+    return super unless relation == :subjects
+
+    ids = value.split(',').map(&:to_i)
+    resource.send(relation).destroy(*ids)
+    resource.reload
+  end
 
   def build_resource_for_create(create_params)
     add_user_as_linked_owner(create_params)
@@ -42,6 +80,13 @@ class Api::V1::CollectionsController < Api::ApiController
       project_ids = ids_string.split(",")
       @controlled_resources = controlled_resources.joins(:projects).where(projects: {id: project_ids})
     end
+  end
+
+  def filter_by_subjects_count
+    min_subjects_count = params.delete(:min_subjects).presence&.to_i
+    return unless min_subjects_count
+
+    @controlled_resources = controlled_resources.where('subjects_count >= ?', min_subjects_count)
   end
 
   def pluralize_project_links
