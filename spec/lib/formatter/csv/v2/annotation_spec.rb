@@ -18,7 +18,7 @@ RSpec.describe Formatter::Csv::V2::Annotation do
   end
 
   context 'with a non-dropdown task workflow and annotation' do
-    let(:workflow) { build_stubbed(:workflow) }
+    let(:workflow) { build_stubbed(:workflow, :question_task) }
     let(:annotation) { { 'task' => 'interest', 'value' => {} } }
     let(:default_formatter) { formatter.default_formatter }
 
@@ -54,6 +54,30 @@ RSpec.describe Formatter::Csv::V2::Annotation do
     it 'uses the dropdown annotation formatter' do
       formatter.to_h
       expect(dropdown_formatter).to have_received(:format)
+    end
+  end
+
+  context 'with a v2 drawing task' do
+    let(:workflow) { build_stubbed(:workflow) }
+    let(:annotation) do
+      {
+        'task' => 'interest',
+        'value' => [
+          { 'x' => 1, 'y' => 2, 'toolIndex' => 1 },
+          { 'x' => 3, 'y' => 4, 'toolIndex' => 2 }
+        ]
+      }
+    end
+    let(:drawing_formatter) { instance_double(Formatter::Csv::V2::DrawingAnnotation) }
+
+    before do
+      allow(Formatter::Csv::V2::DrawingAnnotation).to receive(:new).and_return(drawing_formatter)
+      allow(drawing_formatter).to receive(:format)
+    end
+
+    it 'uses the drawing annotation formatter' do
+      formatter.to_h
+      expect(drawing_formatter).to have_received(:format)
     end
   end
 end
