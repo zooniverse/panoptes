@@ -234,7 +234,8 @@ CREATE TABLE public.collections (
     slug character varying DEFAULT ''::character varying,
     favorite boolean DEFAULT false NOT NULL,
     default_subject_id integer,
-    description text DEFAULT ''::text
+    description text DEFAULT ''::text,
+    subjects_count integer DEFAULT 0
 );
 
 
@@ -2852,6 +2853,13 @@ CREATE INDEX index_collections_on_slug ON public.collections USING btree (slug);
 
 
 --
+-- Name: index_collections_on_subjects_count; Type: INDEX; Schema: public; Owner: -
+--
+
+CREATE INDEX index_collections_on_subjects_count ON public.collections USING btree (subjects_count);
+
+
+--
 -- Name: index_collections_projects_on_collection_id; Type: INDEX; Schema: public; Owner: -
 --
 
@@ -4326,6 +4334,7 @@ ALTER TABLE ONLY public.recents
 SET search_path TO "$user", public;
 
 INSERT INTO "schema_migrations" (version) VALUES
+('20260520193213'),
 ('20260428222525'),
 ('20260407184533'),
 ('20260323120200'),

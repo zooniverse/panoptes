@@ -79,6 +79,32 @@ describe Api::V1::CollectionsController, type: :controller do
           expect(json_response[api_resource_name].map { |r| r['id'] }).to match_array([favorite_col.id.to_s])
         end
       end
+
+      describe 'by min_subjects' do
+        before do
+          collections.first.update_column(:subjects_count, 1)
+          collections.second.update_column(:subjects_count, 3)
+          private_resource.update_column(:subjects_count, 4)
+        end
+
+        it 'only returns visible collections with at least the requested subject count' do
+          get :index, params: { min_subjects: 3 }
+
+          expect(json_response[api_resource_name].map { |r| r['id'] }).to match_array([collections.second.id.to_s])
+        end
+
+        it 'does not filter collections when min_subjects is blank' do
+          get :index, params: { min_subjects: '' }
+
+          expect(json_response[api_resource_name].map { |r| r['id'] }).to match_array(collections.map { |col| col.id.to_s })
+        end
+
+        it 'does not filter collections when min_subjects is not provided' do
+          get :index
+
+          expect(json_response[api_resource_name].map { |r| r['id'] }).to match_array(collections.map { |col| col.id.to_s })
+        end
+      end
     end
   end
 
@@ -112,6 +138,36 @@ describe Api::V1::CollectionsController, type: :controller do
     it_behaves_like 'is updatable'
     it_behaves_like 'has updatable links'
     it_behaves_like 'supports update_links'
+
+    context 'when update_params contains links' do
+      before do
+        default_request scopes: scopes, user_id: authorized_user.id
+      end
+
+      it 'updates the subjects_count when links contain subjects' do
+        put :update, params: update_params.merge(id: resource.id)
+        expect(collection.reload.subjects_count).to eq(subjects.size)
+      end
+
+      it 'updates the default_subject_id when links contain default_subject' do
+        links = update_params[:collections][:links]
+        links[:default_subject] = subjects.first.id.to_s
+        update_params[:collections][:links] = links
+        put :update, params: update_params.merge(id: resource.id)
+        expect(collection.reload.default_subject_id).to eq(subjects.first.id)
+      end
+    end
+
+    it 'updates subjects_count on update_links' do
+      new_subject = create(:subject)
+      default_request scopes: scopes, user_id: authorized_user.id
+      params = {
+        link_relation: 'subjects',
+        collection_id: resource.id,
+        subjects: [new_subject.id]
+      }
+      expect { post :update_links, params: params }.to change { resource.reload.subjects_count }.by(params[:subjects].size)
+    end
 
     context 'when the subject is already in a collection' do
       let!(:test_relation_ids) { Array.wrap(collection.subjects.first.id) }
@@ -272,6 +328,19 @@ describe Api::V1::CollectionsController, type: :controller do
   end
 
   describe '#destroy_links' do
+    context 'subjects_count' do
+      before do
+        default_request scopes: scopes, user_id: authorized_user.id
+      end
+
+      it 'decrements the subjects_count' do
+        params = { collection_id: collection.id,
+                   link_relation: :subjects,
+                   link_ids: collection.subjects.first.id.to_s }
+        expect { delete :destroy_links, params: params }.to change { collection.reload.subjects_count }.by(-1)
+      end
+    end
+
     context 'removing the default subject from the collection' do
       let(:default_subject) { collection.subjects.first }
 
