@@ -27,6 +27,8 @@ module Formatter
           case task_info['type']
           when 'dropdown'
             DropdownAnnotation.new(task_info, current_annotation, workflow_information).format
+          when 'drawing'
+            DrawingAnnotation.new(task_info, current_annotation, workflow_information).format
           else
             # use the default formatter (v1) for non v2 specific task types
             # as time goes on behaviour will eventually move from default formatter
