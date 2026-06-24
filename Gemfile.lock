@@ -251,7 +251,7 @@ GEM
     http-accept (1.7.0)
     http-cookie (1.0.5)
       domain_name (~> 0.5)
-    httparty (0.24.0)
+    httparty (0.24.2)
       csv
       mini_mime (>= 1.0.0)
       multi_xml (>= 0.5.2)
@@ -322,7 +322,7 @@ GEM
       prism (~> 1.5)
     mock_redis (0.34.0)
       ruby2_keywords
-    multi_xml (0.8.1)
+    multi_xml (0.9.1)
       bigdecimal (>= 3.1, < 5)
     multipart-post (2.2.3)
     nenv (0.3.0)
