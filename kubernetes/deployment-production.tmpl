@@ -62,20 +62,41 @@ data:
       default $http_x_azure_clientip;
     }
 
+    log_format json_main escape=json
+      '{'
+        '"timestamp":"$time_iso8601",'
+        '"client_ip":"$resolved_client_ip",'
+        '"host":"$host",'
+        '"remote_addr":"$remote_addr",'
+        '"request":"$request",'
+        '"status":$status,'
+        '"body_bytes_sent":$body_bytes_sent,'
+        '"request_time":$request_time,'
+        '"upstream_time":"$upstream_response_time",'
+        '"http_referer":"$http_referer",'
+        '"http_user_agent":"$http_user_agent",'
+        '"http_x_forwarded_for":"$http_x_forwarded_for",'
+        '"http_x_real_ip":"$http_x_real_ip",'
+        '"request_id":"$request_id"'
+      '}';
+
     server {
       server_name www.zooniverse.org;
+      access_log /dev/stdout json_main;
       include /etc/nginx/ssl.default.conf;
       include /etc/nginx/shared/panoptes-nginx-common.conf;
     }
 
     server {
       server_name panoptes.zooniverse.org;
+      access_log /dev/stdout json_main;
       include /etc/nginx/ssl.default.conf;
       include /etc/nginx/shared/panoptes-nginx-common.conf;
     }
 
     server {
       server_name signin.zooniverse.org;
+      access_log /dev/stdout json_main;
       include /etc/nginx/ssl.default.conf;
       include /etc/nginx/shared/panoptes-nginx-common.conf;
     }
