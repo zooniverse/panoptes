@@ -95,7 +95,9 @@ GEM
     minitest (6.0.3)
       drb (~> 2.0)
       prism (~> 1.5)
-    nokogiri (1.19.2-aarch64-linux-gnu)
+    nokogiri (1.19.4-aarch64-linux-gnu)
+      racc (~> 1.4)
+    nokogiri (1.19.4-x86_64-linux-gnu)
       racc (~> 1.4)
     padrino-helpers (0.15.1)
       i18n (>= 0.6.7, < 2)
@@ -138,13 +140,14 @@ GEM
 
 PLATFORMS
   aarch64-linux
+  x86_64-linux
 
 DEPENDENCIES
   middleman (~> 4.2)
   middleman-autoprefixer (~> 3.0)
   middleman-sprockets (~> 4.0)
   middleman-syntax (~> 3.0)
-  nokogiri (~> 1.19.2)
+  nokogiri (~> 1.19.4)
   redcarpet (~> 3.5)
   rouge (~> 2.0)
 
