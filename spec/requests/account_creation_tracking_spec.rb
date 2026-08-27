@@ -5,9 +5,9 @@ require 'spec_helper'
 describe 'account creation tracking', type: :request, with_cache_store: true do
   let(:ip_address) { '203.0.113.10' }
   let(:user_params) do
-    [ :email, :password, :password_confirmation, :login, :display_name,
-      :global_email_communication, :project_email_communication,
-      :beta_email_communication, :project_id ]
+    %i[email password password_confirmation login display_name
+       global_email_communication project_email_communication
+       beta_email_communication project_id]
   end
   let(:headers) do
     {
