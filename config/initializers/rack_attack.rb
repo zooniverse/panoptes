@@ -16,5 +16,9 @@ module Rack
         params.dig('user', 'email').to_s.downcase.gsub(/\s+/, '').presence
       end
     end
+
+    track('account_creation/ip', limit: 5, period: 1.day) do |req|
+      req.ip if req.path == '/users' && req.post?
+    end
   end
 end
