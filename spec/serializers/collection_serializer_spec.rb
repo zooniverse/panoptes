@@ -25,6 +25,20 @@ describe CollectionSerializer do
     end
   end
 
+  describe 'collection roles include' do
+    it 'only includes roles for the collection resource type' do
+      conflicting_resource = create(:project, id: collection.id)
+      result = described_class.page({ include: 'collection_roles' }, Collection.where(id: collection.id), {})
+      collection_links = result.dig(:collections, 0, :links)
+      collection_role_ids = collection.collection_roles.pluck(:id).map(&:to_s)
+      linked_role_ids = result.dig(:linked, :collection_roles).map { |role| role[:id] }
+
+      expect(collection_links[:collection_roles]).to contain_exactly(*collection_role_ids)
+      expect(collection_links).not_to have_key('collection_roles')
+      expect(linked_role_ids).to contain_exactly(*collection_role_ids)
+    end
+  end
+
   describe "sorting" do
     before do
       collection
