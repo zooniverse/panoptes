@@ -31,7 +31,7 @@ describe CollectionSerializer do
       result = described_class.page({ include: 'collection_roles' }, Collection.where(id: collection.id), {})
       collection_links = result.dig(:collections, 0, :links)
       collection_role_ids = collection.collection_roles.pluck(:id).map(&:to_s)
-      linked_role_ids = result.dig(:linked, :collection_roles).map { |role| role[:id] }
+      linked_role_ids = result.dig(:linked, :collection_roles).pluck(:id)
 
       expect(collection_links[:collection_roles]).to contain_exactly(*collection_role_ids)
       expect(collection_links).not_to have_key('collection_roles')
