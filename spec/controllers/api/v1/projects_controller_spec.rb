@@ -388,6 +388,17 @@ describe Api::V1::ProjectsController, type: :controller do
         get :show, params: { id: resource.id }
       end
     end
+
+    it 'scopes included project roles to projects' do
+      conflicting_resource = create(:collection, id: project.id)
+      get :show, params: { id: project.id, include: 'project_roles' }
+
+      included_roles = json_response['linked']['project_roles']
+      included_role_ids = included_roles.map { |role| role['id'] }
+
+      expect(included_role_ids).to include(project.access_control_lists.first.id.to_s)
+      expect(included_role_ids).not_to include(conflicting_resource.access_control_lists.first.id.to_s)
+    end
   end
 
   describe '#create' do

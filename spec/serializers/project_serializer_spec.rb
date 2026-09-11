@@ -69,6 +69,20 @@ describe ProjectSerializer do
     end
   end
 
+  describe 'project roles include' do
+    it 'does not include roles for another resource type with the same id' do
+      conflicting_resource = create(:collection, id: project.id)
+      result = described_class.page({ include: 'project_roles' }, Project.where(id: project.id), {})
+      project_links = result.dig(:projects, 0, :links)
+      project_role_ids = project.project_roles.pluck(:id).map(&:to_s)
+      linked_role_ids = result.dig(:linked, :project_roles).map { |role| role[:id] }
+
+      expect(project_links[:project_roles]).to contain_exactly(*project_role_ids)
+      expect(project_links).not_to have_key('project_roles')
+      expect(linked_role_ids).to contain_exactly(*project_role_ids)
+    end
+  end
+
   describe "#urls" do
     it "should return the translated version of the url labels" do
       urls = [{"label" => "Blog",
