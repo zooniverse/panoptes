@@ -112,6 +112,17 @@ describe Api::V1::CollectionsController, type: :controller do
     let(:resource) { collection }
 
     it_behaves_like 'is showable'
+
+    it 'scopes included collection roles to collections' do
+      conflicting_resource = create(:project, id: collection.id)
+      get :show, params: { id: collection.id, include: 'collection_roles' }
+
+      included_roles = json_response['linked']['collection_roles']
+      included_role_ids = included_roles.map { |role| role['id'] }
+
+      expect(included_role_ids).to include(collection.collection_roles.first.id.to_s)
+      expect(included_role_ids).not_to include(conflicting_resource.access_control_lists.first.id.to_s)
+    end
   end
 
   describe '#update' do
