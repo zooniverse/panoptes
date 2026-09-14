@@ -1,4 +1,4 @@
-FROM ruby:3.2-bullseye
+FROM ruby:3.2-bookworm
 
 
 WORKDIR /rails_app
