@@ -42,7 +42,7 @@ GEM
     hashie (3.6.0)
     i18n (1.14.8)
       concurrent-ruby (~> 1.0)
-    json (2.19.3)
+    json (2.19.9)
     kramdown (2.4.0)
       rexml
     listen (3.0.8)
@@ -97,6 +97,8 @@ GEM
       prism (~> 1.5)
     nokogiri (1.19.2-aarch64-linux-gnu)
       racc (~> 1.4)
+    nokogiri (1.19.2-x86_64-linux-gnu)
+      racc (~> 1.4)
     padrino-helpers (0.15.1)
       i18n (>= 0.6.7, < 2)
       padrino-support (= 0.15.1)
@@ -138,6 +140,7 @@ GEM
 
 PLATFORMS
   aarch64-linux
+  x86_64-linux
 
 DEPENDENCIES
   middleman (~> 4.2)
