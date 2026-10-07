@@ -63,16 +63,20 @@ RSpec.describe SubjectRemovalWorker do
   it 'allows an explicit hard deletion when orphan cleanup is disabled' do
     Flipper.disable(feature_name)
     allow(Subjects::Remover).to receive(:new).with(subject_id, nil, nil).and_return(remover)
-    expect(remover).to receive(:cleanup).with(hard_delete: true)
+    allow(remover).to receive(:cleanup)
 
     subject_remover.perform(subject_id, nil, true)
+
+    expect(remover).to have_received(:cleanup).with(hard_delete: true)
   end
 
   it 'keeps existing subject-set jobs on the guarded cleanup path' do
     Flipper.enable(feature_name)
     allow(Subjects::Remover).to receive(:new).with(subject_id, nil, 42).and_return(remover)
-    expect(remover).to receive(:cleanup).with(hard_delete: false)
+    allow(remover).to receive(:cleanup)
 
     subject_remover.perform(subject_id, 42)
+
+    expect(remover).to have_received(:cleanup).with(hard_delete: false)
   end
 end

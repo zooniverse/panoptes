@@ -896,8 +896,9 @@ describe Api::V1::SubjectsController, type: :controller do
     it "should background a job to cleanup orphan subjects" do
       stub_token(scopes: scopes, user_id: authorized_user.id)
       set_preconditions
-      expect(SubjectRemovalWorker).to receive(:perform_async).with(resource.id, nil, false)
+      allow(SubjectRemovalWorker).to receive(:perform_async)
       delete :destroy, params: { id: resource.id }
+      expect(SubjectRemovalWorker).to have_received(:perform_async).with(resource.id, nil, false)
     end
 
     it "should handle redis timeout error" do
@@ -907,7 +908,7 @@ describe Api::V1::SubjectsController, type: :controller do
       delete :destroy, params: { id: resource.id }
     end
 
-    context 'hard deletion' do
+    context 'with hard deletion' do
       before do
         stub_token(scopes: scopes, user_id: authorized_user.id)
         set_preconditions
@@ -922,9 +923,10 @@ describe Api::V1::SubjectsController, type: :controller do
       end
 
       it 'treats false as ordinary deletion' do
-        expect(SubjectRemovalWorker).to receive(:perform_async).with(resource.id, nil, false)
+        allow(SubjectRemovalWorker).to receive(:perform_async)
         delete :destroy, params: { id: resource.id, hard_delete: 'false' }
 
+        expect(SubjectRemovalWorker).to have_received(:perform_async).with(resource.id, nil, false)
         expect(response).to have_http_status(:no_content)
       end
 
@@ -935,13 +937,14 @@ describe Api::V1::SubjectsController, type: :controller do
         expect(resource.reload).to be_active
       end
 
-      context 'as an administrator' do
+      context 'with an administrator' do
         let(:user) { create(:admin_user) }
 
         it 'passes the authorized hard-delete flag to the existing worker' do
-          expect(SubjectRemovalWorker).to receive(:perform_async).with(resource.id, nil, true)
+          allow(SubjectRemovalWorker).to receive(:perform_async)
           delete :destroy, params: { id: resource.id, admin: true, hard_delete: true }
 
+          expect(SubjectRemovalWorker).to have_received(:perform_async).with(resource.id, nil, true)
           expect(response).to have_http_status(:no_content)
           expect(resource.reload).to be_inactive
         end
@@ -954,17 +957,19 @@ describe Api::V1::SubjectsController, type: :controller do
         end
 
         it 'keeps admin-only requests on the ordinary deletion path' do
-          expect(SubjectRemovalWorker).to receive(:perform_async).with(resource.id, nil, false)
+          allow(SubjectRemovalWorker).to receive(:perform_async)
           delete :destroy, params: { id: resource.id, admin: true }
 
+          expect(SubjectRemovalWorker).to have_received(:perform_async).with(resource.id, nil, false)
           expect(response).to have_http_status(:no_content)
         end
 
         it 'queues tutorial subjects for association cleanup in the worker' do
           create(:workflow, tutorial_subject: resource)
-          expect(SubjectRemovalWorker).to receive(:perform_async).with(resource.id, nil, true)
+          allow(SubjectRemovalWorker).to receive(:perform_async)
           delete :destroy, params: { id: resource.id, admin: true, hard_delete: true }
 
+          expect(SubjectRemovalWorker).to have_received(:perform_async).with(resource.id, nil, true)
           expect(response).to have_http_status(:no_content)
           expect(resource.reload).to be_inactive
         end
@@ -972,10 +977,11 @@ describe Api::V1::SubjectsController, type: :controller do
         it 'reports a hard-delete enqueue timeout without raising' do
           error = Timeout::Error.new
           allow(SubjectRemovalWorker).to receive(:perform_async).and_raise(error)
-          expect(Honeybadger).to receive(:notify).with(error)
+          allow(Honeybadger).to receive(:notify)
 
           delete :destroy, params: { id: resource.id, admin: true, hard_delete: true }
 
+          expect(Honeybadger).to have_received(:notify).with(error)
           expect(response).to have_http_status(:no_content)
           expect(resource.reload).to be_inactive
         end

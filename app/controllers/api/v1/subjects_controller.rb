@@ -148,9 +148,7 @@ class Api::V1::SubjectsController < Api::ApiController
 
   def destroy
     hard_delete = hard_delete_requested?
-    if hard_delete
-      raise Api::Unauthorized, 'Hard deletion requires administrator access' unless api_user.is_admin?
-    end
+    raise Api::Unauthorized, 'Hard deletion requires administrator access' if hard_delete && !api_user.is_admin?
 
     super
 

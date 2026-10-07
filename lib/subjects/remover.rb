@@ -19,9 +19,7 @@ module Subjects
         set_member_subjects = orphan_subject.set_member_subjects
         workflow_ids = orphan_subject.workflows.pluck(:id)
         subject_set_ids = set_member_subjects.pluck(:subject_set_id) if hard_delete
-        if hard_delete
-          workflow_ids |= orphan_subject_sws_scope.pluck(:workflow_id)
-        end
+        workflow_ids |= orphan_subject_sws_scope.pluck(:workflow_id) if hard_delete
         ActiveRecord::Base.transaction do
           orphan_subject.lock! if hard_delete
           remove_used_subject_links if hard_delete
@@ -52,12 +50,19 @@ module Subjects
       delete_subject_rows(:classification_subjects)
       delete_subject_rows(:recents_old) if Subject.connection.data_source_exists?(:recents_old)
       Recent.where(subject_id: subject_id).delete_all
+      remove_collection_links
+      Workflow.where(tutorial_subject_id: subject_id).update_all(tutorial_subject_id: nil, updated_at: Time.current)
+      clear_gold_standard_subject
+    end
+
+    def remove_collection_links
       Collection.where(default_subject_id: subject_id).update_all(default_subject_id: nil, updated_at: Time.current)
       orphan_subject.collections_subjects.find_each(&:destroy!)
-      Workflow.where(tutorial_subject_id: subject_id).update_all(tutorial_subject_id: nil, updated_at: Time.current)
+    end
 
+    def clear_gold_standard_subject
       connection = Subject.connection
-      connection.execute <<-SQL
+      connection.execute <<-SQL.squish
         UPDATE gold_standard_annotations
         SET subject_id = NULL, updated_at = CURRENT_TIMESTAMP
         WHERE subject_id = #{connection.quote(subject_id)}
@@ -66,7 +71,7 @@ module Subjects
 
     def delete_subject_rows(table_name)
       connection = Subject.connection
-      connection.execute <<-SQL
+      connection.execute <<-SQL.squish
         DELETE FROM #{connection.quote_table_name(table_name)}
         WHERE subject_id = #{connection.quote(subject_id)}
       SQL
