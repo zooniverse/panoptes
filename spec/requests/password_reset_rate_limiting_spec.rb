@@ -31,6 +31,21 @@ describe 'password reset rate limiting', type: :request, with_cache_store: true 
          headers: html_headers
   end
 
+  def password_reset_notification_options
+    hash_including(
+      error_class: 'RateLimitExceeded',
+      context: hash_including(
+        throttle: 'password_reset/email',
+        match_type: :throttle,
+        path: '/users/password',
+        method: 'POST',
+        period: 1.hour,
+        limit: 1,
+        count: 2
+      )
+    )
+  end
+
   describe 'POST /users/password via JSON' do
     let(:user) { create(:user) }
     let(:email) { user.email }
@@ -77,27 +92,16 @@ describe 'password reset rate limiting', type: :request, with_cache_store: true 
         allow(Honeybadger).to receive(:notify)
 
         limit.times { password_reset_request(email) }
+        password_reset_request(email)
 
-        expect(Honeybadger).to receive(:notify).with(
+        expect(Honeybadger).to have_received(:notify).with(
           'Rack::Attack Rate Limit Triggered: password_reset/email',
-          hash_including(
-            error_class: 'RateLimitExceeded',
-            context: hash_including(
-              throttle: 'password_reset/email',
-              match_type: :throttle,
-              path: '/users/password',
-              method: 'POST',
-              period: 1.hour,
-              limit: 1,
-              count: 2
-            )
-          )
-        ) do |_message, options|
+          password_reset_notification_options
+        )
+        expect(Honeybadger).to have_received(:notify) do |_message, options|
           expect(options[:context]).not_to have_key(:match_discriminator)
           expect(options[:context].values).not_to include(email)
         end
-
-        password_reset_request(email)
       end
     end
 

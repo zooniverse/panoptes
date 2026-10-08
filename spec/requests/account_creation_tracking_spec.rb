@@ -60,9 +60,9 @@ describe 'account creation tracking', type: :request, with_cache_store: true do
     end
 
     it 'notifies Honeybadger when the tracking limit is reached' do
-      5.times { account_creation_request }
+      6.times { account_creation_request }
 
-      expect(Honeybadger).to receive(:notify).with(
+      expect(Honeybadger).to have_received(:notify).with(
         'Rack::Attack Rate Limit Triggered: account_creation/ip',
         hash_including(
           error_class: 'RateLimitExceeded',
@@ -78,8 +78,6 @@ describe 'account creation tracking', type: :request, with_cache_store: true do
           )
         )
       )
-
-      account_creation_request
     end
   end
 end
