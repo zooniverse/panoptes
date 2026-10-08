@@ -72,6 +72,33 @@ describe 'password reset rate limiting', type: :request, with_cache_store: true 
         password_reset_request(email)
         expect(response.status).to eq(429)
       end
+
+      it 'notifies Honeybadger when throttled without exposing the email discriminator' do
+        allow(Honeybadger).to receive(:notify)
+
+        limit.times { password_reset_request(email) }
+
+        expect(Honeybadger).to receive(:notify).with(
+          'Rack::Attack Rate Limit Triggered: password_reset/email',
+          hash_including(
+            error_class: 'RateLimitExceeded',
+            context: hash_including(
+              throttle: 'password_reset/email',
+              match_type: :throttle,
+              path: '/users/password',
+              method: 'POST',
+              period: 1.hour,
+              limit: 1,
+              count: 2
+            )
+          )
+        ) do |_message, options|
+          expect(options[:context]).not_to have_key(:match_discriminator)
+          expect(options[:context].values).not_to include(email)
+        end
+
+        password_reset_request(email)
+      end
     end
 
     context 'with rate limiting per email address' do

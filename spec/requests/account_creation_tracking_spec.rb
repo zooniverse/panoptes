@@ -47,4 +47,39 @@ describe 'account creation tracking', type: :request, with_cache_store: true do
       expect(response).to have_http_status(:created)
     end
   end
+
+  describe 'Honeybadger notifications' do
+    before do
+      allow(Honeybadger).to receive(:notify)
+    end
+
+    it 'does not notify Honeybadger when under the tracking limit' do
+      account_creation_request
+
+      expect(Honeybadger).not_to have_received(:notify)
+    end
+
+    it 'notifies Honeybadger when the tracking limit is reached' do
+      5.times { account_creation_request }
+
+      expect(Honeybadger).to receive(:notify).with(
+        'Rack::Attack Rate Limit Triggered: account_creation/ip',
+        hash_including(
+          error_class: 'RateLimitExceeded',
+          context: hash_including(
+            throttle: 'account_creation/ip',
+            match_type: :track,
+            ip: ip_address,
+            path: '/users',
+            method: 'POST',
+            period: 1.day,
+            limit: 5,
+            count: 6
+          )
+        )
+      )
+
+      account_creation_request
+    end
+  end
 end
