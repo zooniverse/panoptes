@@ -5,7 +5,7 @@ RSpec.describe Api::V1::CollectionRolesController, type: :controller do
   let(:collection) { create(:collection, owner: authorized_user) }
 
   let!(:acls) do
-    create_list :access_control_list, 2, resource: collection,
+    create_list :access_control_list_with_user_group, 2, resource: collection,
                 roles: ["viewer"]
   end
 
@@ -98,5 +98,53 @@ RSpec.describe Api::V1::CollectionRolesController, type: :controller do
 
   describe "#destroy" do
     it_behaves_like "is destructable"
+  end
+
+  context 'mailers' do
+    let(:user) do
+      create(:user) do |user|
+        create :access_control_list, user_group: user.identity_group, resource: collection
+      end
+    end
+
+    let(:other_user) { create(:user) }
+
+    before(:each) do
+      default_request scopes: scopes, user_id: authorized_user.id
+    end 
+
+    it 'calls the mailer if user added to collection' do
+      params = {
+        collection_roles: {
+          roles: ["collaborator"],
+          links: {
+            user: other_user.id.to_s,
+            collection: collection.id.to_s
+          }
+        }
+      }
+      expect(UserAddedToCollectionMailerWorker).to receive(:perform_async).with(other_user.id, collection.id, ["collaborator"]).once
+      post :create, params: params
+    end
+
+    it 'calls the mailer if user role is updated to include a new role' do
+      params = {
+        collection_roles: {
+          roles: ["collaborator", "viewer"]
+        }
+      }
+      expect(UserAddedToCollectionMailerWorker).to receive(:perform_async).with(user.id, collection.id, ["collaborator", "viewer"]).once
+      put :update, params: params.merge(id: user.user_groups.first.access_control_lists.first)
+    end
+
+    it 'does not call the mailer if user role is removed from collection' do
+      params = {
+        collection_roles: {
+          roles: [],
+        }
+      }
+      expect(UserAddedToCollectionMailerWorker).to_not receive(:perform_async)
+      put :update, params: params.merge(id: user.user_groups.first.access_control_lists.first)
+    end
   end
 end
