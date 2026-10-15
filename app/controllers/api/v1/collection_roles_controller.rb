@@ -33,7 +33,7 @@ class Api::V1::CollectionRolesController < Api::ApiController
   private
 
   def roles
-    params.dig(:project_roles, :roles)
+    params.dig(:collection_roles, :roles)
   end
 
   def new_roles_present?(roles, previous_roles = [])
