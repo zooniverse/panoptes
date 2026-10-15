@@ -32,6 +32,18 @@ class Api::V1::CollectionRolesController < Api::ApiController
 
   private
 
+  def acl_user_id
+    controlled_resource.user_group.users.first.id.to_i
+  end
+
+  def new_user_id
+    params.dig(:collection_roles, :links, :user).to_i
+  end
+
+  def collection_id
+    params.dig(:collection_roles, :links, :collection).to_i
+  end
+
   def roles
     params.dig(:collection_roles, :roles)
   end
