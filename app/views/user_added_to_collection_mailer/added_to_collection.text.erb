@@ -3,7 +3,7 @@ You have been added to the Zooniverse collection <%= @collection.display_name %>
 Visit <%= Panoptes.frontend_url %>/collections/<%= @collection.owner %>/<%= @collection.id %>"> to get started.
 
 <% if @roles.include? "collaborator" %>
-  <p>To edit your project, go to <%= Panoptes.frontend_url %>/collections/<%= @collection.owner %>/<%= @collection.id %>></p>
+  <p>To edit the collection, go to <%= Panoptes.frontend_url %>/collections/<%= @collection.owner %>/<%= @collection.id %>></p>
 <% end %>
 
 If you believe this to be in error, please contact support (contact@zooniverse.org).
