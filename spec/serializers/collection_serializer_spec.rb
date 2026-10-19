@@ -39,7 +39,7 @@ describe CollectionSerializer do
     end
   end
 
-  describe "sorting" do
+  describe 'sorting' do
     before do
       collection
       first_by_name
@@ -49,13 +49,47 @@ describe CollectionSerializer do
       create(:collection, display_name: "Aardvarks")
     end
     let(:serialized_page) do
-      CollectionSerializer.page({sort: "display_name"}, Collection.all, {})
+      described_class.page({ sort: 'display_name' }, Collection.all, {})
     end
 
-    describe "by display_name" do
-      it 'should respect the sort order query param' do
-        results = serialized_page[:collections].map{ |r| r[:display_name] }
-        expected = [ first_by_name.display_name, collection.display_name ]
+    describe 'by display_name' do
+      it 'respects the sort order query param' do
+        results = serialized_page[:collections].pluck(:display_name)
+        expected = [first_by_name.display_name, collection.display_name]
+        expect(results).to eq(expected)
+      end
+    end
+
+    describe 'by updated_at' do
+      before do
+        collection.update!(updated_at: 2.days.ago)
+        first_by_name.update!(updated_at: 1.day.ago)
+      end
+
+      let(:serialized_page) do
+        described_class.page({ sort: '-updated_at' }, Collection.all, {})
+      end
+
+      it 'respects the sort order query param properly' do
+        results = serialized_page[:collections].map { |r| r[:id].to_i }
+        expected = [first_by_name.id, collection.id]
+        expect(results).to eq(expected)
+      end
+    end
+
+    describe 'by created_at properly' do
+      before do
+        collection.update!(created_at: 2.days.ago)
+        first_by_name.update!(created_at: 1.day.ago)
+      end
+
+      let(:serialized_page) do
+        described_class.page({ sort: '-created_at' }, Collection.all, {})
+      end
+
+      it 'respects the sort order query param' do
+        results = serialized_page[:collections].map { |r| r[:id].to_i }
+        expected = [first_by_name.id, collection.id]
         expect(results).to eq(expected)
       end
     end
