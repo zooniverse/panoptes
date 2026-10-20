@@ -109,9 +109,11 @@ RSpec.describe Api::V1::CollectionRolesController, type: :controller do
 
     before do
       default_request scopes: scopes, user_id: authorized_user.id
+      allow(UserAddedToCollectionMailerWorker).to receive(:perform_async)
     end
 
     it 'enqueues mailer worker' do
+
       other_user = create(:user)
       params = {
         collection_roles: {
@@ -122,8 +124,9 @@ RSpec.describe Api::V1::CollectionRolesController, type: :controller do
           }
         }
       }
-      expect(UserAddedToCollectionMailerWorker).to receive(:perform_async).with(other_user.id, collection.id, ['collaborator']).once
       post :create, params: params
+
+      expect(UserAddedToCollectionMailerWorker).to have_received(:perform_async).with(other_user.id, collection.id, ['collaborator']).once
     end
 
     it 'enqueues mailer worker if user role is updated to include a new role' do
@@ -132,8 +135,10 @@ RSpec.describe Api::V1::CollectionRolesController, type: :controller do
           roles: %w[collaborator viewer]
         }
       }
-      expect(UserAddedToCollectionMailerWorker).to receive(:perform_async).with(user.id, collection.id, %w[collaborator viewer]).once
+      
       put :update, params: params.merge(id: user.user_groups.first.access_control_lists.first)
+
+      expect(UserAddedToCollectionMailerWorker).to have_received(:perform_async).with(user.id, collection.id, %w[collaborator viewer]).once
     end
 
     it 'does not call the mailer if user role is removed from collection' do
@@ -142,8 +147,8 @@ RSpec.describe Api::V1::CollectionRolesController, type: :controller do
           roles: []
         }
       }
-      expect(UserAddedToCollectionMailerWorker).not_to receive(:perform_async)
       put :update, params: params.merge(id: user.user_groups.first.access_control_lists.first)
+      expect(UserAddedToCollectionMailerWorker).not_to have_received(:perform_async)
     end
   end
 end

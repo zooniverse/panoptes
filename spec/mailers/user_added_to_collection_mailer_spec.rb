@@ -26,7 +26,7 @@ RSpec.describe UserAddedToCollectionMailer, type: :mailer do
     end
 
     it 'includes the collection URL in the body' do
-      expect(mail.body.encoded).to match("#{ Panoptes.frontend_url }/collections/#{ collection.slug }")
+      expect(mail.body.encoded).to match("#{Panoptes.frontend_url}/collections/#{collection.slug}")
     end
   end
 end

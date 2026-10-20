@@ -14,7 +14,7 @@ RSpec.describe UserAddedToCollectionMailerWorker do
       expect { mailer_worker.perform(user.id, collection.id, roles) }.to change { 'ActionMailer::Base'.constantize.deliveries.count }.by(1)
     end
 
-    context 'missing attributes' do
+    context 'with missing attributes' do
       it 'does not send email if user is missing' do
         expect { mailer_worker.perform(nil, collection.id, roles) }.not_to change { 'ActionMailer::Base'.constantize.deliveries.count }
       end
