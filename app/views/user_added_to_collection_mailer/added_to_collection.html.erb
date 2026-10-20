@@ -2,10 +2,6 @@
 
 <p>Go to <a href="<%= Panoptes.frontend_url %>/collections/<%= @collection.slug %>"><%= @collection.display_name %></a> to get started.</p>
 
-<% if @roles.include? "collaborator" %>
-  <p>To edit the collection, visit <a href="<%= Panoptes.frontend_url %>/collections/<%= @collection.owner.display_name %>/<%= @collection.id %>">this link</a></p>
-<% end %>
-
 <p>If you believe this to be in error, please contact support (contact@zooniverse.org).</p>
 
 <p>Thanks,</p>

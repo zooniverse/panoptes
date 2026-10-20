@@ -107,13 +107,12 @@ RSpec.describe Api::V1::CollectionRolesController, type: :controller do
       end
     end
 
-    let(:other_user) { create(:user) }
-
-    before(:each) do
+    before do
       default_request scopes: scopes, user_id: authorized_user.id
     end 
 
-    it 'calls the mailer if user added to collection' do
+    it 'enqueues mailer worker if user added to collection' do
+      other_user = create(:user)
       params = {
         collection_roles: {
           roles: ["collaborator"],
@@ -127,7 +126,7 @@ RSpec.describe Api::V1::CollectionRolesController, type: :controller do
       post :create, params: params
     end
 
-    it 'calls the mailer if user role is updated to include a new role' do
+    it 'enqueues mailer worker if user role is updated to include a new role' do
       params = {
         collection_roles: {
           roles: ["collaborator", "viewer"]
