@@ -48,10 +48,10 @@ class Api::V1::CollectionRolesController < Api::ApiController
     params.dig(:collection_roles, :roles)
   end
 
-  def new_roles_present?(roles, previous_roles = [])
-    return false unless roles.present?
+  def new_roles_present?(roles, previous_roles=[])
+    return false if roles.blank?
 
-    new_roles = ["collaborator", "viewer", "contributor"]
+    new_roles = %w[collaborator viewer contributor]
     (new_roles & (roles - previous_roles)).present?
   end
 end
