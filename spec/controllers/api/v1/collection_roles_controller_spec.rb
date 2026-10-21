@@ -113,7 +113,6 @@ RSpec.describe Api::V1::CollectionRolesController, type: :controller do
     end
 
     it 'enqueues mailer worker' do
-
       other_user = create(:user)
       params = {
         collection_roles: {
@@ -135,7 +134,6 @@ RSpec.describe Api::V1::CollectionRolesController, type: :controller do
           roles: %w[collaborator viewer]
         }
       }
-      
       put :update, params: params.merge(id: user.user_groups.first.access_control_lists.first)
 
       expect(UserAddedToCollectionMailerWorker).to have_received(:perform_async).with(user.id, collection.id, %w[collaborator viewer]).once
