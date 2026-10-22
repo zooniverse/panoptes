@@ -10,13 +10,16 @@ RSpec.describe SubjectMetadataWorker do
   let(:subject_two) do
     create(:subject, project: project, uploader: project.owner, metadata: {'#priority'=>'2'})
   end
+  let(:subject_three) do
+    create(:subject, project: project, uploader: project.owner, metadata: {'priority'=>'4'})
+  end
   let(:subject_set) do
     create(
       :subject_set_with_subjects,
-      num_subjects: 1,
+      num_subjects: 3,
       project: project,
       workflows: [workflow],
-      subjects: [subject_one, subject_two]
+      subjects: [subject_one, subject_two, subject_three]
     )
   end
   let(:set_member_subject_ids) do
@@ -44,7 +47,7 @@ RSpec.describe SubjectMetadataWorker do
       ).sort_by(&:id)
       expect(sms_one.priority).to eq(1/3.0)
       expect(sms_two.priority).to eq(2)
-      expect(sms_three.priority).to be_nil
+      expect(sms_three.priority).to eq(4)
     end
 
     it 'raises not found if the SMS resources do not exist' do

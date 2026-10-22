@@ -1,4 +1,4 @@
-FROM ruby:3.2-bullseye
+FROM ruby:3.2-bookworm
 
 WORKDIR /rails_app
 
@@ -8,8 +8,7 @@ RUN apt-get update && apt-get -y upgrade && \
       # git is required for installing gems from git repos
       git \
       libpq-dev \
-      # debian buster and comes with pg client v11 by default
-      postgresql-client-13 \
+      postgresql-client \
       tmpreaper
 
 # set MRI memory allocator to mimic jemalloc memory savings

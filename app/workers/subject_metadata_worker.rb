@@ -28,10 +28,10 @@ class SubjectMetadataWorker
       [
         <<-SQL.squish,
           UPDATE set_member_subjects
-          SET    priority = CAST(subjects.metadata->>'#priority' AS NUMERIC)
+          SET    priority = CAST(COALESCE(subjects.metadata->>'#priority', subjects.metadata->>'priority') AS NUMERIC)
           FROM   subjects
           WHERE  subjects.id = set_member_subjects.subject_id
-          AND    subjects.metadata ? '#priority'
+          AND    subjects.metadata ?| array['#priority', 'priority']
           AND    set_member_subjects.id IN (:sms_ids)
         SQL
         { sms_ids: sms_ids }

@@ -38,6 +38,20 @@ describe OrganizationSerializer do
     end
   end
 
+  describe 'organization roles include' do
+    it 'only includes roles for the organization resource type' do
+      conflicting_resource = create(:project, id: organization.id)
+      result = described_class.page({ include: 'organization_roles' }, Organization.where(id: organization.id), {})
+      org_links = result.dig(:organizations, 0, :links)
+      org_role_ids = organization.organization_roles.pluck(:id).map(&:to_s)
+      linked_role_ids = result.dig(:linked, :organization_roles).pluck(:id)
+
+      expect(org_links[:organization_roles]).to contain_exactly(*org_role_ids)
+      expect(org_links).not_to have_key('organization_roles')
+      expect(linked_role_ids).to contain_exactly(*org_role_ids)
+    end
+  end
+
   describe "media links" do
     it "should include top level links for media" do
       expect(serialized[:links]).to include(*links.map{ |l| "organizations.#{l}" })

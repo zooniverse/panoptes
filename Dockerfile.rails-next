@@ -1,4 +1,4 @@
-FROM ruby:3.2-bullseye
+FROM ruby:3.2-bookworm
 
 WORKDIR /rails_app
 
@@ -7,7 +7,7 @@ RUN apt-get update && apt-get -y upgrade && \
     build-essential \
     git \
     libpq-dev \
-    postgresql-client-13 \
+    postgresql-client \
     tmpreaper \
     && \
     apt-get clean

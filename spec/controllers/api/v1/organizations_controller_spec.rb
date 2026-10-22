@@ -132,6 +132,17 @@ describe Api::V1::OrganizationsController, type: :controller do
         let(:api_resource_attributes) { %w(id display_name) }
         let(:api_resource_links) { %w() }
       end
+
+      it 'scopes included organization roles to organizations' do
+        conflicting_resource = create(:project, id: organization.id)
+        get :show, params: { id: organization.id, include: 'organization_roles' }
+
+        included_roles = json_response['linked']['organization_roles']
+        included_role_ids = included_roles.map { |role| role['id'] }
+
+        expect(included_role_ids).to include(organization.organization_roles.first.id.to_s)
+        expect(included_role_ids).not_to include(conflicting_resource.access_control_lists.first.id.to_s)
+      end
     end
 
     describe "#create" do
