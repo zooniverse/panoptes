@@ -14,8 +14,7 @@ RUN apt-get update && apt-get -y upgrade && \
         nodejs \
         tmpreaper \
         ca-certificates \
-        && \
-        apt-get clean
+        && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # configure jemalloc v5 with v3 behaviours (trade ram usage over performance)
 # https://twitter.com/nateberkopec/status/1442894624935137288
