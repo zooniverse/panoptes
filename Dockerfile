@@ -13,8 +13,8 @@ RUN apt-get update && apt-get -y upgrade && \
         libpq-dev \
         nodejs \
         tmpreaper \
-        && \
-        apt-get clean
+        ca-certificates \
+        && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # configure jemalloc v5 with v3 behaviours (trade ram usage over performance)
 # https://twitter.com/nateberkopec/status/1442894624935137288
