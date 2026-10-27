@@ -13,6 +13,7 @@ RUN apt-get update && apt-get -y upgrade && \
         libpq-dev \
         nodejs \
         tmpreaper \
+        ca-certificates \
         && \
         apt-get clean
 
