@@ -5,7 +5,7 @@ RSpec.describe Api::V1::CollectionRolesController, type: :controller do
   let(:collection) { create(:collection, owner: authorized_user) }
 
   let!(:acls) do
-    create_list :access_control_list, 2, resource: collection,
+    create_list :access_control_list_with_user_group, 2, resource: collection,
                 roles: ["viewer"]
   end
 
@@ -52,7 +52,7 @@ RSpec.describe Api::V1::CollectionRolesController, type: :controller do
     it_behaves_like "is showable"
   end
 
-  describe "#update" do
+  describe '#update' do
     let(:unauthorized_user) { create(:user) }
     let(:test_attr) { :roles }
     let(:test_attr_value) { %w(collaborator) }
@@ -98,5 +98,55 @@ RSpec.describe Api::V1::CollectionRolesController, type: :controller do
 
   describe "#destroy" do
     it_behaves_like "is destructable"
+  end
+
+  context 'when a user is added to a collection' do
+    let(:user) do
+      create(:user) do |user|
+        create :access_control_list, user_group: user.identity_group, resource: collection
+      end
+    end
+
+    before do
+      default_request scopes: scopes, user_id: authorized_user.id
+      allow(UserAddedToCollectionMailerWorker).to receive(:perform_async)
+    end
+
+    it 'enqueues mailer worker' do
+      other_user = create(:user)
+      params = {
+        collection_roles: {
+          roles: ['collaborator'],
+          links: {
+            user: other_user.id.to_s,
+            collection: collection.id.to_s
+          }
+        }
+      }
+      post :create, params: params
+
+      expect(UserAddedToCollectionMailerWorker).to have_received(:perform_async).with(other_user.id, collection.id, ['collaborator']).once
+    end
+
+    it 'enqueues mailer worker if user role is updated to include a new role' do
+      params = {
+        collection_roles: {
+          roles: %w[collaborator viewer]
+        }
+      }
+      put :update, params: params.merge(id: user.user_groups.first.access_control_lists.first)
+
+      expect(UserAddedToCollectionMailerWorker).to have_received(:perform_async).with(user.id, collection.id, %w[collaborator viewer]).once
+    end
+
+    it 'does not call the mailer if user role is removed from collection' do
+      params = {
+        collection_roles: {
+          roles: []
+        }
+      }
+      put :update, params: params.merge(id: user.user_groups.first.access_control_lists.first)
+      expect(UserAddedToCollectionMailerWorker).not_to have_received(:perform_async)
+    end
   end
 end
