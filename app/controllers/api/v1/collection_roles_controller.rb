@@ -33,7 +33,7 @@ class Api::V1::CollectionRolesController < Api::ApiController
   private
 
   def acl_user_id
-    controlled_resource.user_group.users.first.id.to_i
+    controlled_resource.user_group&.users&.first&.id.to_i
   end
 
   def new_user_id
