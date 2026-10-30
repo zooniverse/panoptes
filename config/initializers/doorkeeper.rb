@@ -4,13 +4,13 @@ module Doorkeeper
       DESCRIPTIONS = {
         public: 'See your Zooniverse account information, including email and preferences',
         user: 'Update your Zooniverse account details',
-        project: 'Manage your projects, workflows, pages, subject sets, roles, preferences, imports, exports, and aggregations',
-        group: 'Manage your groups and memberships',
-        collection: 'Access and edit your collections and preferences',
-        classification: 'Read, update, and delete your existing classifications',
+        project: 'Manage your projects, workflows, pages, subject sets, roles, and data exports',
+        group: 'Manage your user groups and memberships',
+        collection: 'Access and edit your subject collections',
+        classification: 'Read existing classifications, update and delete incomplete classifications',
         subject: 'Create, upload, edit, and deactivate subjects',
         medium: 'Manage your uploaded and attached media',
-        organization: 'Manage your organizations, roles, and organization\'s pages',
+        organization: 'Manage your organizations and its roles',
         translation: 'Create and update translations'
       }.freeze
 
