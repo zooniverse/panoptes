@@ -14,7 +14,6 @@
       <ul style="list-style: none; padding-left: 0;">
         <% @pre_auth.scopes.each do |scope| %>
           <li style="margin-bottom: 1rem;">
-            <strong><%= t scope, scope: [:doorkeeper, :scopes] %></strong>
             <% if description = Doorkeeper::Panoptes::Scopes.description_for(scope) %>
               <div><%= description %></div>
             <% end %>
