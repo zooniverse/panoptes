@@ -8,12 +8,17 @@
   </p>
 
   <% if @pre_auth.scopes %>
-    <div id="oauth-permissions">
+    <div id="oauth-permissions" style="width: auto;">
       <p>This application will be able to:</p>
 
-      <ul class="text-info">
+      <ul style="list-style: none; padding-left: 0;">
         <% @pre_auth.scopes.each do |scope| %>
-          <li><%= t scope, scope: [:doorkeeper, :scopes] %></li>
+          <li style="margin-bottom: 1rem;">
+            <strong><%= t scope, scope: [:doorkeeper, :scopes] %></strong>
+            <% if description = Doorkeeper::Panoptes::Scopes.description_for(scope) %>
+              <div><%= description %></div>
+            <% end %>
+          </li>
         <% end %>
       </ul>
     </div>
