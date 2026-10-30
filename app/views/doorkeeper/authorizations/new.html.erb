@@ -4,12 +4,12 @@
 
 <main role="main">
   <p class="h4">
-    Authorize <strong class="text-info"><%= @pre_auth.client.name %></strong> to use your account?
+    <strong class="text-info"><%= @pre_auth.client.name %></strong> wants to use your Zooniverse account.
   </p>
 
   <% if @pre_auth.scopes %>
     <div id="oauth-permissions" style="width: auto;">
-      <p>This application will be able to:</p>
+      <p>With your permission, this site/service will be able to:</p>
 
       <ul style="list-style: none; padding-left: 0;">
         <% @pre_auth.scopes.each do |scope| %>
