@@ -2,16 +2,16 @@ module Doorkeeper
   module Panoptes
     module Scopes
       DESCRIPTIONS = {
-        public: "See your Zooniverse account information, including email and preferences",
-        user: "Update your Zooniverse account details",
-        project: "Manage your projects, workflows, pages, subject sets, roles, preferences, imports, exports, and aggregations",
-        group: "Manage your groups and memberships",
-        collection: "Access and edit your collections and preferences",
-        classification: "Read, update, and delete your existing classifications",
-        subject: "Create, upload, edit, and deactivate subjects",
-        medium: "Manage your uploaded and attached media",
-        organization: "Manage your organizations, roles, and organization's pages",
-        translation: "Create and update translations"
+        public: 'See your Zooniverse account information, including email and preferences',
+        user: 'Update your Zooniverse account details',
+        project: 'Manage your projects, workflows, pages, subject sets, roles, preferences, imports, exports, and aggregations',
+        group: 'Manage your groups and memberships',
+        collection: 'Access and edit your collections and preferences',
+        classification: 'Read, update, and delete your existing classifications',
+        subject: 'Create, upload, edit, and deactivate subjects',
+        medium: 'Manage your uploaded and attached media',
+        organization: 'Manage your organizations, roles, and organization\'s pages',
+        translation: 'Create and update translations'
       }.freeze
 
       def self.optional
