@@ -4,7 +4,7 @@ module Doorkeeper
       DESCRIPTIONS = {
         public: 'See your Zooniverse account information, including email and preferences',
         user: 'Update your Zooniverse account details',
-        project: 'Manage your projects, workflows, pages, subject sets, roles, and data exports',
+        project: 'Manage your projects, workflows, subject sets, roles, and data exports',
         group: 'Manage your user groups and memberships',
         collection: 'Access and edit your subject collections',
         classification: 'Read existing classifications, update and delete incomplete classifications',
