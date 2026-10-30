@@ -1,8 +1,25 @@
 module Doorkeeper
   module Panoptes
     module Scopes
+      DESCRIPTIONS = {
+        public: 'See your Zooniverse account information, including email and preferences',
+        user: 'Update your Zooniverse account details',
+        project: 'Manage your projects, workflows, subject sets, roles, and data exports',
+        group: 'Manage your user groups and memberships',
+        collection: 'Access and edit your subject collections',
+        classification: 'Read existing classifications, update and delete incomplete classifications',
+        subject: 'Create, upload, edit, and deactivate subjects',
+        medium: 'Manage your uploaded and attached media',
+        organization: 'Manage your organizations and its roles',
+        translation: 'Create and update translations'
+      }.freeze
+
       def self.optional
         %i(user project group collection classification subject medium organization translation)
+      end
+
+      def self.description_for(scope)
+        DESCRIPTIONS[scope.to_sym]
       end
     end
 
