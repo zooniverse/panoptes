@@ -1,19 +1,23 @@
 <header class="page-header" role="banner">
-  <h1>Authorize required</h1>
+  <h1>Authorization Required</h1>
 </header>
 
 <main role="main">
   <p class="h4">
-    Authorize <strong class="text-info"><%= @pre_auth.client.name %></strong> to use your account?
+    <strong class="text-info"><%= @pre_auth.client.name %></strong> wants to use your Zooniverse account.
   </p>
 
   <% if @pre_auth.scopes %>
-    <div id="oauth-permissions">
-      <p>This application will be able to:</p>
+    <div id="oauth-permissions" style="width: auto;">
+      <p>With your permission, this site/service will be able to:</p>
 
-      <ul class="text-info">
+      <ul style="list-style: none; padding-left: 0;">
         <% @pre_auth.scopes.each do |scope| %>
-          <li><%= t scope, scope: [:doorkeeper, :scopes] %></li>
+          <li style="margin-bottom: 1rem;">
+            <% if description = Doorkeeper::Panoptes::Scopes.description_for(scope) %>
+              <div><%= description %></div>
+            <% end %>
+          </li>
         <% end %>
       </ul>
     </div>
