@@ -29,14 +29,18 @@
 
   <%= content_tag :div, class: "form-group#{' has-error' if application.errors[:default_scope].present?}" do %>
     <h3>Application Scopes</h3>
-    <div class="row">
-      <% Doorkeeper::Panoptes::Scopes.optional.each do |scope| %>
-        <div class="col-sm-10">
-          <%= f.label scope, class: 'col-sm-2 control-label', for: "application_default_scope_#{scope}" %>
-          <%= check_box_tag "application[default_scope][]", scope, application.default_scope.include?(scope.to_s) %>
-        </div>
-      <% end %>
-    </div>
+    <% Doorkeeper::Panoptes::Scopes.optional.each do |scope| %>
+      <% input_id = "application_default_scope_#{scope}" %>
+      <div class="form-check mb-3">
+        <%= check_box_tag "application[default_scope][]", scope,
+                          application.default_scope.include?(scope.to_s),
+                          id: input_id, class: "form-check-input" %>
+        <%= f.label scope, for: input_id, class: "form-check-label font-weight-bold" %>
+        <% if description = Doorkeeper::Panoptes::Scopes.description_for(scope) %>
+          <small class="form-text text-muted"><%= description %></small>
+        <% end %>
+      </div>
+    <% end %>
   <% end %>
 
   <div class="form-group">
