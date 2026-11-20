@@ -147,12 +147,15 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   def destroy
+    hard_delete = hard_delete_requested?
+    raise Api::Unauthorized, 'Hard deletion requires administrator access' if hard_delete && !api_user.is_admin?
+
     super
 
     begin
       # use the memoized non-destroyed resource ids to setup a worker
       controlled_resources.each do |subject|
-        SubjectRemovalWorker.perform_async(subject.id)
+        SubjectRemovalWorker.perform_async(subject.id, nil, hard_delete)
       end
     rescue Timeout::Error => e
       Honeybadger.notify(e)
@@ -160,6 +163,15 @@ class Api::V1::SubjectsController < Api::ApiController
   end
 
   private
+
+  def hard_delete_requested?
+    case params[:hard_delete]
+    when nil, false, 'false', '0' then false
+    when true, 'true', '1' then true
+    else
+      raise Api::UnpermittedParameter, 'hard_delete must be true or false'
+    end
+  end
 
   def check_subject_limit
     if api_user.above_subject_limit?
